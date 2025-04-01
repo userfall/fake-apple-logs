@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Surveillance Logs</title>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: black;
+            color: lime;
+            padding: 20px;
+        }
+        #logs {
+            white-space: pre-line;
+            font-size: 18px;
+        }
+        #countdown {
+            font-size: 24px;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Apple Surveillance Logs</h1>
+    <div id="logs"></div>
+    <p id="countdown"></p>
+
+    <script>
+        const logs = [
+            "[INFO] Connected to Apple Surveillance Network...",
+            "[WARNING] Location Tracking Enabled...",
+            "[ALERT] Microphone Activated...",
+            "[INFO] Sending Data to Apple Servers...",
+            "[WARNING] Unusual Activity Detected..."
+        ];
+        
+        let index = 0;
+        function showLogs() {
+            if (index < logs.length) {
+                document.getElementById('logs').innerHTML += logs[index] + "\n";
+                index++;
+                setTimeout(showLogs, 2000);
+            } else {
+                startCountdown(30);
+            }
+        }
+        
+        function startCountdown(seconds) {
+            let counter = seconds;
+            const countdownElement = document.getElementById('countdown');
+            const interval = setInterval(() => {
+                countdownElement.textContent = `Apple va verrouiller votre appareil dans ${counter} secondes...`;
+                counter--;
+                if (counter < 0) {
+                    clearInterval(interval);
+                    document.body.innerHTML = "<h1 style='color:red;'>DISCONNECTED</h1>";
+                }
+            }, 1000);
+        }
+        
+        showLogs();
+    </script>
+</body>
+</html>
