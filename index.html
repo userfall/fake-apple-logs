@@ -85,29 +85,25 @@
         ];
         let terminalIndex = 0;
 
-        // Fonction pour démarrer l'attaque
         function fakeHacking() {
             document.getElementById("terminal").style.display = "block";
             showTerminalOutput();
             startLoadingBar();
             startCountdown();
-            playSound();
         }
 
-        // Afficher les lignes dans le terminal
         function showTerminalOutput() {
             if (terminalIndex < terminalContent.length) {
                 let terminal = document.getElementById("terminal");
                 terminal.innerHTML += terminalContent[terminalIndex] + "\n";
-                terminal.scrollTop = terminal.scrollHeight;
+                terminal.scrollTop = terminal.scrollHeight; // Défilement automatique
                 terminalIndex++;
-                setTimeout(showTerminalOutput, 1500); // Affichage des lignes une par une
+                setTimeout(showTerminalOutput, 1500); // Affiche les lignes une par une
             } else {
                 setTimeout(phoneShutDown, 2000); // Attente avant de simuler l'extinction
             }
         }
 
-        // Fonction de la barre de chargement
         function startLoadingBar() {
             let loadingBar = document.getElementById("loadingBar");
             let width = 0;
@@ -118,10 +114,9 @@
                     width++;
                     loadingBar.style.width = width + "%";
                 }
-            }, 50);
+            }, 50); // Le chargement se fait sur 5 secondes
         }
 
-        // Fonction de compte à rebours
         function startCountdown() {
             const countdownElement = document.getElementById('countdown');
             countdownElement.innerHTML = `Votre téléphone va s'éteindre dans ${countdownTime} secondes...`;
@@ -133,49 +128,3 @@
                     phoneShutDown();
                 }
             }, 1000);
-        }
-
-        // Extinction du téléphone et message de fin
-        function phoneShutDown() {
-            const blackoutElement = document.getElementById('blackout');
-            const countdownElement = document.getElementById('countdown');
-            countdownElement.style.display = 'none';
-            blackoutElement.style.display = 'block';
-            blackoutElement.innerHTML = "<h1>Téléphone éteint</h1><p>By Kabir</p>";
-        }
-
-        // Fonction pour jouer un son d'attaque
-        function playSound() {
-            const audio = new Audio('attack-sound.mp3'); // Assurez-vous d'avoir un fichier audio avec ce nom
-            audio.play();
-        }
-    </script>
-</head>
-<body>
-
-    <h1>⚠️ ATTENTION : PIRATAGE EN COURS ⚠️</h1>
-    <p><strong>Votre appareil est sous surveillance. Vos données sont compromises.</strong></p>
-    <p><strong>Cliquez sur le bouton ci-dessous pour voir les logs secrets et observer l'attaque en temps réel.</strong></p>
-
-    <a href="javascript:void(0);" class="button" onclick="fakeHacking()">Cliquez ici pour voir les logs secrets</a>
-
-    <!-- Terminal simulant l'attaque -->
-    <div id="terminal"></div>
-
-    <!-- Barre de chargement -->
-    <div class="loading-bar-container">
-        <div id="loadingBar" class="loading-bar"></div>
-    </div>
-
-    <!-- Compte à rebours avant extinction -->
-    <p id="countdown" class="countdown"></p>
-
-    <!-- Écran noir simulant l'extinction du téléphone -->
-    <div id="blackout" class="blackout"></div>
-
-    <footer>
-        <p>© 2025 Piège Apple. Tous droits réservés.</p>
-    </footer>
-
-</body>
-</html>
