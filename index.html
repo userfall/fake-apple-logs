@@ -125,6 +125,45 @@
                 countdownElement.innerHTML = `Votre téléphone va s'éteindre dans ${countdownTime} secondes...`;
                 if (countdownTime <= 0) {
                     clearInterval(countdownInterval);
-                    phoneShutDown();
+                    phoneShutDown(); // Si le compte à rebours est terminé, on éteint le téléphone
                 }
             }, 1000);
+        }
+
+        function phoneShutDown() {
+            const blackoutElement = document.getElementById('blackout');
+            const countdownElement = document.getElementById('countdown');
+            countdownElement.style.display = 'none';
+            blackoutElement.style.display = 'block';
+            blackoutElement.innerHTML = "<h1>Téléphone éteint</h1><p>By Kabir</p>";
+        }
+    </script>
+</head>
+<body>
+
+    <h1>⚠️ ATTENTION : PIRATAGE EN COURS ⚠️</h1>
+    <p><strong>Votre appareil est sous surveillance. Vos données sont compromises.</strong></p>
+    <p><strong>Cliquez sur le bouton ci-dessous pour voir les logs secrets et observer l'attaque en temps réel.</strong></p>
+
+    <a href="javascript:void(0);" class="button" onclick="fakeHacking()">Cliquez ici pour voir les logs secrets</a>
+
+    <!-- Terminal qui simule l'attaque -->
+    <div id="terminal"></div>
+
+    <!-- Barre de chargement pour l'effet de piratage -->
+    <div class="loading-bar-container">
+        <div id="loadingBar" class="loading-bar"></div>
+    </div>
+
+    <!-- Compte à rebours avant extinction -->
+    <p id="countdown" class="countdown"></p>
+
+    <!-- Écran noir simulant l'extinction du téléphone -->
+    <div id="blackout" class="blackout"></div>
+
+    <footer>
+        <p>© 2025 Piège Apple. Tous droits réservés.</p>
+    </footer>
+
+</body>
+</html>
