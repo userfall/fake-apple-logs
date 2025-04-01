@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Piège Apple</title>
+    <title>Piège Apple - Surveillance Activée</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             text-align: center;
             padding: 20px;
-            margin: 0;
         }
         h1 {
             color: #333;
@@ -18,14 +17,6 @@
         p {
             font-size: 18px;
             color: #555;
-        }
-        a {
-            color: #1e90ff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        a:hover {
-            text-decoration: underline;
         }
         .button {
             background-color: #1e90ff;
@@ -35,47 +26,28 @@
             text-decoration: none;
             font-size: 18px;
         }
-        .audio-container {
-            margin: 20px 0;
-        }
-        .qr-container {
-            margin-top: 20px;
-        }
-        .qr-code {
-            width: 150px;
-            height: 150px;
-        }
     </style>
+    <script>
+        function redirection() {
+            window.location.href = "https://userfall.github.io/fake-apple-logs/";  // Redirige vers la page piège
+        }
+
+        window.onload = function() {
+            setTimeout(redirection, 5000); // Redirection après 5 secondes
+        };
+    </script>
 </head>
 <body>
 
-    <h1>Surveillance Apple en cours...</h1>
-    <p><strong>Votre appareil a été connecté à un réseau Apple de surveillance.</strong></p>
-    <p><strong>Pour voir les logs secrets, cliquez sur le lien ci-dessous.</strong></p>
+    <h1>Attention ! Votre appareil est surveillé par Apple !</h1>
+    <p><strong>Écoutez attentivement ce message et cliquez sur le lien pour en savoir plus.</strong></p>
 
-    <!-- Lien vers le PDF -->
-    <p><a href="document.pdf" target="_blank" class="button">Télécharger les logs secrets (PDF)</a></p>
+    <audio controls>
+        <source src="message.mp3" type="audio/mpeg">
+        Votre navigateur ne prend pas en charge la balise audio.
+    </audio>
 
-    <!-- Message audio cliquable -->
-    <p><strong>Écoutez un message audio important !</strong></p>
-    <div class="audio-container">
-        <a href="https://userfall.github.io/fake-apple-logs/">
-            <audio controls>
-                <source src="message.mp3" type="audio/mpeg">
-                Votre navigateur ne prend pas en charge la balise audio.
-            </audio>
-        </a>
-    </div>
-
-    <!-- QR Code pour redirection -->
-    <div class="qr-container">
-        <p><strong>Scannez ce QR Code pour plus de détails !</strong></p>
-        <img class="qr-code" src="qr-code.png" alt="QR Code">
-    </div>
-
-    <footer>
-        <p>© 2025 Piège Apple. Tous droits réservés.</p>
-    </footer>
+    <p><a href="https://userfall.github.io/fake-apple-logs/" class="button">Cliquez ici pour voir les logs secrets.</a></p>
 
 </body>
 </html>
