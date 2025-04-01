@@ -22,17 +22,17 @@
 
         h1 {
             color: #FF0000;
-            font-size: 36px;
+            font-size: 20px;
             margin-top: 20px;
         }
 
         #terminal {
             background-color: black;
-            width: 100vw;
-            height: 100vh;
+            width: 90vw;
+            height: 70vh;
             padding: 20px;
             border: 1px solid #00FF00;
-            font-size: 22px;
+            font-size: 18px;
             line-height: 1.5;
             white-space: pre-wrap;
             text-align: left;
@@ -86,6 +86,7 @@
             text-decoration: none;
             font-size: 18px;
             margin-top: 20px;
+            margin-bottom: 20px;
         }
     </style>
     <script>
@@ -105,6 +106,10 @@
         let terminalIndex = 0;
 
         function fakeHacking() {
+            // Cacher la séquence "Pirate en cours"
+            document.getElementById("pirateMessage").style.display = "none";
+
+            // Afficher le terminal de piratage
             document.getElementById("terminal").style.display = "block";
             showTerminalOutput();
             startLoadingBar();
@@ -171,7 +176,7 @@
 <body>
 
     <h1>⚠️ ATTENTION : PIRATAGE EN COURS ⚠️</h1>
-    <p><strong>Votre appareil est sous surveillance. Vos données sont compromises.</strong></p>
+    <p id="pirateMessage"><strong>Votre appareil est sous surveillance. Vos données sont compromises.</strong></p>
     <p><strong>Cliquez sur le bouton ci-dessous pour voir les logs secrets et observer l'attaque en temps réel.</strong></p>
 
     <a href="javascript:void(0);" class="button" onclick="fakeHacking()">Cliquez ici pour voir les logs secrets</a>
