@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Piège Apple - Surveillance Activée</title>
+    <title>Pirate - Appareil Sous Surveillance</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             text-align: center;
             padding: 20px;
+            color: #333;
         }
         h1 {
-            color: #333;
+            color: #ff0000;
+            font-size: 24px;
         }
         p {
             font-size: 18px;
-            color: #555;
+            color: #333;
         }
         .button {
             background-color: #1e90ff;
@@ -25,29 +27,91 @@
             border-radius: 5px;
             text-decoration: none;
             font-size: 18px;
+            margin-top: 20px;
+        }
+        .countdown {
+            font-size: 24px;
+            color: #ff0000;
+            margin-top: 20px;
+        }
+        .blackout {
+            display: none;
+            background-color: black;
+            color: white;
+            height: 100vh;
+            width: 100vw;
+            position: absolute;
+            top: 0;
+            left: 0;
+            text-align: center;
+            padding-top: 20%;
+            z-index: 1000;
         }
     </style>
     <script>
-        function redirection() {
-            window.location.href = "https://userfall.github.io/fake-apple-logs/";  // Redirige vers la page piège
+        let countdownTime = 10; // 10 secondes de compte à rebours
+
+        function fakeHacking() {
+            // Simule l'effet de piratage avec une série de messages effrayants
+            alert("Alerte ! Votre appareil est sous surveillance !");
+            alert("Votre position a été suivie.");
+            alert("Microphone activé...");
+            
+            // Ajoute un effet de "bug" avec des alertes répétées
+            let counter = 0;
+            let interval = setInterval(function() {
+                counter++;
+                alert("Erreur critique ! Redémarrage imminent...");
+                if (counter >= 5) clearInterval(interval); // Arrêter après 5 alertes
+            }, 1000); // 1 seconde d'intervalle
+
+            // Démarre le compte à rebours avant extinction
+            startCountdown();
         }
 
-        window.onload = function() {
-            setTimeout(redirection, 5000); // Redirection après 5 secondes
-        };
+        function startCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            countdownElement.innerHTML = `Votre téléphone va s'éteindre dans ${countdownTime} secondes...`;
+            
+            const countdownInterval = setInterval(function() {
+                countdownTime--;
+                countdownElement.innerHTML = `Votre téléphone va s'éteindre dans ${countdownTime} secondes...`;
+                if (countdownTime <= 0) {
+                    clearInterval(countdownInterval);
+                    phoneShutDown();
+                }
+            }, 1000); // Met à jour toutes les secondes
+        }
+
+        function phoneShutDown() {
+            // Affiche le message "Téléphone éteint" et fait passer l'interface en noir
+            const blackoutElement = document.getElementById('blackout');
+            const countdownElement = document.getElementById('countdown');
+            
+            countdownElement.style.display = 'none'; // Cache le compte à rebours
+            blackoutElement.style.display = 'block'; // Affiche l'écran noir
+            blackoutElement.innerHTML = "<h1>Téléphone éteint</h1>"; // Affiche message de téléphone éteint
+        }
     </script>
 </head>
 <body>
 
-    <h1>Attention ! Votre appareil est surveillé par Apple !</h1>
-    <p><strong>Écoutez attentivement ce message et cliquez sur le lien pour en savoir plus.</strong></p>
+    <h1>⚠️ ATTENTION : PIRATAGE EN COURS ⚠️</h1>
+    <p><strong>Votre appareil est sous surveillance. Votre position et vos données sont collectées.</strong></p>
+    <p><strong>Écoutez attentivement ce message et cliquez sur le bouton pour en savoir plus.</strong></p>
 
-    <audio controls>
-        <source src="message.mp3" type="audio/mpeg">
-        Votre navigateur ne prend pas en charge la balise audio.
-    </audio>
+    <!-- Bouton pour déclencher la simulation de piratage -->
+    <a href="javascript:void(0);" class="button" onclick="fakeHacking()">Cliquez ici pour voir les logs secrets</a>
 
-    <p><a href="https://userfall.github.io/fake-apple-logs/" class="button">Cliquez ici pour voir les logs secrets.</a></p>
+    <!-- Compte à rebours avant extinction -->
+    <p id="countdown" class="countdown"></p>
+
+    <!-- Écran noir simulant l'extinction du téléphone -->
+    <div id="blackout" class="blackout"></div>
+
+    <footer>
+        <p>© 2025 Piège Apple. Tous droits réservés.</p>
+    </footer>
 
 </body>
 </html>
