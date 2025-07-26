@@ -1,343 +1,150 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>💀 Kabir Virus Simulation - Optimisé</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 Devine le nombre !</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    html, body {
-      margin: 0; padding: 0;
-      height: 100%;
-      background-color: black;
-      color: #00ff00;
-      font-family: monospace;
-      overflow: hidden;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      touch-action: manipulation;
-    }
-    #skull {
-      text-align: center;
-      color: red;
-      font-size: 26px;
-      margin-top: 10px;
-      animation: blink 0.7s infinite;
-      z-index: 3;
-      position: relative;
-      text-shadow: 0 0 8px red;
-      user-select: none;
-    }
-    #terminal {
-      padding: 20px;
-      white-space: pre-wrap;
-      font-size: 18px;
-      line-height: 1.6;
-      z-index: 2;
-      position: relative;
-      text-shadow: 0 0 6px #00ff00;
-      max-height: 70vh;
-      overflow-y: auto;
-      margin: 0 10px 20px 10px;
-      background: rgba(0,0,0,0.6);
-      border-radius: 6px;
-      user-select: text;
-    }
-    canvas {
-      position: fixed;
-      top: 0; left: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
-    }
-    #startBtn {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: black;
-      border: 3px solid red;
-      color: red;
-      font-size: 22px;
-      padding: 14px 24px;
-      z-index: 10;
-      cursor: pointer;
-      text-shadow: 0 0 8px red;
-      border-radius: 8px;
-      user-select: none;
-      touch-action: manipulation;
-      transition: background-color 0.3s ease;
-    }
-    #startBtn:hover, #startBtn:focus {
-      background-color: darkred;
-      outline: none;
-    }
-    #overlayFinal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: black;
-      color: red;
-      font-size: 30px;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-      flex-direction: column;
-      text-align: center;
-      font-family: monospace;
-      text-shadow: 0 0 10px red;
-      user-select: none;
-      padding: 20px;
-    }
-    #cameraContainer {
-      display: none;
+    body {
+      background-color: #111;
+      color: #0f0;
+      font-family: 'Press Start 2P', monospace;
+      display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 3;
-      background-color: rgba(0, 0, 0, 0.6);
+      padding: 40px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    input, button {
+      font-family: inherit;
+      font-size: 1rem;
       padding: 10px;
-      border: 2px solid red;
-      border-radius: 10px;
-    }
-    video {
-      border: 2px solid red;
-      box-shadow: 0 0 10px red;
-      width: 100%;
-      max-width: 360px;
-      height: auto;
-      filter: grayscale(1) contrast(2) brightness(0.6);
-      border-radius: 8px;
-      user-select: none;
-    }
-    #retryCameraBtn {
-      margin-top: 10px;
-      padding: 8px 16px;
-      font-family: monospace;
+      margin: 10px;
       background: black;
-      color: red;
-      border: 2px solid red;
-      cursor: pointer;
-      user-select: none;
-      border-radius: 6px;
-      transition: background-color 0.3s ease;
+      border: 2px solid #0f0;
+      color: #0f0;
+      border-radius: 5px;
+    }
+    .log {
+      margin-top: 30px;
+      width: 80%;
+      max-width: 600px;
+      height: 250px;
+      overflow-y: auto;
+      background: #000;
+      padding: 10px;
+      border: 2px solid #0f0;
+      white-space: pre-line;
+    }
+    .hidden {
       display: none;
     }
-    #retryCameraBtn:hover, #retryCameraBtn:focus {
-      background-color: darkred;
-      outline: none;
+    .firework {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: yellow;
+      border-radius: 50%;
+      animation: explode 1s ease-out forwards;
     }
-    #countdownTimer {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 100px;
-      font-weight: bold;
-      color: red;
-      text-shadow: 0 0 15px red;
-      user-select: none;
-      z-index: 15;
-      display: none;
-      animation: blink 1s infinite;
-      font-family: monospace;
+    @keyframes explode {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(5); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <div id="skull">💀💀💀 KABIR SYSTEM – ACCÈS NON AUTORISÉ 💀💀💀</div>
-  <canvas id="matrix"></canvas>
-  <div id="terminal"></div>
-  <div id="cameraContainer">
-    <video id="camera" autoplay playsinline muted></video>
-    <button id="retryCameraBtn" aria-label="Réessayer l'accès à la caméra">Réessayer caméra</button>
+  <h1>🎯 Devine le Nombre (1-100)</h1>
+  <div>
+    <input type="text" id="playerName" placeholder="Ton nom" required />
+    <button onclick="startGame()">Commencer</button>
   </div>
-  <div id="countdownTimer" aria-live="polite" aria-atomic="true"></div>
-  <button id="startBtn" aria-label="Démarrer la simulation">TOUCHER POUR DÉMARRER</button>
-  <div id="overlayFinal" role="alert" aria-live="assertive" aria-atomic="true">
-    🔥 SYSTEM DESTROYED 🔥<br>☠️ YOU ARE DEAD ☠️<br>💣 0xDEAD-FEED 💣
+  <div id="game" class="hidden">
+    <p id="feedback"></p>
+    <input type="number" id="guess" placeholder="Devine..." />
+    <button onclick="checkGuess()">Essayer</button>
+    <button onclick="resetGame()">Rejouer</button>
   </div>
-<script>
-  const terminal = document.getElementById("terminal");
-  const startBtn = document.getElementById("startBtn");
-  const overlayFinal = document.getElementById("overlayFinal");
-  const camera = document.getElementById("camera");
-  const cameraContainer = document.getElementById("cameraContainer");
-  const retryCameraBtn = document.getElementById("retryCameraBtn");
-  const countdownTimer = document.getElementById("countdownTimer");
+  <div class="log" id="log"></div>
 
-  let audioCtx = null;
-  let mediaStream = null;
+  <audio id="winSound" src="https://www.myinstants.com/media/sounds/stage-clear.mp3"></audio>
+  <audio id="failSound" src="https://www.myinstants.com/media/sounds/mario-death-sound.mp3"></audio>
 
-  const simulationData = {
-    "Navigateur": navigator.userAgent,
-    "Plateforme": navigator.platform,
-    "Langue": navigator.language,
-    "Résolution écran": screen.width + " x " + screen.height,
-    "Date locale": new Date().toLocaleString()
-  };
+  <script>
+    let secretNumber, attempts, player;
 
-  const lignes = [
-    "📡 [KABIR] Déploiement en cours...",
-    "🔓 Connexion au noyau système...",
-    "💾 Récupération des métadonnées...",
-    "🧨 Activation du module de capture...",
-    "☠️ Injecteur de payload en attente...",
-    "📤 Transfert vers serveur pirate kabir.darknet...",
-    ">>> exec(hack_user())",
-    ">>> deploy_payload('kabir_trojan')",
-    ">>> countdown_self_destruct(delay=5)",
-    "\n🧠 Données système détectées :"
-  ];
-
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  async function beep(freq = 800, duration = 150, type = 'square') {
-    if (!audioCtx) return;
-    try {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.frequency.value = freq;
-      osc.type = type;
-      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration / 1000);
-    } catch (e) {
-      // ignore
+    function logMessage(msg) {
+      const log = document.getElementById("log");
+      log.innerText += `> ${msg}\n`;
+      log.scrollTop = log.scrollHeight;
     }
-  }
 
-  async function typeLine(line, speed = 25) {
-    for (const char of line) {
-      terminal.innerHTML += char;
-      terminal.scrollTop = terminal.scrollHeight;
-      await sleep(speed);
+    function startGame() {
+      player = document.getElementById("playerName").value || "Joueur";
+      secretNumber = Math.floor(Math.random() * 100) + 1;
+      attempts = 0;
+      document.getElementById("game").classList.remove("hidden");
+      logMessage(`Bienvenue ${player} ! Essaie de deviner le nombre secret.`);
+      localStorage.setItem('lastPlayer', player);
     }
-    await beep(800, 120);
-    terminal.innerHTML += "\n";
-    terminal.scrollTop = terminal.scrollHeight;
-  }
 
-  async function simulateTerminal() {
-    for (const ligne of lignes) {
-      await typeLine(ligne);
-      await sleep(300);
-    }
-    for (const key in simulationData) {
-      await typeLine(`🟢 ${key} : ${simulationData[key]}`, 20);
-      await sleep(200);
-    }
-    await typeLine("🔴 Caméra activée - enregistrement en cours...");
-    cameraContainer.style.display = "flex";
-    await countdown(5);
-    await simulateCrash();
-  }
-
-  async function startCamera() {
-    retryCameraBtn.style.display = "none";
-    try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-      camera.srcObject = mediaStream;
-      return true;
-    } catch (e) {
-      await typeLine("❌ Échec de l'accès à la caméra ou permission refusée.");
-      retryCameraBtn.style.display = "block";
-      return false;
-    }
-  }
-
-  retryCameraBtn.addEventListener("click", async () => {
-    retryCameraBtn.style.display = "none";
-    await typeLine("🔄 Tentative de réactivation caméra...");
-    const ok = await startCamera();
-    if (ok) {
-      startBtn.style.display = "none";
-      simulateTerminal();
-      startMatrixAnimation();
-    }
-  });
-
-  async function countdown(seconds) {
-    countdownTimer.style.display = "block";
-    for (let i = seconds; i >= 1; i--) {
-      countdownTimer.textContent = i;
-      await beep(600 + (seconds - i) * 120, 350 - i * 40, 'sine');
-      await sleep(1000);
-    }
-    countdownTimer.style.display = "none";
-    await typeLine("💥 Initialisation formatage système...");
-  }
-
-  async function simulateCrash() {
-    for (let i = 0; i < 15; i++) {
-      await typeLine(`🧨 Suppression fichier ${Math.random().toString(36).substring(2)}.sys`);
-      await sleep(150);
-    }
-    await sleep(1000);
-    overlayFinal.style.display = "flex";
-  }
-
-  startBtn.addEventListener("click", async () => {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    const cameraOk = await startCamera();
-    if (cameraOk) {
-      startBtn.style.display = "none";
-      simulateTerminal();
-      startMatrixAnimation();
-    } else {
-      await typeLine("❗ Autorisation caméra requise pour continuer.");
-    }
-  });
-
-  // Matrix animation
-  const canvas = document.getElementById("matrix");
-  const ctx = canvas.getContext("2d");
-  let width = canvas.width = window.innerWidth;
-  let height = canvas.height = window.innerHeight;
-  let cols = Math.floor(width / 18);
-  let drops = new Array(cols).fill(1);
-  const chars = "01☠@#$%".split("");
-
-  function drawMatrix() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.07)";
-    ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = "#0F0";
-    ctx.font = "18px monospace";
-    for (let i = 0; i < cols; i++) {
-      const text = chars[Math.floor(Math.random() * chars.length)];
-      ctx.fillText(text, i * 18, drops[i] * 18);
-      if (drops[i] * 18 > height || Math.random() > 0.975) {
-        drops[i] = 0;
+    function showFireworks() {
+      for (let i = 0; i < 30; i++) {
+        const f = document.createElement("div");
+        f.className = "firework";
+        f.style.left = `${Math.random() * 100}%`;
+        f.style.top = `${Math.random() * 100}%`;
+        f.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        document.body.appendChild(f);
+        setTimeout(() => f.remove(), 1000);
       }
-      drops[i]++;
     }
-  }
 
-  let matrixInterval = null;
-  function startMatrixAnimation() {
-    if (matrixInterval) clearInterval(matrixInterval);
-    matrixInterval = setInterval(drawMatrix, 33);
-  }
+    function checkGuess() {
+      const guess = parseInt(document.getElementById("guess").value);
+      attempts++;
 
-  window.addEventListener("resize", () => {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-    cols = Math.floor(width / 18);
-    drops = new Array(cols).fill(1);
-  });
+      if (isNaN(guess) || guess < 1 || guess > 100) {
+        logMessage("Entre un nombre valide entre 1 et 100.");
+        return;
+      }
 
-</script>
+      if (guess === secretNumber) {
+        document.getElementById("feedback").innerText = `🎉 Bravo ${player} ! Trouvé en ${attempts} essais.`;
+        document.getElementById("winSound").play();
+        logMessage(`✅ ${player} a trouvé le bon nombre en ${attempts} tentatives !`);
+        localStorage.setItem(`score_${player}`, Math.min(attempts, getBestScore(player)));
+        showFireworks();
+      } else if (guess < secretNumber) {
+        document.getElementById("feedback").innerText = "📉 Trop petit !";
+        logMessage("Trop petit...");
+        document.getElementById("failSound").play();
+      } else {
+        document.getElementById("feedback").innerText = "📈 Trop grand !";
+        logMessage("Trop grand...");
+        document.getElementById("failSound").play();
+      }
+    }
 
+    function getBestScore(player) {
+      return parseInt(localStorage.getItem(`score_${player}`)) || 999;
+    }
+
+    function resetGame() {
+      document.getElementById("feedback").innerText = "";
+      document.getElementById("guess").value = "";
+      document.getElementById("log").innerText = "";
+      startGame();
+    }
+
+    window.onload = () => {
+      const last = localStorage.getItem('lastPlayer');
+      if (last) document.getElementById('playerName').value = last;
+    }
+  </script>
 </body>
 </html>
