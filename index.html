@@ -1,174 +1,559 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jeu de Devinette - Version Ultime</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #222831, #393e46);
-      color: #eeeeee;
-      text-align: center;
-      padding: 30px;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🎯 Jeu Devinette Ultime</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  /* Thèmes */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin:0; padding:0; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background: linear-gradient(135deg, #222831, #393e46);
+    color: #eeeeee;
+    transition: background 0.8s, color 0.8s;
+  }
+  body.theme-light {
+    background: #f4f4f9;
+    color: #222;
+  }
+  body.theme-retro {
+    background: #000000;
+    color: #39ff14;
+    font-family: 'Press Start 2P', cursive;
+  }
+  body.theme-neon {
+    background: #0f0f17;
+    color: #00ffff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+  }
+
+  /* Container général */
+  #app {
+    max-width: 480px;
+    width: 90vw;
+    background: rgba(0, 173, 181, 0.85);
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,173,181,0.7);
+    padding: 20px 25px;
+    box-sizing: border-box;
+  }
+
+  /* Accueil */
+  #welcome {
+    display: flex; flex-direction: column; align-items:center; text-align:center;
+    animation: fadeIn 1s ease forwards;
+  }
+  #welcome h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+  }
+  #welcome p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.4;
+  }
+  #welcome button, #welcome select {
+    cursor: pointer;
+    font-size: 1.1rem;
+    border:none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    margin: 8px;
+    background: #222831;
+    color: #eeeeee;
+    box-shadow: 0 0 10px #00adb5;
+    transition: background 0.3s ease;
+  }
+  #welcome button:hover, #welcome select:hover {
+    background: #00adb5;
+    color: #222831;
+  }
+
+  /* Jeu */
+  #game {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+  }
+  #game h2 {
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+  }
+  #game #info {
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  #game input[type=number] {
+    padding: 12px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    border:none;
+    width: 60%;
+    max-width: 200px;
+    text-align: center;
+  }
+  #game button {
+    margin-top: 15px;
+    background: #222831;
+    color: #eee;
+    border:none;
+    border-radius: 12px;
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 0 10px #00adb5;
+    transition: background 0.3s ease;
+  }
+  #game button:hover {
+    background: #00adb5;
+    color: #222831;
+  }
+  #feedback {
+    margin-top: 15px;
+    min-height: 40px;
+    font-size: 1.3rem;
+  }
+
+  /* Stats */
+  #stats {
+    margin-top: 20px;
+    background: #eeeeee;
+    color: #222831;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  /* Timer */
+  #timer {
+    font-weight: bold;
+    font-size: 1.3rem;
+    margin-top: 10px;
+  }
+
+  /* Son */
+  #controls {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  #controls button {
+    font-size: 1rem;
+    padding: 8px 16px;
+    border-radius: 12px;
+    border:none;
+    cursor: pointer;
+    background: #222831;
+    color: #eee;
+    box-shadow: 0 0 8px #00adb5;
+    transition: background 0.3s ease;
+  }
+  #controls button:hover {
+    background: #00adb5;
+    color: #222831;
+  }
+
+  /* Confettis canvas */
+  #confettiCanvas {
+    position: fixed;
+    pointer-events: none;
+    top:0; left:0;
+    width: 100vw; height: 100vh;
+    z-index: 9999;
+  }
+
+  @keyframes fadeIn {
+    from {opacity:0;}
+    to {opacity:1;}
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    #app {
+      width: 95vw;
+      padding: 15px 20px;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background-color: #00adb5;
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 0 30px rgba(0, 173, 181, 0.5);
+    #game input[type=number] {
+      width: 80%;
     }
-    input, button {
-      padding: 12px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
-      margin: 10px;
-    }
-    button {
-      background-color: #393e46;
-      color: white;
-      cursor: pointer;
-    }
-    .hidden {
-      display: none;
-    }
-    #feedback {
-      font-size: 1.4em;
-      margin: 20px 0;
-    }
-    #log {
-      text-align: left;
-      margin-top: 20px;
-      max-height: 200px;
-      overflow-y: auto;
-      background-color: #eeeeee;
-      color: black;
-      padding: 10px;
-      border-radius: 10px;
-    }
-    #highscores {
-      margin-top: 20px;
-      background-color: #eeeeee;
-      color: black;
-      padding: 10px;
-      border-radius: 10px;
-    }
-  </style>
+  }
+</style>
 </head>
+<body class="theme-dark">
 
-<body>
-  <div class="container">
-    <h1>🎯 Jeu de Devinette 🎯</h1>
-    <p>Devine le nombre secret !</p>
-    <input type="text" id="playerName" placeholder="Entre ton prénom" />
-    <button onclick="startGame()">Commencer</button>
+<div id="app">
+  <!-- Accueil -->
+  <section id="welcome">
+    <h1>🎯 Bienvenue au Jeu Devinette Ultime !</h1>
+    <p>Devine un nombre secret entre 1 et un maximum qui augmente à chaque niveau.<br>
+    Tu as <strong>30 secondes</strong> pour chaque niveau.<br>
+    Après 5 essais ratés, un indice te sera donné.</p>
 
-    <div id="game" class="hidden">
-      <p id="levelInfo">Niveau : 1</p>
-      <p id="attemptInfo">Tentatives : 0</p>
-      <input type="number" id="guess" placeholder="1 - 20" />
-      <button onclick="checkGuess()">Valider</button>
-      <p id="feedback"></p>
-      <div id="log"></div>
+    <label for="themeSelector">Choisis ton thème :</label>
+    <select id="themeSelector" aria-label="Choix du thème graphique">
+      <option value="dark" selected>Sombre</option>
+      <option value="light">Clair</option>
+      <option value="retro">Rétro Pixel</option>
+      <option value="neon">Néon</option>
+    </select>
+
+    <button id="startBtn">Jouer</button>
+  </section>
+
+  <!-- Jeu -->
+  <section id="game" aria-live="polite" aria-atomic="true" aria-relevant="additions removals">
+    <h2>Devine le nombre !</h2>
+    <div id="info">Niveau : 1 | Tentatives : 0</div>
+    <input type="number" id="guessInput" placeholder="Entre un nombre" min="1" autocomplete="off" />
+    <button id="submitGuessBtn">Valider</button>
+    <div id="feedback" aria-live="assertive"></div>
+    <div id="timer" aria-label="Temps restant"></div>
+
+    <div id="controls">
+      <button id="muteMusicBtn">🎵 Musique : On</button>
+      <button id="muteSoundsBtn">🔈 Sons : On</button>
     </div>
 
-    <div id="highscores">
-      <h3>🏆 Meilleurs scores</h3>
-      <ul id="scoreList"></ul>
+    <div id="stats" aria-label="Statistiques du joueur" role="region" tabindex="0">
+      <h3>Statistiques</h3>
+      <p>Parties jouées : <span id="gamesPlayed">0</span></p>
+      <p>Meilleur niveau : <span id="bestLevel">0</span></p>
+      <p>Moyenne tentatives : <span id="avgAttempts">0</span></p>
     </div>
-  </div>
+  </section>
+</div>
 
-  <!-- Bruitage de victoire -->
-  <audio id="winSound" src="https://www.myinstants.com/media/sounds/stage-complete.mp3"></audio>
-  <!-- Musique de fond -->
-  <audio id="bgMusic" src="https://files.catbox.moe/uc4kgx.mp3" loop autoplay></audio>
+<canvas id="confettiCanvas"></canvas>
 
-  <script>
-    let secretNumber;
-    let attempts = 0;
-    let player = "";
-    let level = 1;
+<!-- Sons -->
+<audio id="audioMusic" loop src="https://files.catbox.moe/uc4kgx.mp3" preload="auto"></audio>
+<audio id="audioClick" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3" preload="auto"></audio>
+<audio id="audioError" src="https://freesound.org/data/previews/109/109662_945474-lq.mp3" preload="auto"></audio>
+<audio id="audioWin" src="https://freesound.org/data/previews/276/276033_5121236-lq.mp3" preload="auto"></audio>
+<audio id="audioHint" src="https://freesound.org/data/previews/66/66238_634166-lq.mp3" preload="auto"></audio>
 
-    function getMaxRange(level) {
-      return 20 + (level - 1) * 30;
+<script>
+(() => {
+  // Éléments DOM
+  const welcomeSection = document.getElementById('welcome');
+  const gameSection = document.getElementById('game');
+  const startBtn = document.getElementById('startBtn');
+  const themeSelector = document.getElementById('themeSelector');
+  const guessInput = document.getElementById('guessInput');
+  const submitGuessBtn = document.getElementById('submitGuessBtn');
+  const feedback = document.getElementById('feedback');
+  const info = document.getElementById('info');
+  const timerDisplay = document.getElementById('timer');
+  const gamesPlayedSpan = document.getElementById('gamesPlayed');
+  const bestLevelSpan = document.getElementById('bestLevel');
+  const avgAttemptsSpan = document.getElementById('avgAttempts');
+  const muteMusicBtn = document.getElementById('muteMusicBtn');
+  const muteSoundsBtn = document.getElementById('muteSoundsBtn');
+  const confettiCanvas = document.getElementById('confettiCanvas');
+  const confettiCtx = confettiCanvas.getContext('2d');
+
+  // Son
+  const audioMusic = document.getElementById('audioMusic');
+  const audioClick = document.getElementById('audioClick');
+  const audioError = document.getElementById('audioError');
+  const audioWin = document.getElementById('audioWin');
+  const audioHint = document.getElementById('audioHint');
+
+  // Variables jeu
+  let level = 1;
+  let secretNumber = 0;
+  let attempts = 0;
+  let timer = 30; // secondes
+  let timerId = null;
+  let gameActive = false;
+  let hintGiven = false;
+
+  // Statistiques
+  let gamesPlayed = 0;
+  let totalAttempts = 0;
+  let bestLevel = 0;
+
+  // Confettis
+  const confettis = [];
+
+  // Configuration thèmes
+  const themes = {
+    dark: 'theme-dark',
+    light: 'theme-light',
+    retro: 'theme-retro',
+    neon: 'theme-neon'
+  };
+
+  // Setup initial
+  function setup() {
+    loadStats();
+    updateStats();
+    applyTheme(themeSelector.value);
+    audioMusic.volume = 0.3;
+    audioMusic.play().catch(()=>{});
+  }
+
+  // Gestion thème
+  function applyTheme(themeKey) {
+    document.body.className = themes[themeKey] || themes.dark;
+  }
+
+  themeSelector.addEventListener('change', (e) => {
+    applyTheme(e.target.value);
+  });
+
+  // Commencer partie
+  startBtn.addEventListener('click', () => {
+    playSound(audioClick);
+    level = 1;
+    startLevel();
+    welcomeSection.style.display = 'none';
+    gameSection.style.display = 'flex';
+    guessInput.focus();
+    gameActive = true;
+  });
+
+  // Calcul max selon niveau
+  function getMaxNumber(level) {
+    return 20 + (level - 1) * 30;
+  }
+
+  // Mise à jour infos jeu
+  function updateInfo() {
+    info.textContent = `Niveau : ${level} | Tentatives : ${attempts} | Devine entre 1 et ${getMaxNumber(level)}`;
+  }
+
+  // Démarrer un niveau
+  function startLevel() {
+    secretNumber = Math.floor(Math.random() * getMaxNumber(level)) + 1;
+    attempts = 0;
+    hintGiven = false;
+    timer = 30;
+    updateInfo();
+    feedback.textContent = '';
+    guessInput.value = '';
+    guessInput.placeholder = `1 - ${getMaxNumber(level)}`;
+    updateTimerDisplay();
+    clearInterval(timerId);
+    timerId = setInterval(countDown, 1000);
+  }
+
+  // Compte à rebours
+  function countDown() {
+    timer--;
+    updateTimerDisplay();
+    if (timer <= 0) {
+      clearInterval(timerId);
+      endGame(false, '⏰ Temps écoulé ! Tu as perdu.');
     }
+  }
 
-    function startGame() {
-      player = document.getElementById("playerName").value || "Joueur";
-      secretNumber = Math.floor(Math.random() * getMaxRange(level)) + 1;
-      attempts = 0;
-      document.getElementById("game").classList.remove("hidden");
-      document.getElementById("guess").placeholder = `1 - ${getMaxRange(level)}`;
-      document.getElementById("feedback").innerText = "";
-      document.getElementById("log").innerHTML = "";
-      updateInfo();
-      document.getElementById("playerName").value = player;
-      logMessage(`🎮 Niveau ${level} | Devine un nombre entre 1 et ${getMaxRange(level)}`);
-      localStorage.setItem("lastPlayer", player);
+  // Afficher timer
+  function updateTimerDisplay() {
+    timerDisplay.textContent = `⏳ Temps restant : ${timer}s`;
+  }
+
+  // Gestion soumission devinette
+  submitGuessBtn.addEventListener('click', () => {
+    if (!gameActive) return;
+    const guess = parseInt(guessInput.value);
+    if (!guess || guess < 1 || guess > getMaxNumber(level)) {
+      feedback.textContent = `❗ Entre un nombre entre 1 et ${getMaxNumber(level)}.`;
+      playSound(audioError);
+      return;
     }
+    attempts++;
+    updateInfo();
 
-    function updateInfo() {
-      document.getElementById("levelInfo").innerText = `Niveau : ${level}`;
-      document.getElementById("attemptInfo").innerText = `Tentatives : ${attempts}`;
-    }
-
-    function logMessage(message) {
-      const log = document.getElementById("log");
-      log.innerHTML += `<p>> ${message}</p>`;
-      log.scrollTop = log.scrollHeight;
-    }
-
-    function checkGuess() {
-      const guess = Number(document.getElementById("guess").value);
-      if (!guess || guess < 1 || guess > getMaxRange(level)) {
-        document.getElementById("feedback").innerText = `❗ Entrez un nombre entre 1 et ${getMaxRange(level)}`;
-        return;
-      }
-
-      attempts++;
-      updateInfo();
-
-      if (guess === secretNumber) {
-        document.getElementById("feedback").innerText = `✅ Bravo ${player}, tu as trouvé en ${attempts} tentatives !`;
-        logMessage(`✅ Bien joué ${player} ! Tu passes au niveau ${level + 1}`);
-        saveHighscore(player, level);
-        document.getElementById("winSound").play();
-        level++;
-        setTimeout(startGame, 2500);
-      } else if (guess < secretNumber) {
-        document.getElementById("feedback").innerText = "🔼 Trop petit !";
+    if (guess === secretNumber) {
+      playSound(audioWin);
+      feedback.textContent = `✅ Bravo ! Tu as trouvé le nombre ${secretNumber} en ${attempts} essais.`;
+      confettiEffect(150);
+      saveStats(true);
+      level++;
+      gameActive = false;
+      clearInterval(timerId);
+      setTimeout(() => {
+        startLevel();
+        gameActive = true;
+        guessInput.focus();
+        feedback.textContent = '';
+      }, 3500);
+    } else {
+      if (guess < secretNumber) {
+        feedback.textContent = '🔼 Trop petit !';
       } else {
-        document.getElementById("feedback").innerText = "🔽 Trop grand !";
+        feedback.textContent = '🔽 Trop grand !';
+      }
+      playSound(audioError);
+
+      // Donne un indice après 5 essais ratés et si pas encore donné
+      if (attempts >= 5 && !hintGiven) {
+        giveHint();
       }
     }
+  });
 
-    function saveHighscore(name, score) {
-      let scores = JSON.parse(localStorage.getItem("highscores")) || [];
-      scores.push({ name, score });
-      scores.sort((a, b) => b.score - a.score);
-      scores = scores.slice(0, 5);
-      localStorage.setItem("highscores", JSON.stringify(scores));
-      updateHighscores();
+  // Indice
+  function giveHint() {
+    hintGiven = true;
+    let hint = '';
+    if (secretNumber % 2 === 0) {
+      hint = 'Le nombre est pair.';
+    } else {
+      hint = 'Le nombre est impair.';
     }
+    // Plus d’indices possibles
+    if (secretNumber % 3 === 0) hint += ' Il est multiple de 3.';
+    if (secretNumber % 5 === 0) hint += ' Il est multiple de 5.';
 
-    function updateHighscores() {
-      const scoreList = document.getElementById("scoreList");
-      const scores = JSON.parse(localStorage.getItem("highscores")) || [];
-      scoreList.innerHTML = scores.map(s => `<li>${s.name} - Niveau ${s.score}</li>`).join("");
+    feedback.textContent += ` 💡 Indice : ${hint}`;
+    playSound(audioHint);
+  }
+
+  // Fin de partie
+  function endGame(win, msg) {
+    gameActive = false;
+    clearInterval(timerId);
+    feedback.textContent = msg;
+    saveStats(false);
+    setTimeout(() => {
+      welcomeSection.style.display = 'flex';
+      gameSection.style.display = 'none';
+    }, 3500);
+  }
+
+  // Sons
+  function playSound(audio) {
+    if (!audio) return;
+    if (!audio.muted) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
     }
+  }
 
-    window.onload = function () {
-      const savedPlayer = localStorage.getItem("lastPlayer");
-      if (savedPlayer) {
-        document.getElementById("playerName").value = savedPlayer;
+  // Stats locales
+  function loadStats() {
+    gamesPlayed = parseInt(localStorage.getItem('gamesPlayed')) || 0;
+    totalAttempts = parseInt(localStorage.getItem('totalAttempts')) || 0;
+    bestLevel = parseInt(localStorage.getItem('bestLevel')) || 0;
+  }
+  function saveStats(win) {
+    if (win) {
+      gamesPlayed++;
+      totalAttempts += attempts;
+      if (level > bestLevel) bestLevel = level;
+    }
+    localStorage.setItem('gamesPlayed', gamesPlayed);
+    localStorage.setItem('totalAttempts', totalAttempts);
+    localStorage.setItem('bestLevel', bestLevel);
+    updateStats();
+  }
+  function updateStats() {
+    gamesPlayedSpan.textContent = gamesPlayed;
+    bestLevelSpan.textContent = bestLevel;
+    avgAttemptsSpan.textContent = gamesPlayed ? (totalAttempts / gamesPlayed).toFixed(2) : '0';
+  }
+
+  // Confettis
+  class Confetti {
+    constructor(x, y, color) {
+      this.x = x;
+      this.y = y;
+      this.color = color;
+      this.size = Math.random() * 6 + 4;
+      this.gravity = 0.3;
+      this.velocity = {
+        x: (Math.random() - 0.5) * 7,
+        y: Math.random() * -10 - 5,
+      };
+      this.opacity = 1;
+      this.damping = 0.97;
+      this.tilt = Math.random() * 10 - 5;
+      this.tiltAngle = 0;
+      this.tiltAngleSpeed = Math.random() * 0.1 + 0.05;
+    }
+    update() {
+      this.velocity.y += this.gravity;
+      this.x += this.velocity.x;
+      this.y += this.velocity.y;
+      this.tiltAngle += this.tiltAngleSpeed;
+      this.tilt = Math.sin(this.tiltAngle) * 15;
+      this.opacity -= 0.02;
+      this.size *= 0.98;
+    }
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.lineWidth = this.size / 2;
+      ctx.strokeStyle = `rgba(${this.color},${this.opacity})`;
+      ctx.moveTo(this.x + this.tilt + this.size / 2, this.y);
+      ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.size / 2);
+      ctx.stroke();
+    }
+  }
+  function confettiEffect(amount) {
+    const colors = ['255,0,0', '0,255,0', '0,0,255', '255,255,0', '0,255,255', '255,0,255'];
+    for (let i=0; i<amount; i++) {
+      confettis.push(new Confetti(Math.random()*confettiCanvas.width, Math.random()*confettiCanvas.height/2, colors[Math.floor(Math.random()*colors.length)]));
+    }
+    if (!confettiRunning) {
+      confettiRunning = true;
+      requestAnimationFrame(runConfetti);
+    }
+  }
+  let confettiRunning = false;
+  function runConfetti() {
+    confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    for (let i = confettis.length - 1; i >= 0; i--) {
+      const c = confettis[i];
+      c.update();
+      c.draw(confettiCtx);
+      if (c.opacity <= 0 || c.size <= 0.5) {
+        confettis.splice(i,1);
       }
-      updateHighscores();
-    };
-  </script>
+    }
+    if (confettis.length > 0) {
+      requestAnimationFrame(runConfetti);
+    } else {
+      confettiRunning = false;
+    }
+  }
+
+  // Contrôle musiques et sons
+  muteMusicBtn.addEventListener('click', () => {
+    audioMusic.muted = !audioMusic.muted;
+    muteMusicBtn.textContent = audioMusic.muted ? '🎵 Musique : Off' : '🎵 Musique : On';
+  });
+  muteSoundsBtn.addEventListener('click', () => {
+    [audioClick, audioError, audioWin, audioHint].forEach(a => a.muted = !a.muted);
+    muteSoundsBtn.textContent = audioClick.muted ? '🔈 Sons : Off' : '🔈 Sons : On';
+  });
+
+  // Ajuster taille canvas confettis
+  function resizeCanvas() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // Initialisation
+  setup();
+
+  // Accessibilité : Entrée au clavier sur input
+  guessInput.addEventListener('keypress', e => {
+    if (e.key === 'Enter') {
+      submitGuessBtn.click();
+    }
+  });
+
+})();
+</script>
 </body>
-
 </html>
