@@ -3,418 +3,557 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mini Shooter 3D Web</title>
+<title>🎯 Jeu Devinette Ultime</title>
 <style>
-  html, body {
-    margin: 0; padding: 0; overflow: hidden; height: 100%;
-    background: #111;
-    font-family: Arial, sans-serif;
-    color: white;
-    user-select:none;
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  /* Thèmes */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin:0; padding:0; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background: linear-gradient(135deg, #222831, #393e46);
+    color: #eeeeee;
+    transition: background 0.8s, color 0.8s;
   }
-  #hud {
-    position: fixed;
-    top: 10px; left: 10px;
-    font-size: 18px;
-    background: rgba(0,0,0,0.5);
-    padding: 10px 15px;
+  body.theme-light {
+    background: #f4f4f9;
+    color: #222;
+  }
+  body.theme-retro {
+    background: #000000;
+    color: #39ff14;
+    font-family: 'Press Start 2P', cursive;
+  }
+  body.theme-neon {
+    background: #0f0f17;
+    color: #00ffff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+  }
+
+  /* Container général */
+  #app {
+    max-width: 480px;
+    width: 90vw;
+    background: rgba(0, 173, 181, 0.85);
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,173,181,0.7);
+    padding: 20px 25px;
+    box-sizing: border-box;
+  }
+
+  /* Accueil */
+  #welcome {
+    display: flex; flex-direction: column; align-items:center; text-align:center;
+    animation: fadeIn 1s ease forwards;
+  }
+  #welcome h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+  }
+  #welcome p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.4;
+  }
+  #welcome button, #welcome select {
+    cursor: pointer;
+    font-size: 1.1rem;
+    border:none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    margin: 8px;
+    background: #222831;
+    color: #eeeeee;
+    box-shadow: 0 0 10px #00adb5;
+    transition: background 0.3s ease;
+  }
+  #welcome button:hover, #welcome select:hover {
+    background: #00adb5;
+    color: #222831;
+  }
+
+  /* Jeu */
+  #game {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+  }
+  #game h2 {
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+  }
+  #game #info {
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  #game input[type=number] {
+    padding: 12px;
+    font-size: 1.2rem;
     border-radius: 10px;
-    z-index: 10;
-    width: 180px;
-  }
-  #instructions {
-    position: fixed;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 14px;
-    background: rgba(0,0,0,0.7);
-    padding: 8px 12px;
-    border-radius: 8px;
-    max-width: 90vw;
+    border:none;
+    width: 60%;
+    max-width: 200px;
     text-align: center;
-    user-select:none;
   }
-  canvas {
-    display: block;
+  #game button {
+    margin-top: 15px;
+    background: #222831;
+    color: #eee;
+    border:none;
+    border-radius: 12px;
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 0 10px #00adb5;
+    transition: background 0.3s ease;
+  }
+  #game button:hover {
+    background: #00adb5;
+    color: #222831;
+  }
+  #feedback {
+    margin-top: 15px;
+    min-height: 40px;
+    font-size: 1.3rem;
+  }
+
+  /* Stats */
+  #stats {
+    margin-top: 20px;
+    background: #eeeeee;
+    color: #222831;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  /* Timer */
+  #timer {
+    font-weight: bold;
+    font-size: 1.3rem;
+    margin-top: 10px;
+  }
+
+  /* Son */
+  #controls {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  #controls button {
+    font-size: 1rem;
+    padding: 8px 16px;
+    border-radius: 12px;
+    border:none;
+    cursor: pointer;
+    background: #222831;
+    color: #eee;
+    box-shadow: 0 0 8px #00adb5;
+    transition: background 0.3s ease;
+  }
+  #controls button:hover {
+    background: #00adb5;
+    color: #222831;
+  }
+
+  /* Confettis canvas */
+  #confettiCanvas {
+    position: fixed;
+    pointer-events: none;
+    top:0; left:0;
+    width: 100vw; height: 100vh;
+    z-index: 9999;
+  }
+
+  @keyframes fadeIn {
+    from {opacity:0;}
+    to {opacity:1;}
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    #app {
+      width: 95vw;
+      padding: 15px 20px;
+    }
+    #game input[type=number] {
+      width: 80%;
+    }
   }
 </style>
 </head>
-<body>
+<body class="theme-dark">
 
-<div id="hud">
-  <div>Vie : <span id="health">100</span></div>
-  <div>Munitions : <span id="ammo">30</span></div>
-  <div>Ennemis tués : <span id="score">0</span></div>
-</div>
-<div id="instructions">
-  WASD = Déplacer, Souris = Regarder, Clic ou barre Espace = Tirer
+<div id="app">
+  <!-- Accueil -->
+  <section id="welcome">
+    <h1>🎯 Bienvenue au Jeu Devinette Ultime !</h1>
+    <p>Devine un nombre secret entre 1 et un maximum qui augmente à chaque niveau.<br>
+    Tu as <strong>30 secondes</strong> pour chaque niveau.<br>
+    Après 5 essais ratés, un indice te sera donné.</p>
+
+    <label for="themeSelector">Choisis ton thème :</label>
+    <select id="themeSelector" aria-label="Choix du thème graphique">
+      <option value="dark" selected>Sombre</option>
+      <option value="light">Clair</option>
+      <option value="retro">Rétro Pixel</option>
+      <option value="neon">Néon</option>
+    </select>
+
+    <button id="startBtn">Jouer</button>
+  </section>
+
+  <!-- Jeu -->
+  <section id="game" aria-live="polite" aria-atomic="true" aria-relevant="additions removals">
+    <h2>Devine le nombre !</h2>
+    <div id="info">Niveau : 1 | Tentatives : 0</div>
+    <input type="number" id="guessInput" placeholder="Entre un nombre" min="1" autocomplete="off" />
+    <button id="submitGuessBtn">Valider</button>
+    <div id="feedback" aria-live="assertive"></div>
+    <div id="timer" aria-label="Temps restant"></div>
+
+    <div id="controls">
+      <button id="muteMusicBtn">🎵 Musique : On</button>
+      <button id="muteSoundsBtn">🔈 Sons : On</button>
+    </div>
+
+    <div id="stats" aria-label="Statistiques du joueur" role="region" tabindex="0">
+      <h3>Statistiques</h3>
+      <p>Parties jouées : <span id="gamesPlayed">0</span></p>
+      <p>Meilleur niveau : <span id="bestLevel">0</span></p>
+      <p>Moyenne tentatives : <span id="avgAttempts">0</span></p>
+    </div>
+  </section>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/controls/PointerLockControls.js"></script>
+<canvas id="confettiCanvas"></canvas>
+
+<!-- Sons -->
+<audio id="audioMusic" loop src="https://files.catbox.moe/uc4kgx.mp3" preload="auto"></audio>
+<audio id="audioClick" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3" preload="auto"></audio>
+<audio id="audioError" src="https://freesound.org/data/previews/109/109662_945474-lq.mp3" preload="auto"></audio>
+<audio id="audioWin" src="https://freesound.org/data/previews/276/276033_5121236-lq.mp3" preload="auto"></audio>
+<audio id="audioHint" src="https://freesound.org/data/previews/66/66238_634166-lq.mp3" preload="auto"></audio>
 
 <script>
 (() => {
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x111111);
+  // Éléments DOM
+  const welcomeSection = document.getElementById('welcome');
+  const gameSection = document.getElementById('game');
+  const startBtn = document.getElementById('startBtn');
+  const themeSelector = document.getElementById('themeSelector');
+  const guessInput = document.getElementById('guessInput');
+  const submitGuessBtn = document.getElementById('submitGuessBtn');
+  const feedback = document.getElementById('feedback');
+  const info = document.getElementById('info');
+  const timerDisplay = document.getElementById('timer');
+  const gamesPlayedSpan = document.getElementById('gamesPlayed');
+  const bestLevelSpan = document.getElementById('bestLevel');
+  const avgAttemptsSpan = document.getElementById('avgAttempts');
+  const muteMusicBtn = document.getElementById('muteMusicBtn');
+  const muteSoundsBtn = document.getElementById('muteSoundsBtn');
+  const confettiCanvas = document.getElementById('confettiCanvas');
+  const confettiCtx = confettiCanvas.getContext('2d');
 
-  // Camera setup
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-
-  // Renderer
-  const renderer = new THREE.WebGLRenderer({antialias:true});
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  // PointerLockControls pour contrôle souris 1ere personne
-  const controls = new THREE.PointerLockControls(camera, document.body);
-
-  // Instructions pour activer PointerLock
-  const instructions = document.getElementById('instructions');
-  instructions.addEventListener('click', () => {
-    controls.lock();
-  });
-  controls.addEventListener('lock', () => { instructions.style.display = 'none'; });
-  controls.addEventListener('unlock', () => { instructions.style.display = 'block'; });
-
-  // Lumières
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-  scene.add(ambientLight);
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-  dirLight.position.set(5, 10, 7);
-  scene.add(dirLight);
-
-  // Sol (plan)
-  const floorGeometry = new THREE.PlaneGeometry(200, 200);
-  const floorMaterial = new THREE.MeshStandardMaterial({color: 0x333333});
-  const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-  floor.rotation.x = -Math.PI/2;
-  scene.add(floor);
-
-  // Joueur (invisible, la caméra est la tête)
-  const player = {
-    height: 1.8,
-    speed: 6,
-    velocity: new THREE.Vector3(),
-    direction: new THREE.Vector3(),
-    canShoot: true,
-    ammo: 30,
-    health: 100,
-    score: 0,
-    boundingBox: new THREE.Box3()
-  };
-
-  // Variables pour déplacement clavier
-  const keysPressed = {};
-  document.addEventListener('keydown', e => { keysPressed[e.code] = true; });
-  document.addEventListener('keyup', e => { keysPressed[e.code] = false; });
-
-  // Balle
-  class Bullet {
-    constructor(position, direction) {
-      this.speed = 30;
-      this.life = 3; // secondes avant disparition
-      this.geometry = new THREE.SphereGeometry(0.05, 8, 8);
-      this.material = new THREE.MeshBasicMaterial({color: 0xffff00});
-      this.mesh = new THREE.Mesh(this.geometry, this.material);
-      this.mesh.position.copy(position);
-      this.direction = direction.clone().normalize();
-      scene.add(this.mesh);
-    }
-    update(delta) {
-      this.mesh.position.addScaledVector(this.direction, this.speed * delta);
-      this.life -= delta;
-      if (this.life <= 0) return false;
-      return true;
-    }
-    dispose() {
-      scene.remove(this.mesh);
-      this.geometry.dispose();
-      this.material.dispose();
-    }
-  }
-
-  // Ennemis
-  class Enemy {
-    constructor(position) {
-      this.speed = 2;
-      this.health = 20;
-      this.geometry = new THREE.BoxGeometry(0.8, 1.8, 0.8);
-      this.material = new THREE.MeshStandardMaterial({color: 0xff3333});
-      this.mesh = new THREE.Mesh(this.geometry, this.material);
-      this.mesh.position.copy(position);
-      this.boundingBox = new THREE.Box3().setFromObject(this.mesh);
-      scene.add(this.mesh);
-    }
-    update(delta, playerPos) {
-      const dir = playerPos.clone().sub(this.mesh.position).normalize();
-      this.mesh.position.addScaledVector(dir, this.speed * delta);
-      this.boundingBox.setFromObject(this.mesh);
-    }
-    damage(amount) {
-      this.health -= amount;
-      if (this.health <= 0) {
-        this.destroy();
-        return true;
-      }
-      return false;
-    }
-    destroy() {
-      scene.remove(this.mesh);
-      this.geometry.dispose();
-      this.material.dispose();
-    }
-  }
+  // Son
+  const audioMusic = document.getElementById('audioMusic');
+  const audioClick = document.getElementById('audioClick');
+  const audioError = document.getElementById('audioError');
+  const audioWin = document.getElementById('audioWin');
+  const audioHint = document.getElementById('audioHint');
 
   // Variables jeu
-  const bullets = [];
-  const enemies = [];
-  let lastEnemySpawn = 0;
-  const enemySpawnInterval = 3; // secondes
-  const bulletDamage = 10;
+  let level = 1;
+  let secretNumber = 0;
+  let attempts = 0;
+  let timer = 30; // secondes
+  let timerId = null;
+  let gameActive = false;
+  let hintGiven = false;
 
-  // HUD éléments
-  const healthSpan = document.getElementById('health');
-  const ammoSpan = document.getElementById('ammo');
-  const scoreSpan = document.getElementById('score');
+  // Statistiques
+  let gamesPlayed = 0;
+  let totalAttempts = 0;
+  let bestLevel = 0;
 
-  // Sons
-  const listener = new THREE.AudioListener();
-  camera.add(listener);
-  const audioLoader = new THREE.AudioLoader();
-  const soundShoot = new THREE.Audio(listener);
-  const soundHit = new THREE.Audio(listener);
-  const soundMusic = new THREE.Audio(listener);
+  // Confettis
+  const confettis = [];
 
-  audioLoader.load('https://freesound.org/data/previews/402/402175_5121236-lq.mp3', buffer => {
-    soundShoot.setBuffer(buffer);
-    soundShoot.setVolume(0.3);
-  });
-  audioLoader.load('https://freesound.org/data/previews/170/170151_2437358-lq.mp3', buffer => {
-    soundHit.setBuffer(buffer);
-    soundHit.setVolume(0.3);
-  });
-  audioLoader.load('https://files.catbox.moe/uc4kgx.mp3', buffer => {
-    soundMusic.setBuffer(buffer);
-    soundMusic.setLoop(true);
-    soundMusic.setVolume(0.15);
-    soundMusic.play();
-  });
+  // Configuration thèmes
+  const themes = {
+    dark: 'theme-dark',
+    light: 'theme-light',
+    retro: 'theme-retro',
+    neon: 'theme-neon'
+  };
 
-  // Tir
-  function shoot() {
-    if (!player.canShoot || player.ammo <= 0) return;
-    player.ammo--;
-    ammoSpan.textContent = player.ammo;
-    player.canShoot = false;
-    soundShoot.play();
-    // Position devant la caméra, ajustée un peu bas
-    const shootPos = new THREE.Vector3();
-    shootPos.setFromMatrixPosition(camera.matrixWorld);
-    const shootDir = new THREE.Vector3();
-    camera.getWorldDirection(shootDir);
-    bullets.push(new Bullet(shootPos, shootDir));
-    setTimeout(() => { player.canShoot = true; }, 300); // cadence tir
+  // Setup initial
+  function setup() {
+    loadStats();
+    updateStats();
+    applyTheme(themeSelector.value);
+    audioMusic.volume = 0.3;
+    audioMusic.play().catch(()=>{});
   }
 
-  // Gestion collisions simple AABB bullet/enemy
-  function checkBulletEnemyCollisions() {
-    bullets.forEach((b, i) => {
-      enemies.forEach((e, j) => {
-        const bulletBox = new THREE.Box3().setFromCenterAndSize(b.mesh.position, new THREE.Vector3(0.1,0.1,0.1));
-        if (bulletBox.intersectsBox(e.boundingBox)) {
-          // Dégâts
-          if (e.damage(bulletDamage)) {
-            enemies.splice(j,1);
-            player.score++;
-            scoreSpan.textContent = player.score;
-            soundHit.play();
-            spawnExplosion(e.mesh.position);
-          }
-          // Détruire balle
-          b.dispose();
-          bullets.splice(i,1);
-        }
-      });
-    });
+  // Gestion thème
+  function applyTheme(themeKey) {
+    document.body.className = themes[themeKey] || themes.dark;
   }
 
-  // Explosion simple particules
-  const particles = [];
-  class Particle {
-    constructor(pos){
-      this.position = pos.clone();
-      this.life = 1;
-      this.size = Math.random()*0.1 + 0.05;
-      this.velocity = new THREE.Vector3(
-        (Math.random()-0.5)*2,
-        Math.random()*2,
-        (Math.random()-0.5)*2
-      );
-      this.geometry = new THREE.SphereGeometry(this.size, 6, 6);
-      this.material = new THREE.MeshBasicMaterial({color: 0xffcc00});
-      this.mesh = new THREE.Mesh(this.geometry, this.material);
-      this.mesh.position.copy(this.position);
-      scene.add(this.mesh);
+  themeSelector.addEventListener('change', (e) => {
+    applyTheme(e.target.value);
+  });
+
+  // Commencer partie
+  startBtn.addEventListener('click', () => {
+    playSound(audioClick);
+    level = 1;
+    startLevel();
+    welcomeSection.style.display = 'none';
+    gameSection.style.display = 'flex';
+    guessInput.focus();
+    gameActive = true;
+  });
+
+  // Calcul max selon niveau
+  function getMaxNumber(level) {
+    return 20 + (level - 1) * 30;
+  }
+
+  // Mise à jour infos jeu
+  function updateInfo() {
+    info.textContent = `Niveau : ${level} | Tentatives : ${attempts} | Devine entre 1 et ${getMaxNumber(level)}`;
+  }
+
+  // Démarrer un niveau
+  function startLevel() {
+    secretNumber = Math.floor(Math.random() * getMaxNumber(level)) + 1;
+    attempts = 0;
+    hintGiven = false;
+    timer = 30;
+    updateInfo();
+    feedback.textContent = '';
+    guessInput.value = '';
+    guessInput.placeholder = `1 - ${getMaxNumber(level)}`;
+    updateTimerDisplay();
+    clearInterval(timerId);
+    timerId = setInterval(countDown, 1000);
+  }
+
+  // Compte à rebours
+  function countDown() {
+    timer--;
+    updateTimerDisplay();
+    if (timer <= 0) {
+      clearInterval(timerId);
+      endGame(false, '⏰ Temps écoulé ! Tu as perdu.');
     }
-    update(delta){
-      this.velocity.y -= 5*delta;
-      this.position.addScaledVector(this.velocity, delta);
-      this.mesh.position.copy(this.position);
-      this.life -= delta;
-      if(this.life <= 0){
-        scene.remove(this.mesh);
-        this.geometry.dispose();
-        this.material.dispose();
-        return false;
+  }
+
+  // Afficher timer
+  function updateTimerDisplay() {
+    timerDisplay.textContent = `⏳ Temps restant : ${timer}s`;
+  }
+
+  // Gestion soumission devinette
+  submitGuessBtn.addEventListener('click', () => {
+    if (!gameActive) return;
+    const guess = parseInt(guessInput.value);
+    if (!guess || guess < 1 || guess > getMaxNumber(level)) {
+      feedback.textContent = `❗ Entre un nombre entre 1 et ${getMaxNumber(level)}.`;
+      playSound(audioError);
+      return;
+    }
+    attempts++;
+    updateInfo();
+
+    if (guess === secretNumber) {
+      playSound(audioWin);
+      feedback.textContent = `✅ Bravo ! Tu as trouvé le nombre ${secretNumber} en ${attempts} essais.`;
+      confettiEffect(150);
+      saveStats(true);
+      level++;
+      gameActive = false;
+      clearInterval(timerId);
+      setTimeout(() => {
+        startLevel();
+        gameActive = true;
+        guessInput.focus();
+        feedback.textContent = '';
+      }, 3500);
+    } else {
+      if (guess < secretNumber) {
+        feedback.textContent = '🔼 Trop petit !';
+      } else {
+        feedback.textContent = '🔽 Trop grand !';
       }
-      return true;
-    }
-  }
-  function spawnExplosion(position){
-    for(let i=0; i<15; i++){
-      particles.push(new Particle(position));
-    }
-  }
+      playSound(audioError);
 
-  // Spawn ennemi aléatoire autour joueur
-  function spawnEnemy(){
-    const distance = 20 + Math.random()*10;
-    const angle = Math.random()*Math.PI*2;
-    const pos = new THREE.Vector3(
-      Math.cos(angle)*distance,
-      0.9,
-      Math.sin(angle)*distance
-    );
-    enemies.push(new Enemy(pos));
-  }
-
-  // Mise à jour joueur position et collisions sol simple
-  function updatePlayer(delta){
-    player.direction.set(0,0,0);
-    if(keysPressed['KeyW']) player.direction.z -= 1;
-    if(keysPressed['KeyS']) player.direction.z += 1;
-    if(keysPressed['KeyA']) player.direction.x -= 1;
-    if(keysPressed['KeyD']) player.direction.x += 1;
-    player.direction.normalize();
-
-    if(controls.isLocked){
-      // Déplacement relatif à la direction caméra
-      const angle = controls.getObject().rotation.y;
-      const forward = new THREE.Vector3(
-        Math.sin(angle),
-        0,
-        Math.cos(angle)
-      );
-      const right = new THREE.Vector3(
-        Math.sin(angle + Math.PI/2),
-        0,
-        Math.cos(angle + Math.PI/2)
-      );
-
-      const move = new THREE.Vector3();
-      move.addScaledVector(forward, -player.direction.z);
-      move.addScaledVector(right, -player.direction.x);
-      move.normalize();
-
-      move.multiplyScalar(player.speed * delta);
-      controls.getObject().position.add(move);
-
-      // Limites du terrain
-      const pos = controls.getObject().position;
-      pos.x = Math.min(90, Math.max(-90, pos.x));
-      pos.z = Math.min(90, Math.max(-90, pos.z));
-      pos.y = player.height; // hauteur constante
-    }
-  }
-
-  // Gestion dommages ennemis -> joueur si proches
-  function enemyAttack(delta){
-    enemies.forEach(e => {
-      const dist = e.mesh.position.distanceTo(controls.getObject().position);
-      if(dist < 1.5){
-        player.health -= 15 * delta; // dégâts continus
-        player.health = Math.max(0, player.health);
-        healthSpan.textContent = Math.floor(player.health);
-        if(player.health <= 0){
-          gameOver();
-        }
+      // Donne un indice après 5 essais ratés et si pas encore donné
+      if (attempts >= 5 && !hintGiven) {
+        giveHint();
       }
-    });
+    }
+  });
+
+  // Indice
+  function giveHint() {
+    hintGiven = true;
+    let hint = '';
+    if (secretNumber % 2 === 0) {
+      hint = 'Le nombre est pair.';
+    } else {
+      hint = 'Le nombre est impair.';
+    }
+    // Plus d’indices possibles
+    if (secretNumber % 3 === 0) hint += ' Il est multiple de 3.';
+    if (secretNumber % 5 === 0) hint += ' Il est multiple de 5.';
+
+    feedback.textContent += ` 💡 Indice : ${hint}`;
+    playSound(audioHint);
   }
 
   // Fin de partie
-  function gameOver(){
-    controls.unlock();
-    alert(`💀 Game Over ! Tu as tué ${player.score} ennemis.`);
-    location.reload();
+  function endGame(win, msg) {
+    gameActive = false;
+    clearInterval(timerId);
+    feedback.textContent = msg;
+    saveStats(false);
+    setTimeout(() => {
+      welcomeSection.style.display = 'flex';
+      gameSection.style.display = 'none';
+    }, 3500);
   }
 
-  // Événements tir
-  window.addEventListener('click', shoot);
-  window.addEventListener('keydown', e => {
-    if(e.code === 'Space') {
-      shoot();
-      e.preventDefault();
+  // Sons
+  function playSound(audio) {
+    if (!audio) return;
+    if (!audio.muted) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
     }
-  });
+  }
 
-  // Redimensionnement
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
+  // Stats locales
+  function loadStats() {
+    gamesPlayed = parseInt(localStorage.getItem('gamesPlayed')) || 0;
+    totalAttempts = parseInt(localStorage.getItem('totalAttempts')) || 0;
+    bestLevel = parseInt(localStorage.getItem('bestLevel')) || 0;
+  }
+  function saveStats(win) {
+    if (win) {
+      gamesPlayed++;
+      totalAttempts += attempts;
+      if (level > bestLevel) bestLevel = level;
+    }
+    localStorage.setItem('gamesPlayed', gamesPlayed);
+    localStorage.setItem('totalAttempts', totalAttempts);
+    localStorage.setItem('bestLevel', bestLevel);
+    updateStats();
+  }
+  function updateStats() {
+    gamesPlayedSpan.textContent = gamesPlayed;
+    bestLevelSpan.textContent = bestLevel;
+    avgAttemptsSpan.textContent = gamesPlayed ? (totalAttempts / gamesPlayed).toFixed(2) : '0';
+  }
 
-  // Position initiale caméra (player)
-  controls.getObject().position.set(0, player.height, 0);
-  scene.add(controls.getObject());
-
-  // Boucle principale
-  let lastTime = performance.now();
-  function animate() {
-    requestAnimationFrame(animate);
-    const now = performance.now();
-    const delta = (now - lastTime)/1000;
-    lastTime = now;
-
-    if(controls.isLocked){
-      updatePlayer(delta);
-
-      bullets.forEach((b,i) => {
-        if(!b.update(delta)){
-          b.dispose();
-          bullets.splice(i,1);
-        }
-      });
-
-      enemies.forEach((e,i) => {
-        e.update(delta, controls.getObject().position);
-      });
-
-      checkBulletEnemyCollisions();
-      enemyAttack(delta);
-
-      // Spawn ennemis
-      lastEnemySpawn += delta;
-      if(lastEnemySpawn > enemySpawnInterval){
-        spawnEnemy();
-        lastEnemySpawn = 0;
+  // Confettis
+  class Confetti {
+    constructor(x, y, color) {
+      this.x = x;
+      this.y = y;
+      this.color = color;
+      this.size = Math.random() * 6 + 4;
+      this.gravity = 0.3;
+      this.velocity = {
+        x: (Math.random() - 0.5) * 7,
+        y: Math.random() * -10 - 5,
+      };
+      this.opacity = 1;
+      this.damping = 0.97;
+      this.tilt = Math.random() * 10 - 5;
+      this.tiltAngle = 0;
+      this.tiltAngleSpeed = Math.random() * 0.1 + 0.05;
+    }
+    update() {
+      this.velocity.y += this.gravity;
+      this.x += this.velocity.x;
+      this.y += this.velocity.y;
+      this.tiltAngle += this.tiltAngleSpeed;
+      this.tilt = Math.sin(this.tiltAngle) * 15;
+      this.opacity -= 0.02;
+      this.size *= 0.98;
+    }
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.lineWidth = this.size / 2;
+      ctx.strokeStyle = `rgba(${this.color},${this.opacity})`;
+      ctx.moveTo(this.x + this.tilt + this.size / 2, this.y);
+      ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.size / 2);
+      ctx.stroke();
+    }
+  }
+  function confettiEffect(amount) {
+    const colors = ['255,0,0', '0,255,0', '0,0,255', '255,255,0', '0,255,255', '255,0,255'];
+    for (let i=0; i<amount; i++) {
+      confettis.push(new Confetti(Math.random()*confettiCanvas.width, Math.random()*confettiCanvas.height/2, colors[Math.floor(Math.random()*colors.length)]));
+    }
+    if (!confettiRunning) {
+      confettiRunning = true;
+      requestAnimationFrame(runConfetti);
+    }
+  }
+  let confettiRunning = false;
+  function runConfetti() {
+    confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    for (let i = confettis.length - 1; i >= 0; i--) {
+      const c = confettis[i];
+      c.update();
+      c.draw(confettiCtx);
+      if (c.opacity <= 0 || c.size <= 0.5) {
+        confettis.splice(i,1);
       }
     }
-
-    // Mise à jour particules explosion
-    for(let i = particles.length-1; i>=0; i--){
-      if(!particles[i].update(delta)) particles.splice(i,1);
+    if (confettis.length > 0) {
+      requestAnimationFrame(runConfetti);
+    } else {
+      confettiRunning = false;
     }
-
-    renderer.render(scene, camera);
   }
-  animate();
+
+  // Contrôle musiques et sons
+  muteMusicBtn.addEventListener('click', () => {
+    audioMusic.muted = !audioMusic.muted;
+    muteMusicBtn.textContent = audioMusic.muted ? '🎵 Musique : Off' : '🎵 Musique : On';
+  });
+  muteSoundsBtn.addEventListener('click', () => {
+    [audioClick, audioError, audioWin, audioHint].forEach(a => a.muted = !a.muted);
+    muteSoundsBtn.textContent = audioClick.muted ? '🔈 Sons : Off' : '🔈 Sons : On';
+  });
+
+  // Ajuster taille canvas confettis
+  function resizeCanvas() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // Initialisation
+  setup();
+
+  // Accessibilité : Entrée au clavier sur input
+  guessInput.addEventListener('keypress', e => {
+    if (e.key === 'Enter') {
+      submitGuessBtn.click();
+    }
+  });
 
 })();
 </script>
-
 </body>
 </html>
