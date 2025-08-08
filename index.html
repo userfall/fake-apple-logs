@@ -3,148 +3,187 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Kabir Virus Simulation — Demo</title>
+<title>KabirCam Ultimate — Test</title>
 <style>
-  html,body{height:100%;margin:0;background:#000;color:#0f0;font-family: "Courier New", monospace;overflow:hidden}
-  #container{position:relative;width:100%;height:100%;}
-  canvas#matrix{position:absolute;left:0;top:0;width:100%;height:100%;z-index:0;opacity:0.6}
-  .terminal{
-    position: absolute;
-    left:50%;top:50%;transform:translate(-50%,-50%);
-    width:88%;max-width:1000px;height:60%;
-    background:rgba(0,0,0,0.6); border:2px solid #060; box-shadow:0 10px 40px rgba(0,0,0,0.9);
-    z-index:2; padding:18px; box-sizing:border-box; overflow:hidden;
-    border-radius:8px;
+  :root{
+    --bg:#050506;
+    --green:#0f0;
+    --muted:#9aa;
+    --accent:#ff3b3b;
   }
-  .title{color:#6f6;font-weight:700;margin-bottom:8px}
-  #log{height:82%;overflow:auto;white-space:pre-wrap; font-size:14px; line-height:1.3}
-  .controls{position:absolute;right:18px;top:14px;display:flex;gap:8px}
-  button{
-    background:#062;border:1px solid #0a0;padding:8px 12px;border-radius:6px;color:#cfc;cursor:pointer;
-    font-family:inherit;font-weight:600;
-  }
-  button.secondary{background:transparent;border:1px solid #044;color:#8f8}
-  #camWrapper{position:absolute;right:20px;bottom:20px;z-index:3;background:rgba(0,0,0,0.45);padding:8px;border-radius:6px;display:none}
-  video#cam{width:200px;height:150px;border-radius:6px;object-fit:cover;border:2px solid #072}
-  .small{font-size:12px;color:#9f9}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--green);font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; -webkit-font-smoothing:antialiased;}
+  .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;}
+  .card{width:100%;max-width:920px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(0,255,0,0.06);border-radius:12px;padding:18px;box-sizing:border-box;position:relative;overflow:hidden;}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .brand{font-weight:800;letter-spacing:1px;font-size:18px}
+  .by{font-size:12px;color:var(--muted);margin-left:8px;font-weight:600}
+  .singleBtn{display:flex;align-items:center;justify-content:center;margin:10px 0}
+  button#start{background:linear-gradient(90deg,#0b0 0%, #074 100%);color:#001;padding:14px 18px;border-radius:10px;border:none;font-weight:800;font-size:16px;cursor:pointer}
+  button#start[disabled]{opacity:0.55;cursor:not-allowed}
+  .stage{display:grid;grid-template-columns:1fr 360px;gap:14px}
+  @media(max-width:880px){ .stage{grid-template-columns:1fr;}}
+  .videoWrap{background:#000;border-radius:10px;height:360px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  @media(max-width:880px){ .videoWrap{height:220px;}}
+  video#cam{width:100%;height:100%;object-fit:cover;display:block}
+  .fakePlaceholder{color:var(--muted);font-size:15px;text-align:center;padding:12px}
+  .term{background:#000;border-radius:10px;padding:12px;min-height:360px;color:#0f0;overflow:hidden;position:relative}
+  @media(max-width:880px){ .term{min-height:280px}}
+  #terminalContent{font-family:monospace, monospace;font-size:14px;line-height:1.35;white-space:pre-wrap;overflow:auto;height:100%;padding-right:6px}
+  .overlayBig{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  .flash{position:absolute;inset:0;background:var(--accent);opacity:0;mix-blend-mode:screen;pointer-events:none}
+  .bigAlert{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:40;pointer-events:none;opacity:0;transform:scale(0.9);transition:opacity .18s, transform .18s}
+  .bigAlert h1{font-size:36px;color:#fff;margin:0;padding:0;letter-spacing:2px;text-align:center}
+  .bigAlert p{color:#fee;opacity:0.9;margin-top:12px}
+  .finalScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;z-index:200;flex-direction:column;gap:20px;visibility:hidden;opacity:0;transition:opacity .25s, visibility .25s}
+  .finalScreen.show{visibility:visible;opacity:1}
+  .finalMsg{font-weight:900;color:var(--accent);font-size:26px;text-align:center;letter-spacing:1px}
+  .sub{color:var(--muted);font-size:13px;text-align:center}
+  footer{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
+  /* blinking */
+  @keyframes blink { 0%{opacity:1}50%{opacity:0}100%{opacity:1} }
+  .blink{animation:blink 1s infinite}
+  /* dramatic red flash animation */
+  @keyframes flashQuick {0%{opacity:0}50%{opacity:0.95}100%{opacity:0}}
+  .flashOn{animation:flashQuick .15s linear 0s 4}
 </style>
 </head>
 <body>
-<div id="container">
-  <canvas id="matrix"></canvas>
-
-  <div class="terminal" role="region" aria-label="Kabir simulation">
-    <div style="display:flex;align-items:center;justify-content:space-between">
+<div class="wrap">
+  <div class="card" role="main" aria-live="polite">
+    <header>
       <div>
-        <span class="title">[KABIR-ATTACK-SIM]</span>
-        <span class="small"> — simulation active</span>
+        <span class="brand">KABIR CAM LIVE</span>
+        <span class="by">— by KABIR</span>
       </div>
-      <div class="controls">
-        <button id="startBtn">Lancer</button>
-        <button id="camBtn" class="secondary">Activer caméra</button>
-        <button id="resetBtn" class="secondary">Réinitialiser</button>
+      <div style="color:var(--muted);font-size:13px">Test caméra • Responsive</div>
+    </header>
+
+    <div class="singleBtn" style="justify-content:center">
+      <button id="start">Activer la caméra</button>
+    </div>
+
+    <div class="stage" style="margin-top:6px">
+      <div class="videoWrap" id="videoWrap">
+        <div id="videoInner" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column">
+          <div class="fakePlaceholder">Appuyez sur <strong>Activer la caméra</strong> pour tester votre webcam</div>
+        </div>
+      </div>
+
+      <div class="term" aria-label="Terminal simulation">
+        <div id="terminalContent"># Terminal idle. Aucune activité.</div>
+        <div class="overlayBig">
+          <div class="flash" id="flash"></div>
+          <div class="bigAlert" id="bigAlert">
+            <h1 id="bigTitle">[ SYSTEM STATUS ]</h1>
+            <p id="bigSub">Aucune menace détectée</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div id="log" aria-live="polite"></div>
+    <footer>Utilise ce prank uniquement avec consentement. Rien n'est envoyé — affichage local.</footer>
   </div>
+</div>
 
-  <div id="camWrapper">
-    <div class="small">Caméra (permission requise)</div>
-    <video id="cam" autoplay muted playsinline></video>
+<!-- final overlay -->
+<div id="final" class="finalScreen" aria-hidden="true">
+  <div style="max-width:980px;padding:20px;">
+    <div class="finalMsg" id="finalMsg">⚠ TOUS VOS DONNÉES ONT ÉTÉ TRANSMISES À RIBACK</div>
+    <div class="sub">Simulation terminée — Aucun système n'a été endommagé (affichage local).</div>
   </div>
 </div>
 
 <script>
-/* ========== Matrix rain ========== */
-const canvas = document.getElementById('matrix');
-const ctx = canvas.getContext('2d');
-let w, h, cols, size=16, drops;
+/* ---------- Helpers & state ---------- */
+const startBtn = document.getElementById('start');
+const videoWrap = document.getElementById('videoInner');
+const terminal = document.getElementById('terminalContent');
+const flash = document.getElementById('flash');
+const bigAlert = document.getElementById('bigAlert');
+const bigTitle = document.getElementById('bigTitle');
+const bigSub = document.getElementById('bigSub');
+const final = document.getElementById('final');
+const finalMsg = document.getElementById('finalMsg');
 
-function resize() {
-  w = canvas.width = innerWidth;
-  h = canvas.height = innerHeight;
-  cols = Math.floor(w / size) + 1;
-  drops = new Array(cols).fill(0).map(()=>Math.floor(Math.random()*h));
-}
-window.addEventListener('resize', resize);
-resize();
+let stream = null;
+let audioCtx = null;
+let isRunning = false;
 
-function matrixLoop(){
-  ctx.fillStyle = 'rgba(0,0,0,0.1)';
-  ctx.fillRect(0,0,w,h);
-  ctx.fillStyle = '#0f0';
-  ctx.font = size + 'px monospace';
-  for(let i=0;i<drops.length;i++){
-    const text = String.fromCharCode(0x30A0 + Math.random()*96);
-    ctx.fillText(text, i*size, drops[i]*size);
-    if(drops[i]*size > h && Math.random()>0.975) drops[i]=0;
-    drops[i]++;
-  }
-  requestAnimationFrame(matrixLoop);
-}
-matrixLoop();
-
-/* ========== Terminal typing + fake commands ========== */
-const log = document.getElementById('log');
-const startBtn = document.getElementById('startBtn');
-const resetBtn = document.getElementById('resetBtn');
-const camBtn = document.getElementById('camBtn');
-const camWrapper = document.getElementById('camWrapper');
-const camVideo = document.getElementById('cam');
-
-let sequence = [
-  "Initialisation du moteur KABIR v3.14...",
-  "Chargement des modules : [NET] [I/O] [CORE] [MATRIX_RENDERER] ...",
-  "Connexion aux sockets locaux...",
-  "Scanning des ports : 80, 443, 22, 3389 ...",
-  "Injection de patterns visuels...",
-  "Compilation dynamique des shaders...",
-  "Simulation d'attaque en cours — ETA 00:00:23",
-  "DETRUIRE: /usr/bin/FAKE_PROCESS",
-  "ENVOI: paquets-> 127.0.0.1: flood (simulé)",
-  "Analyse HACK_SUCCESS_RATE: 99.99% (simulé)",
-  "RESULTAT: SYSTEME COMPROMIS (simulé) — affichage uniquement",
-  "Terminé. Rendez-vous sur /dev/null"
+/* ---------- Command sequence ---------- */
+const commands = [
+  "Initialisation du module KabirCam v4.0",
+  "Vérification des pilotes vidéo...",
+  "Connexion au serveur de synchronisation...",
+  "Authentification biométrique locale (simulée)...",
+  "Scan des ports: 80, 443, 21, 22, 3389",
+  "Extraction des fichiers temporaires (simulé)...",
+  "Analyse des contacts récents...",
+  "Compression des paquets de données...",
+  "Chiffrement AES-256 (simulé)...",
+  "Préparation du canal de transfert",
+  "Établissement du tunnel sécurisé -> RIBACK",
+  "Envoi des paquets... 12% 27% 51% 78% 100%",
+  "CONFIRMATION: TRANSMISSION TERMINÉE"
 ];
 
-let typing = null;
-let idx=0;
-
-function playBeepSequence(){
-  // WebAudio dramatique
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  function beep(freq, time, dur, type='sine'){
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = type;
-    o.frequency.value = freq;
-    o.connect(g); g.connect(ctx.destination);
-    g.gain.setValueAtTime(0.0001, time);
-    g.gain.exponentialRampToValueAtTime(0.05, time + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
-    o.start(time); o.stop(time + dur + 0.02);
+/* ---------- Audio primitives (WebAudio) ---------- */
+function ensureAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  const now = ctx.currentTime + 0.02;
-  beep(120, now, 0.18,'sawtooth');
-  beep(240, now+0.12, 0.15,'sawtooth');
-  beep(380, now+0.28, 0.22,'sine');
-  beep(80, now+0.6, 0.6,'triangle');
 }
 
-/* slow type effect */
-function typeLine(text, speed=35){
+/* beep at freq (hz), duration (s), when (sec offset relative now) */
+function scheduleBeep(freq, dur, when){
+  ensureAudio();
+  const t0 = audioCtx.currentTime + when;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sawtooth';
+  o.frequency.setValueAtTime(freq, t0);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.08, t0 + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(t0); o.stop(t0 + dur + 0.02);
+}
+
+/* siren: sweeping oscillator for dramatic ending */
+function playSiren(startInSec, duration){
+  ensureAudio();
+  const now = audioCtx.currentTime + startInSec;
+  const o1 = audioCtx.createOscillator();
+  const o2 = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o1.type = 'sine'; o2.type = 'sine';
+  o1.frequency.setValueAtTime(400, now);
+  o2.frequency.setValueAtTime(600, now);
+  // Frequency sweep
+  o1.frequency.linearRampToValueAtTime(1200, now + duration);
+  o2.frequency.linearRampToValueAtTime(1800, now + duration);
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.linearRampToValueAtTime(0.15, now + 0.05);
+  g.gain.linearRampToValueAtTime(0.0001, now + duration);
+  o1.connect(g); o2.connect(g); g.connect(audioCtx.destination);
+  o1.start(now); o2.start(now);
+  o1.stop(now + duration + 0.05); o2.stop(now + duration + 0.05);
+}
+
+/* ---------- Terminal typing ---------- */
+function appendLine(text, fast=false){
+  // type effect
+  const speedBase = fast ? 6 : 20;
+  let i = 0;
   return new Promise(res=>{
-    let i=0;
     function step(){
-      if(i<=text.length){
-        log.innerText = log.innerText + text.charAt(i);
-        log.scrollTop = log.scrollHeight;
+      if(i <= text.length){
+        terminal.textContent += text.charAt(i);
+        terminal.scrollTop = terminal.scrollHeight;
         i++;
-        setTimeout(step, speed + Math.random()*60);
+        setTimeout(step, speedBase + Math.random()*12);
       } else {
-        log.innerText += "\n";
-        log.scrollTop = log.scrollHeight;
+        terminal.textContent += "\n";
+        terminal.scrollTop = terminal.scrollHeight;
         res();
       }
     }
@@ -152,69 +191,146 @@ function typeLine(text, speed=35){
   });
 }
 
-async function runSequence(){
-  if(typing) return;
-  typing = true;
-  startBtn.textContent = "En cours...";
-  startBtn.disabled = true;
-  playBeepSequence();
-  for(let s of sequence){
-    // small pause to feel dramatic
-    await typeLine("> " + s, 22);
-    await new Promise(r=>setTimeout(r, 350 + Math.random()*420));
+/* ---------- UI transitions ---------- */
+function showBigAlert(title, sub, pulse=false){
+  bigTitle.textContent = title;
+  bigSub.textContent = sub;
+  bigAlert.style.opacity = 1;
+  bigAlert.style.transform = "scale(1)";
+  if(pulse){
+    flash.classList.add('flashOn');
+    setTimeout(()=>flash.classList.remove('flashOn'), 700);
   }
-  // extra dramatic block of "code"
-  await typeLine("\n--- DUMP: memory @0xDEADBEEF ---", 12);
-  for(let i=0;i<8;i++){
-    await typeLine((Math.random().toString(16).substr(2,16) + "  " + Math.random().toString(2).substr(2,24)).slice(0,48), 6);
-  }
-  await typeLine("\nSimulation terminée. (Aucune action réelle effectuée)", 20);
-  startBtn.textContent = "Lancer";
-  startBtn.disabled = false;
-  typing = false;
+}
+function hideBigAlert(){
+  bigAlert.style.opacity = 0;
+  bigAlert.style.transform = "scale(0.9)";
 }
 
-startBtn.addEventListener('click', ()=>{
-  log.innerText = "";
-  runSequence();
-});
+/* ---------- The main dramatic run ---------- */
+async function runSequence(){
+  if(isRunning) return;
+  isRunning = true;
+  startBtn.disabled = true;
+  startBtn.textContent = "En cours...";
+  terminal.textContent = ""; // clear
 
-/* Reset */
-resetBtn.addEventListener('click', ()=>{
-  log.innerText = "";
-});
+  // show "test camera" normal for a few seconds
+  showBigAlert("[ TEST DE CONNEXION ]", "Analyse de la webcam en cours...", false);
+  await new Promise(r=>setTimeout(r, 1400));
+  hideBigAlert();
 
-/* ========== Camera (consentement explicite) ========== */
-let stream = null;
-camBtn.addEventListener('click', async ()=>{
-  if(camWrapper.style.display === 'none' || camWrapper.style.display === ''){
-    try{
-      // Demande de permission : l'utilisateur verra la popup du navigateur.
-      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      camVideo.srcObject = stream;
-      camWrapper.style.display = 'block';
-      camBtn.textContent = "Désactiver caméra";
-      // On applique un filtre "Matrix" basique via canvas capture if wanted (left simple)
-    } catch(err){
-      alert("Permission caméra refusée ou erreur: " + err.message);
+  // small pause to feel normal
+  await new Promise(r=>setTimeout(r, 900));
+
+  // Begin command-by-command with beeps
+  let tOffset = 0.05; // relative time for scheduled audio
+  for(let i=0;i<commands.length;i++){
+    const c = "> " + commands[i];
+    // beep per line (pitch rises a bit)
+    scheduleBeep(220 + i*20, 0.12, tOffset);
+    tOffset += 0.18;
+    await appendLine(c);
+    // slight dynamic: if last item, fast beeps and flash
+    if(i === Math.floor(commands.length*0.6)){
+      // mid-breach dramatic flash
+      showBigAlert("[ SYSTEM BREACH ]", "Connexion non autorisée détectée", true);
+      await new Promise(r=>setTimeout(r, 700));
+      hideBigAlert();
     }
-  } else {
-    // stop stream
-    if(stream){
-      stream.getTracks().forEach(t=>t.stop());
-      stream = null;
-    }
-    camVideo.srcObject = null;
-    camWrapper.style.display = 'none';
-    camBtn.textContent = "Activer caméra";
+    // small pause
+    await new Promise(r=>setTimeout(r, 250 + Math.random()*250));
   }
+
+  // accelerate beeps: rapid short bips before the big siren
+  for(let k=0;k<10;k++){
+    scheduleBeep(900 + k*60, 0.06, tOffset);
+    tOffset += 0.07;
+    await new Promise(r=>setTimeout(r, 70));
+  }
+
+  // red flash and giant breach
+  flash.style.opacity = 0.95;
+  flash.classList.add('flashOn');
+  showBigAlert("[ SYSTEM BREACH BY KABIR ]", "Accès root simulé", true);
+  await new Promise(r=>setTimeout(r, 650));
+  flash.classList.remove('flashOn');
+
+  // play siren
+  playSiren(0, 2.2);
+
+  // Wait siren duration
+  await new Promise(r=>setTimeout(r, 2200));
+
+  // Final: big final screen message
+  final.classList.add('show');
+  final.setAttribute('aria-hidden','false');
+
+  // final textual emphasis (we keep terminal also)
+  terminal.textContent += "\n>>> END OF SIMULATION\n";
+  terminal.scrollTop = terminal.scrollHeight;
+
+  // stop everything, allow reset after a while
+  startBtn.disabled = false;
+  startBtn.textContent = "Activer la caméra";
+  isRunning = false;
+}
+
+/* ---------- Camera handling ---------- */
+async function activateCameraAndRun(){
+  // if already streaming, just run sequence
+  if(stream) {
+    // small delay to mimic "normal test"
+    setTimeout(()=>runSequence(), 1200);
+    return;
+  }
+
+  try{
+    // request camera (video only)
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+    const v = document.createElement('video');
+    v.id = 'cam';
+    v.autoplay = true; v.playsInline = true; v.muted = true;
+    v.srcObject = stream;
+    // remove placeholder and append video
+    videoWrap.innerHTML = "";
+    videoWrap.appendChild(v);
+    // small friendly overlay label
+    const label = document.createElement('div');
+    label.style.position='absolute';
+    label.style.bottom='8px';label.style.left='8px';
+    label.style.padding='6px 8px';label.style.background='rgba(0,0,0,0.4)';
+    label.style.color='var(--muted)';label.style.fontSize='12px';label.style.borderRadius='6px';
+    label.textContent = "Caméra active — Test utilisateur";
+    videoWrap.appendChild(label);
+
+    // allow audio to be started (some browsers require a user gesture)
+    if(!audioCtx) {
+      try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); audioCtx.suspend && audioCtx.suspend(); } catch(e){}
+    }
+
+    // after 1.8s pretend "normal test" then trigger the dramatique
+    setTimeout(()=>runSequence(), 1800);
+  } catch(err){
+    // permission denied or error
+    videoWrap.innerHTML = '<div class="fakePlaceholder">Permission caméra refusée ou indisponible.<br><small style="color:var(--muted)">Erreur: '+ (err && err.message ? String(err.message) : "inconnue") +'</small></div>';
+  }
+}
+
+/* ---------- Start button ---------- */
+startBtn.addEventListener('click', async ()=>{
+  // resume audio context if needed on user interaction
+  if(audioCtx && audioCtx.state === 'suspended'){ try{ await audioCtx.resume(); } catch(e){} }
+  activateCameraAndRun();
 });
 
-/* Accessibility: allow Enter to start */
-document.addEventListener('keydown', (e)=>{ if(e.key==='Enter') startBtn.click(); });
-
-/* Small autoplay-safety: play a muted click sound on first user interaction to unlock AudioContext on mobile */
-window.addEventListener('pointerdown', ()=>{ if((AudioContext || webkitAudioContext) && !window._audioUnlocked){ try{ new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} window._audioUnlocked=true; } }, {once:true});
+/* ---------- Cleanup on page unload ---------- */
+window.addEventListener('beforeunload', ()=>{
+  if(stream){
+    stream.getTracks().forEach(t=>t.stop());
+  }
+  if(audioCtx && audioCtx.close) audioCtx.close();
+});
 </script>
 </body>
 </html>
