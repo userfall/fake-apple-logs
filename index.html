@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>KabirCam Pro Intrusion</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>KabirCam Pro - Intrusion en cours</title>
 <style>
   /* Reset & base */
   * {
@@ -11,50 +11,30 @@
   }
   html, body {
     margin:0; padding:0; height:100%;
-    background: #070b07;
-    color: #00ff55;
-    font-family: 'Lucida Console', Monaco, monospace, monospace;
+    background: #0a0f0a;
+    color: #00ff44;
+    font-family: 'Courier New', Courier, monospace;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     overflow: hidden;
   }
-
-  button {
-    cursor: pointer;
-    background: linear-gradient(135deg, #004400, #007700);
-    border: 2px solid #00ff55;
-    color: #00ff55;
-    font-weight: 700;
-    font-size: 1.3rem;
-    padding: 14px 28px;
-    border-radius: 10px;
-    transition: background 0.3s ease;
-    user-select: none;
-  }
-  button:hover {
-    background: linear-gradient(135deg, #007700, #00aa00);
-  }
-  button:disabled {
-    background: #003300;
-    border-color: #005500;
-    color: #006600;
-    cursor: not-allowed;
+  body {
+    background: radial-gradient(ellipse at center, #001000 0%, #000000 90%);
   }
 
-  /* Containers */
+  /* Screens */
   #welcomeScreen, #cameraScreen, #terminalScreen {
     width: 100vw;
     max-width: 640px;
     height: 100vh;
-    padding: 20px;
+    padding: 24px 32px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     user-select: none;
-    box-sizing: border-box;
   }
   .hidden {
     display: none !important;
@@ -63,108 +43,113 @@
   /* Welcome Screen */
   #welcomeScreen h1 {
     font-size: 3rem;
-    letter-spacing: 2px;
     margin-bottom: 20px;
-    text-shadow: 0 0 15px #00ff55aa;
+    text-shadow: 0 0 20px #00ff44aa;
   }
   #welcomeScreen p {
-    font-size: 1.3rem;
-    margin-bottom: 30px;
-    color: #00cc44;
-    text-shadow: 0 0 8px #00ff55bb;
+    font-size: 1.4rem;
+    margin-bottom: 32px;
+    color: #00cc33;
+  }
+  #startCameraBtn {
+    cursor: pointer;
+    background: linear-gradient(135deg, #004400, #007700);
+    border: 2px solid #00ff44;
+    color: #00ff44;
+    font-weight: 700;
+    font-size: 1.5rem;
+    padding: 18px 42px;
+    border-radius: 12px;
+    transition: background 0.3s ease;
+    user-select: none;
+  }
+  #startCameraBtn:hover {
+    background: linear-gradient(135deg, #007700, #00cc33);
   }
 
   /* Camera Screen */
   #cameraScreen h2 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-shadow: 0 0 12px #00ff55cc;
+    font-size: 2.4rem;
+    margin-bottom: 22px;
+    text-shadow: 0 0 16px #00ff44cc;
   }
   #cameraVideo {
     width: 100%;
     max-width: 620px;
     border-radius: 16px;
-    border: 5px solid #00ff55aa;
-    box-shadow: 0 0 15px #00ff55cc;
+    border: 6px solid #00ff44cc;
+    box-shadow: 0 0 25px #00ff44aa;
     background-color: #000;
     user-select: none;
   }
-  #startIntrusionBtn {
-    margin-top: 30px;
-    padding: 16px 36px;
-    font-size: 1.3rem;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    box-shadow: 0 0 30px #ff0000aa;
-    background: linear-gradient(45deg, #660000, #aa0000);
-    border: 3px solid #ff3300;
-    color: #ff4444;
-    transition: background 0.25s ease;
-  }
-  #startIntrusionBtn:hover:not(:disabled) {
-    background: linear-gradient(45deg, #aa0000, #ff3333);
-    box-shadow: 0 0 50px #ff3300;
-  }
-  #startIntrusionBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    box-shadow: none;
+  #cameraLoadingText {
+    margin-top: 12px;
+    font-style: italic;
+    color: #008800cc;
   }
 
-  /* Red overlay flash for transition */
+  /* Red overlay flash + glitch for transition */
   #redFlash {
     position: fixed;
     inset: 0;
-    background: rgba(255, 0, 0, 0);
+    background: rgba(255,0,0,0);
     pointer-events: none;
     z-index: 9999;
-    transition: background 0.5s ease;
+    transition: background 0.7s ease;
   }
   #redFlash.active {
-    background: rgba(255, 0, 0, 0.75);
-    animation: pulseRed 1.5s ease-in-out infinite alternate;
+    background: rgba(255,0,0,0.85);
+    animation: pulseRed 1.2s ease-in-out infinite alternate;
   }
   @keyframes pulseRed {
-    0% { background: rgba(255, 0, 0, 0.55); }
-    100% { background: rgba(255, 0, 0, 0.85); }
+    0% { background: rgba(255,0,0,0.65); }
+    100% { background: rgba(255,0,0,0.9); }
+  }
+  /* Glitch effect on terminal */
+  @keyframes glitch {
+    0% { text-shadow: 2px 0 red, -2px 0 cyan; }
+    20% { text-shadow: -2px 0 red, 2px 0 cyan; }
+    40% { text-shadow: 2px 2px red, -2px -2px cyan; }
+    60% { text-shadow: -2px -2px red, 2px 2px cyan; }
+    80% { text-shadow: 2px 0 red, -2px 0 cyan; }
+    100% { text-shadow: -2px 0 red, 2px 0 cyan; }
   }
 
   /* Terminal Screen */
   #terminalScreen {
     background: #000000dd;
-    border: 4px solid #00ff55;
-    box-shadow: 0 0 20px #00ff55cc inset;
-    border-radius: 18px;
+    border: 4px solid #00ff44;
+    box-shadow: 0 0 30px #00ff44aa inset;
+    border-radius: 20px;
     font-size: 1.15rem;
-    letter-spacing: 1.4px;
+    letter-spacing: 1.3px;
     line-height: 1.3;
-    padding: 20px;
+    padding: 28px 32px;
     color: #00ff44;
     font-family: 'Courier New', Courier, monospace;
     white-space: pre-wrap;
     overflow-y: auto;
     user-select: text;
+    position: relative;
   }
 
-  /* blinking cursor */
   .blinking-cursor {
-    border-right: 2px solid #00ff55;
+    border-right: 2px solid #00ff44;
     animation: blink 1s steps(2, start) infinite;
     display: inline-block;
   }
   @keyframes blink {
-    0%, 50% { border-color: #00ff55; }
+    0%, 50% { border-color: #00ff44; }
     51%, 100% { border-color: transparent; }
   }
 
   /* Scrollbar for terminal */
   #terminalScreen::-webkit-scrollbar {
-    width: 12px;
+    width: 14px;
   }
   #terminalScreen::-webkit-scrollbar-thumb {
     background-color: #00ff44cc;
-    border-radius: 6px;
+    border-radius: 7px;
     border: 3px solid transparent;
     background-clip: content-box;
   }
@@ -174,79 +159,103 @@
 
   /* Final alert style */
   #finalAlert {
-    margin-top: 25px;
-    font-size: 1.6rem;
+    margin-top: 36px;
+    font-size: 1.8rem;
     font-weight: 900;
     letter-spacing: 1.8px;
     color: #ff2200;
-    text-shadow: 0 0 20px #ff2200bb;
+    text-shadow: 0 0 30px #ff2200cc;
     text-align: center;
     user-select: none;
+    animation: glitch 1.5s infinite;
+  }
+
+  /* Network noise sound wave overlay for terminal */
+  #noiseOverlay {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(0,255,0,0.06),
+      rgba(0,255,0,0.06) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+    opacity: 0.12;
+    animation: noiseMove 1.3s linear infinite;
+  }
+  @keyframes noiseMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 100px 100px; }
   }
 
   /* Responsive */
   @media (max-width: 700px) {
     #welcomeScreen, #cameraScreen, #terminalScreen {
       max-width: 100vw;
-      padding: 15px;
+      padding: 18px 20px;
     }
     #welcomeScreen h1 {
       font-size: 2.4rem;
     }
     #cameraScreen h2 {
-      font-size: 1.7rem;
+      font-size: 1.9rem;
     }
-    #startIntrusionBtn {
-      padding: 14px 24px;
-      font-size: 1.1rem;
+    #startCameraBtn {
+      padding: 16px 34px;
+      font-size: 1.3rem;
     }
     #terminalScreen {
       font-size: 1rem;
-      letter-spacing: 1.2px;
+      letter-spacing: 1.1px;
+      padding: 20px 24px;
     }
     #finalAlert {
-      font-size: 1.3rem;
+      font-size: 1.5rem;
     }
   }
 </style>
 </head>
 <body>
 
-<!-- Step 1: Welcome -->
-<div id="welcomeScreen">
+<!-- Step 1 : Accueil -->
+<div id="welcomeScreen" aria-label="Ecran d'accueil">
   <h1>KABIR SYSTEM</h1>
   <p>Cliquez pour activer la caméra frontale</p>
-  <button id="btnStartCamera">Activer caméra</button>
+  <button id="startCameraBtn" aria-label="Activer la caméra">Activer caméra</button>
 </div>
 
-<!-- Step 2: Camera -->
-<div id="cameraScreen" class="hidden">
+<!-- Step 2 : Caméra active -->
+<div id="cameraScreen" class="hidden" aria-label="Caméra activée">
   <h2>Caméra activée</h2>
   <video id="cameraVideo" autoplay muted playsinline></video>
-  <button id="btnStartIntrusion">Lancer intrusion</button>
+  <p id="cameraLoadingText">Veuillez patienter...</p>
 </div>
 
-<!-- Step 2.5: Red Flash -->
+<!-- Step 2.5 : Flash rouge -->
 <div id="redFlash"></div>
 
-<!-- Step 3: Terminal -->
-<div id="terminalScreen" class="hidden" aria-live="polite" aria-atomic="true" role="log"></div>
+<!-- Step 3 : Terminal intrusion -->
+<div id="terminalScreen" class="hidden" aria-live="polite" aria-atomic="true" role="log">
+  <div id="noiseOverlay"></div>
+</div>
 
 <script>
-  // Elements
   const welcomeScreen = document.getElementById('welcomeScreen');
   const cameraScreen = document.getElementById('cameraScreen');
   const terminalScreen = document.getElementById('terminalScreen');
   const redFlash = document.getElementById('redFlash');
-  const btnStartCamera = document.getElementById('btnStartCamera');
-  const btnStartIntrusion = document.getElementById('btnStartIntrusion');
-  const video = document.getElementById('cameraVideo');
+  const btnStartCamera = document.getElementById('startCameraBtn');
+  const cameraVideo = document.getElementById('cameraVideo');
+  const cameraLoadingText = document.getElementById('cameraLoadingText');
 
   let stream = null;
   let audioCtx = null;
+  let intrusionTimeout = null;
 
   // WebAudio beep helper
-  function beep(frequency=800, duration=120, type='square', volume=0.07) {
+  function beep(frequency=900, duration=100, type='square', volume=0.08) {
     if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
@@ -260,23 +269,32 @@
     gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration/1000);
   }
 
-  // Typing effect with beep
-  async function typeLine(text, delay=20, beepOnEnd=true, error=false) {
+  // Additional beep for error
+  function beepError() {
+    beep(400, 160, 'square', 0.12);
+  }
+  // Additional beep for alert
+  function beepAlert() {
+    beep(320, 300, 'sawtooth', 0.15);
+  }
+
+  // Typewriter effect, with optional beep on line end and error beep
+  async function typeLine(text, delay=18, beepOnEnd=true, error=false) {
     return new Promise(resolve => {
       let i=0;
       const cursor = document.createElement('span');
       cursor.className = 'blinking-cursor';
       terminalScreen.appendChild(cursor);
 
-      function typeChar(){
+      function typeChar() {
         if(i < text.length) {
           cursor.insertAdjacentText('beforebegin', text[i]);
           i++;
-          setTimeout(typeChar, delay + Math.random()*10);
+          setTimeout(typeChar, delay + Math.random()*8);
         } else {
           if(beepOnEnd) {
-            if(error) beep(400, 150, 'square', 0.09);
-            else beep(900, 90, 'square', 0.07);
+            if(error) beepError();
+            else beep();
           }
           terminalScreen.removeChild(cursor);
           terminalScreen.appendChild(document.createTextNode('\n'));
@@ -288,82 +306,85 @@
     });
   }
 
-  // Lines for intrusion simulation
+  // Lines of intrusion simulation, realistic and pro
   const intrusionLines = [
-    "Connexion à l'hôte 192.168.1.12...",
-    "Authentification SSH : échec - mot de passe incorrect",
-    "Tentative de contournement...",
-    "Accès refusé - tentative 1/3",
-    "Accès refusé - tentative 2/3",
-    "Accès refusé - tentative 3/3",
-    "Erreur fatale : échec de l'authentification",
-    "Activation du mode root (local)...",
-    "Chargement du module d'injection...",
-    "Injection réussie",
-    "Établissement du tunnel sécurisé vers RIBACK...",
-    "Transfert des données utilisateur en cours...",
+    "[Init] Lancement du protocole de connexion distante...",
+    "-> Tentative d'accès SSH vers 192.168.1.12...",
+    "-> Authentification par mot de passe : ÉCHEC",
+    "-> Tentative de contournement des ACLs en cours...",
+    "[Warning] Accès refusé - tentative 1/3",
+    "[Warning] Accès refusé - tentative 2/3",
+    "[Warning] Accès refusé - tentative 3/3",
+    "[Error] Échec critique d'authentification",
+    "[Action] Passage en mode root local activé",
+    "[Load] Chargement du module d'injection mémoire...",
+    "[Success] Injection terminée avec succès",
+    "[Net] Ouverture tunnel sécurisé vers serveur RIBACK...",
+    "[Transfer] Transmission des données utilisateur en cours...",
     "[███████████████.............] 56%",
-    "Erreur de transmission détectée - tentative de reconnection",
+    "[Error] Erreur de transmission détectée, reconnexion...",
     "[████████████████████████....] 87%",
-    "Transfert terminé avec succès",
-    "Déconnexion du serveur"
+    "[Success] Transfert terminé",
+    "[Disconnect] Déconnexion du serveur distante"
   ];
 
-  // Start camera
-  btnStartCamera.addEventListener('click', async () => {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({video: {facingMode:'user'}});
-      video.srcObject = stream;
-      welcomeScreen.classList.add('hidden');
-      cameraScreen.classList.remove('hidden');
-      if(audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-    } catch(e) {
-      alert('Erreur accès caméra: ' + e.message);
-    }
-  });
-
-  // Red flash animation before terminal
+  // Play red flash animation with sound
   function playRedFlash() {
     return new Promise(resolve => {
       redFlash.classList.add('active');
-      beep(350, 700, 'sawtooth', 0.15);
+      beepAlert();
       setTimeout(() => {
         redFlash.classList.remove('active');
         resolve();
-      }, 1500);
+      }, 1600);
     });
   }
 
-  // Run intrusion terminal
+  // Run the intrusion simulation
   async function runIntrusion() {
     cameraScreen.classList.add('hidden');
-    await playRedFlash();
     terminalScreen.textContent = '';
     terminalScreen.classList.remove('hidden');
 
-    for(let line of intrusionLines){
-      const isError = /échec|Erreur|Accès refusé/i.test(line);
-      await typeLine('> ' + line, 18, true, isError);
+    await playRedFlash();
+
+    for(let line of intrusionLines) {
+      const error = /\b(ÉCHEC|Erreur|Error|Warning|Refusé)\b/i.test(line);
+      await typeLine("> " + line, 20, true, error);
     }
-    // Final beep error sequence
-    for(let i=0; i<3; i++) {
-      beep(300, 200, 'square', 0.1);
-      await new Promise(r => setTimeout(r, 270));
+
+    // Final beep sequence, forte alerte rouge
+    for(let i=0; i<4; i++) {
+      beepError();
+      await new Promise(r => setTimeout(r, 320));
     }
     terminalScreen.appendChild(document.createTextNode("\n>> TOUS VOS DONNÉES ONT ÉTÉ TRANSMIS À RIBACK <<"));
     terminalScreen.scrollTop = terminalScreen.scrollHeight;
   }
 
-  btnStartIntrusion.addEventListener('click', async () => {
-    if(audioCtx && audioCtx.state === 'suspended') {
-      await audioCtx.resume();
+  // Start camera event
+  btnStartCamera.addEventListener('click', async () => {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({video: {facingMode:'user'}});
+      cameraVideo.srcObject = stream;
+      cameraLoadingText.textContent = "Caméra activée. Préparez-vous...";
+      welcomeScreen.classList.add('hidden');
+      cameraScreen.classList.remove('hidden');
+
+      // Resume audio context on mobile
+      if(audioCtx && audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+
+      // Lancement intrusion automatique 7s après activation caméra
+      intrusionTimeout = setTimeout(runIntrusion, 7000);
+
+    } catch(e) {
+      alert("Erreur d'accès à la caméra : " + e.message);
     }
-    btnStartIntrusion.disabled = true;
-    await runIntrusion();
   });
 
+  // Cleanup on unload
   window.addEventListener('beforeunload', () => {
     if(stream) {
       stream.getTracks().forEach(track => track.stop());
@@ -371,7 +392,11 @@
     if(audioCtx) {
       audioCtx.close();
     }
+    if(intrusionTimeout) {
+      clearTimeout(intrusionTimeout);
+    }
   });
+
 </script>
 
 </body>
