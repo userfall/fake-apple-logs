@@ -1,428 +1,378 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>KabirCam — Cinematic Ultimate</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KabirCam Pro Intrusion</title>
 <style>
-:root{
-  --bg:#030304; --matrix:#0df25a; --muted:#8fa; --accent:#ff3b3b; --glass: rgba(255,255,255,0.02);
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);color:var(--matrix);font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, monospace;}
-.center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
-.card{width:100%;max-width:1100px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));border-radius:12px;padding:14px;border:1px solid rgba(13,242,90,0.04);position:relative;overflow:hidden}
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.brand{font-weight:900;font-size:18px;letter-spacing:1px}
-.by{font-size:12px;color:var(--muted);margin-left:8px}
-.grid{display:grid;grid-template-columns:1fr 420px;gap:12px}
-@media(max-width:920px){.grid{grid-template-columns:1fr}}
-.left{background:#000;border-radius:10px;min-height:480px;position:relative;overflow:hidden;padding:10px}
-.right{background:#030303;border-radius:10px;padding:12px;color:var(--matrix);min-height:480px;overflow:auto}
-.videoWrap{position:relative;border-radius:8px;overflow:hidden;background:#111;height:260px;display:flex;align-items:center;justify-content:center}
-@media(max-width:920px){ .videoWrap{height:180px} }
-#camVideo{width:100%;height:100%;object-fit:cover;display:block}
-.placeholder{color:var(--muted);text-align:center;padding:18px}
-.controls{display:flex;gap:10px;justify-content:center;margin:12px 0}
-button{
-  padding:12px 18px;border-radius:10px;border:none;font-weight:800;cursor:pointer;
-  background:linear-gradient(90deg,#052 0%, #0a6 100%); color:#001;
-}
-button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted);font-weight:700}
-.small{font-size:12px;color:var(--muted)}
-.terminal{background:#000;border-radius:8px;padding:10px;height:240px;overflow:auto;border:1px solid rgba(13,242,90,0.05);font-family:monospace;white-space:pre-wrap}
-.matrixBg{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0.65}
-.overlay{position:absolute;left:12px;top:12px;z-index:20}
-.vignette{position:absolute;right:12px;top:12px;width:160px;height:110px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);background:#000;display:flex;align-items:center;justify-content:center}
-.vignette video{width:100%;height:100%;object-fit:cover;display:block}
-.logLine .token{color:#7de; font-weight:800}
-.logLine .key{color:#ffa; font-weight:800}
-.bigDamage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:150;pointer-events:none;opacity:0;transition:opacity .12s}
-.bigDamage.show{opacity:1}
-.bigDamage h1{font-size:32px;color:#fff;margin:0;padding:6px 12px;background:linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0.2));border-radius:6px}
-.flash{position:absolute;inset:0;background:var(--accent);opacity:0;mix-blend-mode:screen;pointer-events:none;z-index:140}
-.finalScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;z-index:9999;flex-direction:column;gap:18px;visibility:hidden;opacity:0;transition:opacity .25s, visibility .25s}
-.finalScreen.show{visibility:visible;opacity:1}
-.finalMsg{font-weight:900;color:var(--accent);font-size:24px;text-align:center;letter-spacing:1px}
-.footerNote{font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:10px}
-.progressBar{width:100%;height:12px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;margin-top:8px}
-.progressInner{height:100%;width:0%;background:linear-gradient(90deg,#0f0,#7f7);border-radius:8px;transition:width .25s}
-.tokenHighlight{color:#ffd97a}
-.smallMuted{font-size:12px;color:var(--muted);margin-top:6px}
-.blink{animation:blink 1s infinite}
-@keyframes blink {0%{opacity:1}50%{opacity:0}100%{opacity:1}}
-/* tiny glitch */
-.glitch{
-  position:absolute;left:6px;top:6px;color:rgba(255,0,10,0.06);transform:translate(2px,1px);filter:blur(.6px);
-  z-index:160;pointer-events:none;font-weight:900;
-}
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+  }
+  html, body {
+    margin:0; padding:0; height:100%;
+    background: #070b07;
+    color: #00ff55;
+    font-family: 'Lucida Console', Monaco, monospace, monospace;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  button {
+    cursor: pointer;
+    background: linear-gradient(135deg, #004400, #007700);
+    border: 2px solid #00ff55;
+    color: #00ff55;
+    font-weight: 700;
+    font-size: 1.3rem;
+    padding: 14px 28px;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+    user-select: none;
+  }
+  button:hover {
+    background: linear-gradient(135deg, #007700, #00aa00);
+  }
+  button:disabled {
+    background: #003300;
+    border-color: #005500;
+    color: #006600;
+    cursor: not-allowed;
+  }
+
+  /* Containers */
+  #welcomeScreen, #cameraScreen, #terminalScreen {
+    width: 100vw;
+    max-width: 640px;
+    height: 100vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    box-sizing: border-box;
+  }
+  .hidden {
+    display: none !important;
+  }
+
+  /* Welcome Screen */
+  #welcomeScreen h1 {
+    font-size: 3rem;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 15px #00ff55aa;
+  }
+  #welcomeScreen p {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    color: #00cc44;
+    text-shadow: 0 0 8px #00ff55bb;
+  }
+
+  /* Camera Screen */
+  #cameraScreen h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-shadow: 0 0 12px #00ff55cc;
+  }
+  #cameraVideo {
+    width: 100%;
+    max-width: 620px;
+    border-radius: 16px;
+    border: 5px solid #00ff55aa;
+    box-shadow: 0 0 15px #00ff55cc;
+    background-color: #000;
+    user-select: none;
+  }
+  #startIntrusionBtn {
+    margin-top: 30px;
+    padding: 16px 36px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    box-shadow: 0 0 30px #ff0000aa;
+    background: linear-gradient(45deg, #660000, #aa0000);
+    border: 3px solid #ff3300;
+    color: #ff4444;
+    transition: background 0.25s ease;
+  }
+  #startIntrusionBtn:hover:not(:disabled) {
+    background: linear-gradient(45deg, #aa0000, #ff3333);
+    box-shadow: 0 0 50px #ff3300;
+  }
+  #startIntrusionBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Red overlay flash for transition */
+  #redFlash {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 0, 0, 0);
+    pointer-events: none;
+    z-index: 9999;
+    transition: background 0.5s ease;
+  }
+  #redFlash.active {
+    background: rgba(255, 0, 0, 0.75);
+    animation: pulseRed 1.5s ease-in-out infinite alternate;
+  }
+  @keyframes pulseRed {
+    0% { background: rgba(255, 0, 0, 0.55); }
+    100% { background: rgba(255, 0, 0, 0.85); }
+  }
+
+  /* Terminal Screen */
+  #terminalScreen {
+    background: #000000dd;
+    border: 4px solid #00ff55;
+    box-shadow: 0 0 20px #00ff55cc inset;
+    border-radius: 18px;
+    font-size: 1.15rem;
+    letter-spacing: 1.4px;
+    line-height: 1.3;
+    padding: 20px;
+    color: #00ff44;
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    user-select: text;
+  }
+
+  /* blinking cursor */
+  .blinking-cursor {
+    border-right: 2px solid #00ff55;
+    animation: blink 1s steps(2, start) infinite;
+    display: inline-block;
+  }
+  @keyframes blink {
+    0%, 50% { border-color: #00ff55; }
+    51%, 100% { border-color: transparent; }
+  }
+
+  /* Scrollbar for terminal */
+  #terminalScreen::-webkit-scrollbar {
+    width: 12px;
+  }
+  #terminalScreen::-webkit-scrollbar-thumb {
+    background-color: #00ff44cc;
+    border-radius: 6px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  #terminalScreen::-webkit-scrollbar-track {
+    background: #001000;
+  }
+
+  /* Final alert style */
+  #finalAlert {
+    margin-top: 25px;
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: 1.8px;
+    color: #ff2200;
+    text-shadow: 0 0 20px #ff2200bb;
+    text-align: center;
+    user-select: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    #welcomeScreen, #cameraScreen, #terminalScreen {
+      max-width: 100vw;
+      padding: 15px;
+    }
+    #welcomeScreen h1 {
+      font-size: 2.4rem;
+    }
+    #cameraScreen h2 {
+      font-size: 1.7rem;
+    }
+    #startIntrusionBtn {
+      padding: 14px 24px;
+      font-size: 1.1rem;
+    }
+    #terminalScreen {
+      font-size: 1rem;
+      letter-spacing: 1.2px;
+    }
+    #finalAlert {
+      font-size: 1.3rem;
+    }
+  }
 </style>
 </head>
 <body>
-<div class="center">
-  <div class="card" role="main" aria-live="polite">
-    <div class="header">
-      <div>
-        <span class="brand">KABIR SYSTEM</span>
-        <span class="by">— by KABIR</span>
-      </div>
-      <div class="smallMuted">Simulation locale • Prank — Utiliser avec consentement</div>
-    </div>
 
-    <div class="grid">
-      <div class="left">
-        <!-- Matrix background canvas -->
-        <canvas id="matrixCanvas" class="matrixBg"></canvas>
-
-        <!-- small glitch text decorative -->
-        <div class="glitch">K A B I R</div>
-
-        <!-- video area -->
-        <div class="videoWrap" id="videoWrap">
-          <div id="videoInner" class="placeholder">
-            <div class="placeholder">
-              Interface caméra discrète<br><span class="small">Appuyez sur "Démarrer" pour lancer le test</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- vignette (camera preview when active) -->
-        <div id="vignette" class="vignette" style="display:none">
-          <!-- video inserted here -->
-        </div>
-
-        <!-- dramatic overlay -->
-        <div class="bigDamage" id="bigDamage">
-          <h1 id="bigDamageText">[ SYSTEM BREACH ]</h1>
-        </div>
-        <div id="flash" class="flash"></div>
-      </div>
-
-      <div class="right">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="smallMuted">Terminal • Logs</div>
-          <div style="display:flex;gap:8px">
-            <button id="start">Démarrer</button>
-            <button id="reset" class="secondary">Réinitialiser</button>
-          </div>
-        </div>
-
-        <div id="terminal" class="terminal" aria-live="polite">
-          # Terminal prêt — aucune activité.
-        </div>
-
-        <div class="progressBar" aria-hidden="true" style="margin-top:12px">
-          <div id="progressInner" class="progressInner"></div>
-        </div>
-
-        <div class="footerNote">⚠ Simulation locale — AUCUNE DONNÉE N'EST TRANSMISE RÉELLEMENT (prank).</div>
-      </div>
-    </div>
-  </div>
+<!-- Step 1: Welcome -->
+<div id="welcomeScreen">
+  <h1>KABIR SYSTEM</h1>
+  <p>Cliquez pour activer la caméra frontale</p>
+  <button id="btnStartCamera">Activer caméra</button>
 </div>
 
-<!-- Final full-screen message -->
-<div id="finalScreen" class="finalScreen" aria-hidden="true">
-  <div style="max-width:980px;padding:20px;text-align:center">
-    <div class="finalMsg" id="finalMain">⚠ TOUS VOS DONNÉES ONT ÉTÉ TRANSMISES À RIBACK</div>
-    <div class="smallMuted">Simulation terminée — Aucune altération réelle. (Affichage local)</div>
-  </div>
+<!-- Step 2: Camera -->
+<div id="cameraScreen" class="hidden">
+  <h2>Caméra activée</h2>
+  <video id="cameraVideo" autoplay muted playsinline></video>
+  <button id="btnStartIntrusion">Lancer intrusion</button>
 </div>
+
+<!-- Step 2.5: Red Flash -->
+<div id="redFlash"></div>
+
+<!-- Step 3: Terminal -->
+<div id="terminalScreen" class="hidden" aria-live="polite" aria-atomic="true" role="log"></div>
 
 <script>
-/*
-  KabirCam — Cinematic Ultimate
-  - Multi-stage cinematic prank
-  - Camera only after click
-  - All local; nothing uploaded
-  - WebAudio bips generated after first user gesture
-*/
+  // Elements
+  const welcomeScreen = document.getElementById('welcomeScreen');
+  const cameraScreen = document.getElementById('cameraScreen');
+  const terminalScreen = document.getElementById('terminalScreen');
+  const redFlash = document.getElementById('redFlash');
+  const btnStartCamera = document.getElementById('btnStartCamera');
+  const btnStartIntrusion = document.getElementById('btnStartIntrusion');
+  const video = document.getElementById('cameraVideo');
 
-/* ---------- Elements & state ---------- */
-const startBtn = document.getElementById('start');
-const resetBtn = document.getElementById('reset');
-const videoInner = document.getElementById('videoInner');
-const vignette = document.getElementById('vignette');
-const terminal = document.getElementById('terminal');
-const progressInner = document.getElementById('progressInner');
-const bigDamage = document.getElementById('bigDamage');
-const bigDamageText = document.getElementById('bigDamageText');
-const flash = document.getElementById('flash');
-const finalScreen = document.getElementById('finalScreen');
+  let stream = null;
+  let audioCtx = null;
 
-let audioCtx = null;
-let stream = null;
-let isRunning = false;
-
-/* ---------- Matrix background ---------- */
-const canvas = document.getElementById('matrixCanvas');
-const ctx = canvas.getContext('2d');
-let w = innerWidth, h = innerHeight;
-function resizeCanvas(){
-  canvas.width = w = innerWidth;
-  canvas.height = h = innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-const cols =  Math.floor(window.innerWidth / 14);
-let drops = [];
-for(let i=0;i<cols;i++) drops[i] = Math.random()*1000;
-function drawMatrix(){
-  ctx.fillStyle = 'rgba(0,0,0,0.18)';
-  ctx.fillRect(0,0,w,h);
-  ctx.fillStyle = '#0df25a';
-  ctx.font = '12px monospace';
-  for(let i=0;i<drops.length;i++){
-    const text = String.fromCharCode(0x30A0 + Math.random()*96);
-    ctx.fillText(text, i*14, drops[i]*14);
-    if(drops[i]*14 > h && Math.random()>0.975) drops[i]=0;
-    drops[i]++;
+  // WebAudio beep helper
+  function beep(frequency=800, duration=120, type='square', volume=0.07) {
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration/1000);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration/1000);
   }
-  requestAnimationFrame(drawMatrix);
-}
-drawMatrix();
 
-/* ---------- WebAudio helpers (bips/siren) ---------- */
-function ensureAudio(){
-  if(!audioCtx){
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-}
-function beepAt(timeOffset, freq=400, dur=0.12, type='sine', gainMax=0.08){
-  ensureAudio();
-  const now = audioCtx.currentTime + timeOffset;
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.type = type; o.frequency.setValueAtTime(freq, now);
-  g.gain.setValueAtTime(0.0001, now);
-  g.gain.exponentialRampToValueAtTime(gainMax, now + 0.005);
-  g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-  o.connect(g); g.connect(audioCtx.destination);
-  o.start(now); o.stop(now + dur + 0.02);
-}
-function playSirenNow(duration=2.0){
-  ensureAudio();
-  const now = audioCtx.currentTime;
-  const o1 = audioCtx.createOscillator(), o2 = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o1.type='sine'; o2.type='sine';
-  o1.frequency.setValueAtTime(400, now); o2.frequency.setValueAtTime(600, now);
-  o1.frequency.linearRampToValueAtTime(1200, now + duration);
-  o2.frequency.linearRampToValueAtTime(1800, now + duration);
-  g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(0.18, now + 0.06);
-  g.gain.linearRampToValueAtTime(0.0001, now + duration);
-  o1.connect(g); o2.connect(g); g.connect(audioCtx.destination);
-  o1.start(now); o2.start(now); o1.stop(now + duration + 0.05); o2.stop(now + duration + 0.05);
-}
+  // Typing effect with beep
+  async function typeLine(text, delay=20, beepOnEnd=true, error=false) {
+    return new Promise(resolve => {
+      let i=0;
+      const cursor = document.createElement('span');
+      cursor.className = 'blinking-cursor';
+      terminalScreen.appendChild(cursor);
 
-/* ---------- Typing effect for terminal ---------- */
-function typeText(targetEl, text, speed=14){
-  return new Promise(res=>{
-    let i = 0;
-    function step(){
-      if(i <= text.length){
-        targetEl.textContent += text.charAt(i);
-        targetEl.scrollTop = targetEl.scrollHeight;
-        i++;
-        setTimeout(step, speed + Math.random()*18);
-      } else {
-        targetEl.textContent += "\n";
-        targetEl.scrollTop = targetEl.scrollHeight;
-        res();
+      function typeChar(){
+        if(i < text.length) {
+          cursor.insertAdjacentText('beforebegin', text[i]);
+          i++;
+          setTimeout(typeChar, delay + Math.random()*10);
+        } else {
+          if(beepOnEnd) {
+            if(error) beep(400, 150, 'square', 0.09);
+            else beep(900, 90, 'square', 0.07);
+          }
+          terminalScreen.removeChild(cursor);
+          terminalScreen.appendChild(document.createTextNode('\n'));
+          terminalScreen.scrollTop = terminalScreen.scrollHeight;
+          setTimeout(resolve, 200);
+        }
       }
+      typeChar();
+    });
+  }
+
+  // Lines for intrusion simulation
+  const intrusionLines = [
+    "Connexion à l'hôte 192.168.1.12...",
+    "Authentification SSH : échec - mot de passe incorrect",
+    "Tentative de contournement...",
+    "Accès refusé - tentative 1/3",
+    "Accès refusé - tentative 2/3",
+    "Accès refusé - tentative 3/3",
+    "Erreur fatale : échec de l'authentification",
+    "Activation du mode root (local)...",
+    "Chargement du module d'injection...",
+    "Injection réussie",
+    "Établissement du tunnel sécurisé vers RIBACK...",
+    "Transfert des données utilisateur en cours...",
+    "[███████████████.............] 56%",
+    "Erreur de transmission détectée - tentative de reconnection",
+    "[████████████████████████....] 87%",
+    "Transfert terminé avec succès",
+    "Déconnexion du serveur"
+  ];
+
+  // Start camera
+  btnStartCamera.addEventListener('click', async () => {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({video: {facingMode:'user'}});
+      video.srcObject = stream;
+      welcomeScreen.classList.add('hidden');
+      cameraScreen.classList.remove('hidden');
+      if(audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    } catch(e) {
+      alert('Erreur accès caméra: ' + e.message);
     }
-    step();
   });
-}
 
-/* ---------- Random numeric stream (movie-style) ---------- */
-let numInterval = null;
-function startNumericStream(){
-  if(numInterval) clearInterval(numInterval);
-  const bg = document.createElement('div');
-  bg.style.position='absolute'; bg.style.inset='0'; bg.style.pointerEvents='none'; bg.style.zIndex=1;
-  document.querySelector('.left').appendChild(bg);
-  numInterval = setInterval(()=>{
-    const span = document.createElement('div');
-    span.style.position='absolute';
-    span.style.left = Math.random()*90 + '%';
-    span.style.top = Math.random()*90 + '%';
-    span.style.fontSize = (8 + Math.random()*28) + 'px';
-    span.style.opacity = 0.6;
-    span.style.color = '#0df25a';
-    span.style.fontFamily = 'monospace';
-    span.textContent = Array.from({length: Math.floor(6+Math.random()*18)}).map(()=>Math.floor(Math.random()*10)).join('');
-    bg.appendChild(span);
-    setTimeout(()=>{ span.style.transition='opacity 1.2s, transform 1.2s'; span.style.opacity=0; span.style.transform='translateY(-30px)'; }, 80 + Math.random()*200);
-    setTimeout(()=>{ try{ bg.removeChild(span); }catch(e){} }, 1300 + Math.random()*900);
-  }, 120);
-}
-function stopNumericStream(){
-  if(numInterval) clearInterval(numInterval);
-  const bg = document.querySelector('.left > div');
-  // intentionally leave cleanup to page reload
-}
-
-/* ---------- Staged cinematic sequence ---------- */
-const commandsStage = [
-  "Initialisation du module KabirSystem v7.1",
-  "Chargement des drivers vidéo...",
-  "Authentification locale (simulée) : OK",
-  "Découverte réseau: 5 hôtes trouvés",
-  "Scan des ports (80,443,22,3389)...",
-  "Extraction des caches temporaires...",
-  "Analyse des tokens d'accès...",
-  "Préparation du canal chiffré...",
-  "Établissement du tunnel -> RIBACK",
-  "Transmission: 12%  27%  51%  78%  100%",
-  "CONFIRMATION: TRANSMISSION TERMINÉE"
-];
-
-async function runCinematic(){
-  if(isRunning) return;
-  isRunning = true;
-  startBtn.disabled = true;
-  terminal.textContent = "";
-  progressInner.style.width = '0%';
-  // Stage 0 — normal test (calm)
-  await typeText(terminal, "> Démarrage du test caméra..."); 
-  // schedule mild bips while "testing"
-  for(let i=0;i<3;i++){
-    beepAt(0.02 + i*0.9, 300 + i*20, 0.12, 'sine', 0.06);
-    await new Promise(r=>setTimeout(r, 900));
-    await typeText(terminal, `> Check ${i+1} OK`);
+  // Red flash animation before terminal
+  function playRedFlash() {
+    return new Promise(resolve => {
+      redFlash.classList.add('active');
+      beep(350, 700, 'sawtooth', 0.15);
+      setTimeout(() => {
+        redFlash.classList.remove('active');
+        resolve();
+      }, 1500);
+    });
   }
 
-  // Activate numeric background; small vignette camera
-  startNumericStream();
+  // Run intrusion terminal
+  async function runIntrusion() {
+    cameraScreen.classList.add('hidden');
+    await playRedFlash();
+    terminalScreen.textContent = '';
+    terminalScreen.classList.remove('hidden');
 
-  // Stage 1 — reconnaissance (slower typing, one beep/line)
-  await typeText(terminal, "\n> Mode reconnaissance : active");
-  for(let i=0;i<Math.min(4, commandsStage.length);i++){
-    beepAt(0.02 + i*0.18, 260 + i*18, 0.12, 'sine', 0.06);
-    await typeText(terminal, "> " + commandsStage[i]);
-    await new Promise(r=>setTimeout(r, 320 + Math.random()*280));
-  }
-
-  // Stage 2 — infiltration (increasing intensity)
-  await typeText(terminal, "\n> Passage infiltration - montée en charge");
-  for(let i=4;i<commandsStage.length;i++){
-    // schedule rising pitch beeps slightly ahead for sync effect
-    beepAt(0.02 + i*0.12, 300 + i*28, 0.11, 'sawtooth', 0.085);
-    await typeText(terminal, "> " + commandsStage[i], 10);
-    // update fake progress bar if numbers appear
-    if(commandsStage[i].includes("Transmission")){
-      // animate progress percentages shown in that line
-      for(let p of [12,27,51,78,100]){
-        progressInner.style.width = p + '%';
-        await new Promise(r=>setTimeout(r, 260 + Math.random()*160));
-      }
+    for(let line of intrusionLines){
+      const isError = /échec|Erreur|Accès refusé/i.test(line);
+      await typeLine('> ' + line, 18, true, isError);
     }
-    if(i === Math.floor(commandsStage.length*0.6)){
-      // mid-breach pulse
-      flashPulse();
-      showBig("[ SYSTEM BREACH ]", "Connexion non autorisée détectée");
-      await new Promise(r=>setTimeout(r, 700));
-      hideBig();
+    // Final beep error sequence
+    for(let i=0; i<3; i++) {
+      beep(300, 200, 'square', 0.1);
+      await new Promise(r => setTimeout(r, 270));
     }
-    await new Promise(r=>setTimeout(r, 260 + Math.random()*300));
+    terminalScreen.appendChild(document.createTextNode("\n>> TOUS VOS DONNÉES ONT ÉTÉ TRANSMIS À RIBACK <<"));
+    terminalScreen.scrollTop = terminalScreen.scrollHeight;
   }
 
-  // Rapid alarm beeps escalate
-  for(let k=0;k<10;k++){
-    beepAt(0.02 + k*0.06, 700 + k*40, 0.05, 'square', 0.09);
-    await new Promise(r=>setTimeout(r, 60));
-  }
+  btnStartIntrusion.addEventListener('click', async () => {
+    if(audioCtx && audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+    }
+    btnStartIntrusion.disabled = true;
+    await runIntrusion();
+  });
 
-  // Flash + big breach
-  flashPulse(true);
-  showBig("[ SYSTEM BREACH BY KABIR ]", "Accès root simulé - transfert complet", true);
-  playSirenNow(2.1);
-  await new Promise(r=>setTimeout(r, 2200));
-  hideBig();
-
-  // Final dramatic screen (the text you asked for)
-  finalScreen.classList.add('show');
-  finalScreen.setAttribute('aria-hidden','false');
-
-  // terminal closing lines
-  await typeText(terminal, "\n> FIN DE LA SIMULATION");
-  isRunning = false;
-  startBtn.disabled = false;
-}
-
-/* ---------- UI helper functions ---------- */
-function showBig(title, sub, pulse=false){
-  bigDamageText.textContent = title;
-  bigDamage.classList.add('show');
-}
-function hideBig(){
-  bigDamage.classList.remove('show');
-}
-function flashPulse(repeat=false){
-  flash.style.opacity = 0.95;
-  flash.style.transition = 'opacity .12s';
-  flash.classList.add('active');
-  // quick sequence
-  let seq = 3;
-  for(let i=0;i<seq;i++){
-    setTimeout(()=>{ flash.style.opacity = 0.95; }, i*140);
-    setTimeout(()=>{ flash.style.opacity = 0.0; }, i*140 + 70);
-  }
-  setTimeout(()=>{ flash.style.opacity = 0.0; }, seq*160 + 20);
-}
-
-/* ---------- Camera activation ---------- */
-async function startCamera(){
-  // Resume/create audio on gesture (mobile requirement)
-  if(!audioCtx) try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-    const v = document.createElement('video');
-    v.autoplay = true; v.playsInline = true; v.muted = true; v.id = 'camVideo';
-    v.srcObject = stream;
-    // show mini vignette
-    vignette.style.display = 'block';
-    vignette.innerHTML = ''; vignette.appendChild(v);
-    // show main video in left area small (but keep terminal visible)
-    videoInner.innerHTML = ''; videoInner.appendChild(v.cloneNode(true));
-    // ensure video playback on mobile
-    try{ await v.play(); }catch(e){}
-    // small delay that builds trust
-    setTimeout(()=>runCinematic(), 1200);
-  }catch(err){
-    videoInner.innerHTML = '<div class="placeholder">Caméra indisponible ou permission refusée.<br><span class="small">Erreur: '+ (err && err.message ? err.message : 'inconnue') +'</span></div>';
-  }
-}
-
-/* ---------- Reset function ---------- */
-function resetAll(){
-  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
-  // stop audio context gently
-  if(audioCtx && audioCtx.state !== 'closed'){ try{ audioCtx.close(); }catch(e){} audioCtx = null; }
-  terminal.textContent = "# Terminal prêt — aucune activité.";
-  progressInner.style.width = '0%';
-  finalScreen.classList.remove('show');
-  vignette.style.display = 'none';
-  videoInner.innerHTML = '<div class="placeholder">Interface caméra discrète<br><span class="small">Appuyez sur "Démarrer" pour lancer le test</span></div>';
-  // clear numeric stream - reload page is easiest; we'll just clearInterval if exists
-  stopNumericStream();
-}
-
-/* ---------- Events ---------- */
-startBtn.addEventListener('click', async ()=>{
-  // must resume audio context on user gesture for mobile
-  if(audioCtx && audioCtx.state === 'suspended'){ try{ await audioCtx.resume(); }catch(e){} }
-  // if camera not yet active, start it; else start cinematic only
-  if(!stream) startCamera(); else runCinematic();
-});
-resetBtn.addEventListener('click', resetAll);
-
-/* ---------- Cleanup on unload ---------- */
-window.addEventListener('beforeunload', ()=>{
-  if(stream) stream.getTracks().forEach(t=>t.stop());
-  if(audioCtx && audioCtx.close) audioCtx.close();
-});
+  window.addEventListener('beforeunload', () => {
+    if(stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+    if(audioCtx) {
+      audioCtx.close();
+    }
+  });
 </script>
+
 </body>
 </html>
