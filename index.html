@@ -1,668 +1,220 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>🎯 Jeu Devinette Ultime Amélioré</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kabir Virus Simulation — Demo</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin:0; padding:0; min-height:100vh;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    background: linear-gradient(135deg, #222831, #393e46);
-    color: #eeeeee;
-    transition: background 0.8s, color 0.8s;
+  html,body{height:100%;margin:0;background:#000;color:#0f0;font-family: "Courier New", monospace;overflow:hidden}
+  #container{position:relative;width:100%;height:100%;}
+  canvas#matrix{position:absolute;left:0;top:0;width:100%;height:100%;z-index:0;opacity:0.6}
+  .terminal{
+    position: absolute;
+    left:50%;top:50%;transform:translate(-50%,-50%);
+    width:88%;max-width:1000px;height:60%;
+    background:rgba(0,0,0,0.6); border:2px solid #060; box-shadow:0 10px 40px rgba(0,0,0,0.9);
+    z-index:2; padding:18px; box-sizing:border-box; overflow:hidden;
+    border-radius:8px;
   }
-  body.theme-light {
-    background: #f4f4f9;
-    color: #222;
+  .title{color:#6f6;font-weight:700;margin-bottom:8px}
+  #log{height:82%;overflow:auto;white-space:pre-wrap; font-size:14px; line-height:1.3}
+  .controls{position:absolute;right:18px;top:14px;display:flex;gap:8px}
+  button{
+    background:#062;border:1px solid #0a0;padding:8px 12px;border-radius:6px;color:#cfc;cursor:pointer;
+    font-family:inherit;font-weight:600;
   }
-  body.theme-retro {
-    background: #000000;
-    color: #39ff14;
-    font-family: 'Press Start 2P', cursive;
-  }
-  body.theme-neon {
-    background: #0f0f17;
-    color: #00ffff;
-    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
-  }
-
-  #app {
-    max-width: 480px;
-    width: 90vw;
-    background: rgba(0, 173, 181, 0.85);
-    border-radius: 15px;
-    box-shadow: 0 0 30px rgba(0,173,181,0.7);
-    padding: 20px 25px;
-    box-sizing: border-box;
-    position: relative;
-  }
-
-  #welcome, #game {
-    text-align: center;
-    animation: fadeIn 1s ease forwards;
-  }
-
-  #welcome {
-    display: flex; flex-direction: column; align-items:center; gap: 10px;
-  }
-
-  #welcome h1 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-  }
-  #welcome p {
-    font-size: 1.1rem;
-    margin-bottom: 20px;
-    line-height: 1.4;
-  }
-  #welcome button, #welcome select, #game button {
-    cursor: pointer;
-    font-size: 1.1rem;
-    border:none;
-    border-radius: 12px;
-    padding: 12px 24px;
-    margin: 8px;
-    background: #222831;
-    color: #eeeeee;
-    box-shadow: 0 0 10px #00adb5;
-    transition: background 0.3s ease;
-  }
-  #welcome button:hover, #welcome select:hover, #game button:hover {
-    background: #00adb5;
-    color: #222831;
-  }
-
-  #game {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-
-  #game h2 {
-    margin-bottom: 10px;
-    font-size: 1.8rem;
-  }
-  #info {
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-  #guessInput {
-    padding: 12px;
-    font-size: 1.2rem;
-    border-radius: 10px;
-    border:none;
-    width: 60%;
-    max-width: 200px;
-    text-align: center;
-  }
-  #feedback {
-    margin-top: 15px;
-    min-height: 40px;
-    font-size: 1.3rem;
-  }
-
-  #timerContainer {
-    width: 100%;
-    max-width: 320px;
-    height: 20px;
-    background: #222831;
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 10px auto 0 auto;
-    box-shadow: 0 0 10px #00adb5;
-  }
-  #timerBar {
-    height: 100%;
-    width: 100%;
-    background: #00adb5;
-    transition: width 1s linear, background-color 0.5s;
-  }
-
-  #timerText {
-    margin-top: 5px;
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-
-  #controls {
-    margin-top: 15px;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-  }
-  #stats {
-    margin-top: 20px;
-    background: #eeeeee;
-    color: #222831;
-    border-radius: 10px;
-    padding: 15px;
-    font-size: 0.9rem;
-    line-height: 1.4;
-    text-align: left;
-    max-width: 320px;
-  }
-  #stats h3 {
-    margin-top: 0;
-  }
-
-  #confettiCanvas {
-    position: fixed;
-    pointer-events: none;
-    top:0; left:0;
-    width: 100vw; height: 100vh;
-    z-index: 9999;
-  }
-
-  @keyframes fadeIn {
-    from {opacity:0;}
-    to {opacity:1;}
-  }
-
-  @media (max-width: 480px) {
-    #app {
-      width: 95vw;
-      padding: 15px 20px;
-    }
-    #guessInput {
-      width: 80%;
-    }
-  }
-
+  button.secondary{background:transparent;border:1px solid #044;color:#8f8}
+  #camWrapper{position:absolute;right:20px;bottom:20px;z-index:3;background:rgba(0,0,0,0.45);padding:8px;border-radius:6px;display:none}
+  video#cam{width:200px;height:150px;border-radius:6px;object-fit:cover;border:2px solid #072}
+  .small{font-size:12px;color:#9f9}
 </style>
 </head>
-<body class="theme-dark">
+<body>
+<div id="container">
+  <canvas id="matrix"></canvas>
 
-<div id="app">
-  <section id="welcome" aria-label="Accueil du jeu">
-    <h1>🎯 Bienvenue au Jeu Devinette Ultime !</h1>
-    <p>Devine un nombre secret entre 1 et un maximum qui augmente à chaque niveau.<br>
-    Tu as un temps limité qui augmente aussi.<br>
-    Après 5 essais ratés, un indice te sera donné.</p>
-
-    <label for="themeSelector">Choisis ton thème :</label>
-    <select id="themeSelector" aria-label="Choix du thème graphique">
-      <option value="dark" selected>Sombre</option>
-      <option value="light">Clair</option>
-      <option value="retro">Rétro Pixel</option>
-      <option value="neon">Néon</option>
-    </select>
-
-    <button id="startBtn">Jouer</button>
-  </section>
-
-  <section id="game" aria-live="polite" aria-atomic="true" aria-relevant="additions removals" role="main">
-    <h2>Devine le nombre !</h2>
-    <div id="info">Niveau : 1 | Tentatives : 0</div>
-    <input type="number" id="guessInput" placeholder="Entre un nombre" min="1" autocomplete="off" aria-label="Entrée du nombre deviné"/>
-    <button id="submitGuessBtn">Valider</button>
-    <div id="feedback" aria-live="assertive"></div>
-
-    <div id="timerContainer" aria-label="Barre de temps restant">
-      <div id="timerBar"></div>
-    </div>
-    <div id="timerText" aria-label="Temps restant"></div>
-
-    <div id="controls">
-      <button id="muteMusicBtn" aria-pressed="false">🎵 Musique : On</button>
-      <button id="muteSoundsBtn" aria-pressed="false">🔈 Sons : On</button>
+  <div class="terminal" role="region" aria-label="Kabir simulation">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <span class="title">[KABIR-ATTACK-SIM]</span>
+        <span class="small"> — simulation active</span>
+      </div>
+      <div class="controls">
+        <button id="startBtn">Lancer</button>
+        <button id="camBtn" class="secondary">Activer caméra</button>
+        <button id="resetBtn" class="secondary">Réinitialiser</button>
+      </div>
     </div>
 
-    <div id="stats" aria-label="Statistiques du joueur" role="region" tabindex="0">
-      <h3>Statistiques</h3>
-      <p>Parties jouées : <span id="gamesPlayed">0</span></p>
-      <p>Meilleur niveau : <span id="bestLevel">0</span></p>
-      <p>Moyenne tentatives : <span id="avgAttempts">0</span></p>
-      <p>Trophées : <span id="trophies">Aucun</span></p>
-    </div>
-  </section>
+    <div id="log" aria-live="polite"></div>
+  </div>
+
+  <div id="camWrapper">
+    <div class="small">Caméra (permission requise)</div>
+    <video id="cam" autoplay muted playsinline></video>
+  </div>
 </div>
 
-<canvas id="confettiCanvas"></canvas>
-
-<!-- Sons -->
-<audio id="audioMusic" loop src="https://files.catbox.moe/uc4kgx.mp3" preload="auto"></audio>
-<audio id="audioClick" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3" preload="auto"></audio>
-<audio id="audioError" src="https://freesound.org/data/previews/109/109662_945474-lq.mp3" preload="auto"></audio>
-<audio id="audioWin" src="https://freesound.org/data/previews/276/276033_5121236-lq.mp3" preload="auto"></audio>
-<audio id="audioHint" src="https://freesound.org/data/previews/66/66238_634166-lq.mp3" preload="auto"></audio>
-<audio id="audioTick" src="https://freesound.org/data/previews/341/341695_5121236-lq.mp3" preload="auto"></audio>
-
 <script>
-(() => {
-  // DOM
-  const welcomeSection = document.getElementById('welcome');
-  const gameSection = document.getElementById('game');
-  const startBtn = document.getElementById('startBtn');
-  const themeSelector = document.getElementById('themeSelector');
-  const guessInput = document.getElementById('guessInput');
-  const submitGuessBtn = document.getElementById('submitGuessBtn');
-  const feedback = document.getElementById('feedback');
-  const info = document.getElementById('info');
-  const timerBar = document.getElementById('timerBar');
-  const timerText = document.getElementById('timerText');
-  const gamesPlayedSpan = document.getElementById('gamesPlayed');
-  const bestLevelSpan = document.getElementById('bestLevel');
-  const avgAttemptsSpan = document.getElementById('avgAttempts');
-  const trophiesSpan = document.getElementById('trophies');
-  const muteMusicBtn = document.getElementById('muteMusicBtn');
-  const muteSoundsBtn = document.getElementById('muteSoundsBtn');
-  const confettiCanvas = document.getElementById('confettiCanvas');
-  const confettiCtx = confettiCanvas.getContext('2d');
+/* ========== Matrix rain ========== */
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+let w, h, cols, size=16, drops;
 
-  // Audio
-  const audioMusic = document.getElementById('audioMusic');
-  const audioClick = document.getElementById('audioClick');
-  const audioError = document.getElementById('audioError');
-  const audioWin = document.getElementById('audioWin');
-  const audioHint = document.getElementById('audioHint');
-  const audioTick = document.getElementById('audioTick');
+function resize() {
+  w = canvas.width = innerWidth;
+  h = canvas.height = innerHeight;
+  cols = Math.floor(w / size) + 1;
+  drops = new Array(cols).fill(0).map(()=>Math.floor(Math.random()*h));
+}
+window.addEventListener('resize', resize);
+resize();
 
-  // Config
-  const BASE_TIME = 60;    // secondes de base
-  const TIME_INCREMENT = 30; // par niveau
-  const MAX_LEVEL = 50;
-  const HINT_1_TRIES = 5;
-  const HINT_2_TRIES = 8;
-
-  // Variables jeu
-  let level = 1;
-  let secretNumber = 0;
-  let attempts = 0;
-  let timer = 0;
-  let timerId = null;
-  let gameActive = false;
-  let hintGiven1 = false;
-  let hintGiven2 = false;
-  let trophies = new Set();
-
-  // Statistiques
-  let gamesPlayed = 0;
-  let totalAttempts = 0;
-  let bestLevel = 0;
-
-  // Confettis
-  const confettis = [];
-  let confettiRunning = false;
-
-  // Thèmes
-  const themes = {
-    dark: 'theme-dark',
-    light: 'theme-light',
-    retro: 'theme-retro',
-    neon: 'theme-neon'
-  };
-
-  // Setup initial
-  function setup() {
-    loadStats();
-    updateStats();
-    applyTheme(themeSelector.value);
-    audioMusic.volume = 0.3;
-    audioMusic.play().catch(()=>{});
+function matrixLoop(){
+  ctx.fillStyle = 'rgba(0,0,0,0.1)';
+  ctx.fillRect(0,0,w,h);
+  ctx.fillStyle = '#0f0';
+  ctx.font = size + 'px monospace';
+  for(let i=0;i<drops.length;i++){
+    const text = String.fromCharCode(0x30A0 + Math.random()*96);
+    ctx.fillText(text, i*size, drops[i]*size);
+    if(drops[i]*size > h && Math.random()>0.975) drops[i]=0;
+    drops[i]++;
   }
+  requestAnimationFrame(matrixLoop);
+}
+matrixLoop();
 
-  // Thème
-  function applyTheme(themeKey) {
-    document.body.className = themes[themeKey] || themes.dark;
+/* ========== Terminal typing + fake commands ========== */
+const log = document.getElementById('log');
+const startBtn = document.getElementById('startBtn');
+const resetBtn = document.getElementById('resetBtn');
+const camBtn = document.getElementById('camBtn');
+const camWrapper = document.getElementById('camWrapper');
+const camVideo = document.getElementById('cam');
+
+let sequence = [
+  "Initialisation du moteur KABIR v3.14...",
+  "Chargement des modules : [NET] [I/O] [CORE] [MATRIX_RENDERER] ...",
+  "Connexion aux sockets locaux...",
+  "Scanning des ports : 80, 443, 22, 3389 ...",
+  "Injection de patterns visuels...",
+  "Compilation dynamique des shaders...",
+  "Simulation d'attaque en cours — ETA 00:00:23",
+  "DETRUIRE: /usr/bin/FAKE_PROCESS",
+  "ENVOI: paquets-> 127.0.0.1: flood (simulé)",
+  "Analyse HACK_SUCCESS_RATE: 99.99% (simulé)",
+  "RESULTAT: SYSTEME COMPROMIS (simulé) — affichage uniquement",
+  "Terminé. Rendez-vous sur /dev/null"
+];
+
+let typing = null;
+let idx=0;
+
+function playBeepSequence(){
+  // WebAudio dramatique
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  function beep(freq, time, dur, type='sine'){
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    o.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.0001, time);
+    g.gain.exponentialRampToValueAtTime(0.05, time + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    o.start(time); o.stop(time + dur + 0.02);
   }
-  themeSelector.addEventListener('change', e => {
-    applyTheme(e.target.value);
-  });
+  const now = ctx.currentTime + 0.02;
+  beep(120, now, 0.18,'sawtooth');
+  beep(240, now+0.12, 0.15,'sawtooth');
+  beep(380, now+0.28, 0.22,'sine');
+  beep(80, now+0.6, 0.6,'triangle');
+}
 
-  // Démarrer jeu
-  startBtn.addEventListener('click', () => {
-    playSound(audioClick);
-    level = 1;
-    startLevel();
-    welcomeSection.style.display = 'none';
-    gameSection.style.display = 'flex';
-    guessInput.focus();
-    gameActive = true;
-  });
-
-  // Max nombre selon niveau
-  function getMaxNumber(level) {
-    return 20 + (level - 1) * 30;
-  }
-
-  // Update infos
-  function updateInfo() {
-    info.textContent = `Niveau : ${level} | Tentatives : ${attempts} | Entre 1 et ${getMaxNumber(level)}`;
-  }
-
-  // Démarrer niveau
-  function startLevel() {
-    secretNumber = Math.floor(Math.random() * getMaxNumber(level)) + 1;
-    attempts = 0;
-    hintGiven1 = false;
-    hintGiven2 = false;
-    timer = BASE_TIME;
-    updateInfo();
-    feedback.textContent = '';
-    guessInput.value = '';
-    guessInput.placeholder = `1 - ${getMaxNumber(level)}`;
-    updateTimerDisplay();
-    clearInterval(timerId);
-    timerId = setInterval(countDown, 1000);
-    startTimerBar();
-    showLevelMessage();
-  }
-
-  // Message motivant
-  function showLevelMessage() {
-    const messages = [
-      "🔥 Prêt pour le défi ?",
-      "🚀 Tu vas tout déchirer !",
-      "🎯 Concentre-toi, tu es capable !",
-      "💡 Chaque niveau compte, go go !",
-      "⚡ Tu es une légende en devenir !"
-    ];
-    const msg = messages[Math.floor(Math.random() * messages.length)];
-    feedback.textContent = msg;
-  }
-
-  // Timer compte à rebours
-  function countDown() {
-    timer--;
-    updateTimerDisplay();
-    updateTimerBar();
-
-    if (timer <= 5 && timer > 0) {
-      // Tic-tac urgent
-      playSound(audioTick);
-      timerBar.style.backgroundColor = '#ff5555';
-      timerText.style.color = '#ff5555';
-    } else {
-      timerBar.style.backgroundColor = '#00adb5';
-      timerText.style.color = '';
-    }
-
-    if (timer <= 0) {
-      clearInterval(timerId);
-      endGame(false, '⏰ Temps écoulé ! Tu as perdu.');
-    }
-  }
-
-  // Update affichage timer
-  function updateTimerDisplay() {
-    timerText.textContent = `Temps restant : ${timer}s`;
-  }
-
-  // Barre timer animée
-  let timerBarInterval = null;
-  function startTimerBar() {
-    if (timerBarInterval) clearInterval(timerBarInterval);
-    timerBar.style.width = '100%';
-    const totalTime = timer;
-    timerBarInterval = setInterval(() => {
-      let percent = (timer / totalTime) * 100;
-      timerBar.style.width = percent + '%';
-      if (percent <= 0) clearInterval(timerBarInterval);
-    }, 200);
-  }
-  function updateTimerBar() {
-    // width géré par timerBarInterval
-  }
-
-  // Gestion soumission
-  submitGuessBtn.addEventListener('click', () => {
-    if (!gameActive) return;
-    handleGuess();
-  });
-  guessInput.addEventListener('keypress', e => {
-    if (e.key === 'Enter') {
-      submitGuessBtn.click();
-    }
-  });
-
-  // Gestion devinette
-  function handleGuess() {
-    const guess = parseInt(guessInput.value);
-    if (!guess || guess < 1 || guess > getMaxNumber(level)) {
-      feedback.textContent = `❗ Entre un nombre entre 1 et ${getMaxNumber(level)}.`;
-      playSound(audioError);
-      wrongGuessEffect();
-      return;
-    }
-    attempts++;
-    updateInfo();
-
-    if (guess === secretNumber) {
-      playSound(audioWin);
-      feedback.textContent = `✅ Bravo ! Tu as trouvé le nombre ${secretNumber} en ${attempts} essais.`;
-      confettiEffect(150);
-      saveStats(true);
-      gameActive = false;
-      clearInterval(timerId);
-      clearInterval(timerBarInterval);
-      addTrophies();
-      level++;
-      setTimeout(() => {
-        startLevel();
-        gameActive = true;
-        guessInput.focus();
-        feedback.textContent = '';
-      }, 3500);
-    } else {
-      playSound(audioError);
-      wrongGuessEffect();
-      if (guess < secretNumber) {
-        feedback.textContent = '🔼 Trop petit !';
+/* slow type effect */
+function typeLine(text, speed=35){
+  return new Promise(res=>{
+    let i=0;
+    function step(){
+      if(i<=text.length){
+        log.innerText = log.innerText + text.charAt(i);
+        log.scrollTop = log.scrollHeight;
+        i++;
+        setTimeout(step, speed + Math.random()*60);
       } else {
-        feedback.textContent = '🔽 Trop grand !';
-      }
-      // Indices progressifs
-      if (attempts >= HINT_1_TRIES && !hintGiven1) {
-        giveHint1();
-      }
-      if (attempts >= HINT_2_TRIES && !hintGiven2) {
-        giveHint2();
+        log.innerText += "\n";
+        log.scrollTop = log.scrollHeight;
+        res();
       }
     }
-    guessInput.value = '';
-  }
-
-  // Effet shake input mauvais guess
-  function wrongGuessEffect() {
-    guessInput.classList.add('error-shake');
-    setTimeout(() => guessInput.classList.remove('error-shake'), 400);
-  }
-
-  // Indices
-  function giveHint1() {
-    hintGiven1 = true;
-    let hint = (secretNumber % 2 === 0) ? 'Le nombre est pair.' : 'Le nombre est impair.';
-    if (secretNumber % 3 === 0) hint += ' Il est multiple de 3.';
-    feedback.textContent += ` 💡 Indice : ${hint}`;
-    playSound(audioHint);
-  }
-  function giveHint2() {
-    hintGiven2 = true;
-    const half = Math.floor(getMaxNumber(level) / 2);
-    const rangeHint = secretNumber <= half ? `entre 1 et ${half}` : `entre ${half + 1} et ${getMaxNumber(level)}`;
-    feedback.textContent += ` 💡 Deuxième indice : Le nombre est ${rangeHint}.`;
-    playSound(audioHint);
-  }
-
-  // Fin de partie
-  function endGame(win, msg) {
-    gameActive = false;
-    clearInterval(timerId);
-    clearInterval(timerBarInterval);
-    feedback.textContent = msg;
-    saveStats(false);
-    showFinalTrophies();
-    setTimeout(() => {
-      welcomeSection.style.display = 'flex';
-      gameSection.style.display = 'none';
-      feedback.textContent = '';
-    }, 4500);
-  }
-
-  // Sons
-  function playSound(audio) {
-    if (!audio) return;
-    if (!audio.muted) {
-      audio.currentTime = 0;
-      audio.play().catch(() => {});
-    }
-  }
-
-  // Stats locale
-  function loadStats() {
-    gamesPlayed = parseInt(localStorage.getItem('gamesPlayed')) || 0;
-    totalAttempts = parseInt(localStorage.getItem('totalAttempts')) || 0;
-    bestLevel = parseInt(localStorage.getItem('bestLevel')) || 0;
-    const storedTrophies = localStorage.getItem('trophies');
-    if (storedTrophies) trophies = new Set(JSON.parse(storedTrophies));
-  }
-  function saveStats(win) {
-    if (win) {
-      gamesPlayed++;
-      totalAttempts += attempts;
-      if (level > bestLevel) bestLevel = level;
-    }
-    localStorage.setItem('gamesPlayed', gamesPlayed);
-    localStorage.setItem('totalAttempts', totalAttempts);
-    localStorage.setItem('bestLevel', bestLevel);
-    localStorage.setItem('trophies', JSON.stringify(Array.from(trophies)));
-    updateStats();
-  }
-  function updateStats() {
-    gamesPlayedSpan.textContent = gamesPlayed;
-    bestLevelSpan.textContent = bestLevel;
-    avgAttemptsSpan.textContent = gamesPlayed ? (totalAttempts / gamesPlayed).toFixed(2) : '0';
-    trophiesSpan.textContent = trophies.size ? Array.from(trophies).join(', ') : 'Aucun';
-  }
-
-  // Trophées simples
-  function addTrophies() {
-    if (level === 5) trophies.add('🏅 Débutant');
-    if (level === 10) trophies.add('🥉 Amateur');
-    if (level === 20) trophies.add('🥈 Expert');
-    if (level === 30) trophies.add('🥇 Maître');
-    if (level === 40) trophies.add('🏆 Légende');
-    saveStats(false);
-  }
-  function showFinalTrophies() {
-    if (trophies.size) {
-      feedback.textContent += ` 🎉 Trophées obtenus : ${Array.from(trophies).join(', ')}`;
-    }
-  }
-
-  // Confettis
-  class Confetti {
-    constructor(x, y, color) {
-      this.x = x;
-      this.y = y;
-      this.color = color;
-      this.size = Math.random() * 6 + 4;
-      this.gravity = 0.3;
-      this.velocity = {
-        x: (Math.random() - 0.5) * 7,
-        y: Math.random() * -10 - 5,
-      };
-      this.opacity = 1;
-      this.damping = 0.97;
-      this.tilt = Math.random() * 10 - 5;
-      this.tiltAngle = 0;
-      this.tiltAngleSpeed = Math.random() * 0.1 + 0.05;
-    }
-    update() {
-      this.velocity.y += this.gravity;
-      this.x += this.velocity.x;
-      this.y += this.velocity.y;
-      this.tiltAngle += this.tiltAngleSpeed;
-      this.tilt = Math.sin(this.tiltAngle) * 15;
-      this.opacity -= 0.02;
-      this.size *= 0.98;
-    }
-    draw(ctx) {
-      ctx.beginPath();
-      ctx.lineWidth = this.size / 2;
-      ctx.strokeStyle = `rgba(${this.color},${this.opacity})`;
-      ctx.moveTo(this.x + this.tilt + this.size / 2, this.y);
-      ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.size / 2);
-      ctx.stroke();
-    }
-  }
-  function confettiEffect(amount) {
-    const colors = ['255,0,0', '0,255,0', '0,0,255', '255,255,0', '0,255,255', '255,0,255'];
-    for (let i=0; i<amount; i++) {
-      confettis.push(new Confetti(Math.random()*confettiCanvas.width, Math.random()*confettiCanvas.height/2, colors[Math.floor(Math.random()*colors.length)]));
-    }
-    if (!confettiRunning) {
-      confettiRunning = true;
-      requestAnimationFrame(runConfetti);
-    }
-  }
-  function runConfetti() {
-    confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-    for (let i = confettis.length - 1; i >= 0; i--) {
-      const c = confettis[i];
-      c.update();
-      c.draw(confettiCtx);
-      if (c.opacity <= 0 || c.size <= 0.5) {
-        confettis.splice(i,1);
-      }
-    }
-    if (confettis.length > 0) {
-      requestAnimationFrame(runConfetti);
-    } else {
-      confettiRunning = false;
-    }
-  }
-
-  // Sons On/Off
-  muteMusicBtn.addEventListener('click', () => {
-    audioMusic.muted = !audioMusic.muted;
-    muteMusicBtn.textContent = audioMusic.muted ? '🎵 Musique : Off' : '🎵 Musique : On';
-    muteMusicBtn.setAttribute('aria-pressed', audioMusic.muted);
+    step();
   });
-  muteSoundsBtn.addEventListener('click', () => {
-    const mute = !audioClick.muted;
-    [audioClick, audioError, audioWin, audioHint, audioTick].forEach(a => a.muted = mute);
-    muteSoundsBtn.textContent = mute ? '🔈 Sons : Off' : '🔈 Sons : On';
-    muteSoundsBtn.setAttribute('aria-pressed', mute);
-  });
+}
 
-  // Canvas resize
-  function resizeCanvas() {
-    confettiCanvas.width = window.innerWidth;
-    confettiCanvas.height = window.innerHeight;
+async function runSequence(){
+  if(typing) return;
+  typing = true;
+  startBtn.textContent = "En cours...";
+  startBtn.disabled = true;
+  playBeepSequence();
+  for(let s of sequence){
+    // small pause to feel dramatic
+    await typeLine("> " + s, 22);
+    await new Promise(r=>setTimeout(r, 350 + Math.random()*420));
   }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
+  // extra dramatic block of "code"
+  await typeLine("\n--- DUMP: memory @0xDEADBEEF ---", 12);
+  for(let i=0;i<8;i++){
+    await typeLine((Math.random().toString(16).substr(2,16) + "  " + Math.random().toString(2).substr(2,24)).slice(0,48), 6);
+  }
+  await typeLine("\nSimulation terminée. (Aucune action réelle effectuée)", 20);
+  startBtn.textContent = "Lancer";
+  startBtn.disabled = false;
+  typing = false;
+}
 
-  // Init
-  setup();
-})();
+startBtn.addEventListener('click', ()=>{
+  log.innerText = "";
+  runSequence();
+});
+
+/* Reset */
+resetBtn.addEventListener('click', ()=>{
+  log.innerText = "";
+});
+
+/* ========== Camera (consentement explicite) ========== */
+let stream = null;
+camBtn.addEventListener('click', async ()=>{
+  if(camWrapper.style.display === 'none' || camWrapper.style.display === ''){
+    try{
+      // Demande de permission : l'utilisateur verra la popup du navigateur.
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      camVideo.srcObject = stream;
+      camWrapper.style.display = 'block';
+      camBtn.textContent = "Désactiver caméra";
+      // On applique un filtre "Matrix" basique via canvas capture if wanted (left simple)
+    } catch(err){
+      alert("Permission caméra refusée ou erreur: " + err.message);
+    }
+  } else {
+    // stop stream
+    if(stream){
+      stream.getTracks().forEach(t=>t.stop());
+      stream = null;
+    }
+    camVideo.srcObject = null;
+    camWrapper.style.display = 'none';
+    camBtn.textContent = "Activer caméra";
+  }
+});
+
+/* Accessibility: allow Enter to start */
+document.addEventListener('keydown', (e)=>{ if(e.key==='Enter') startBtn.click(); });
+
+/* Small autoplay-safety: play a muted click sound on first user interaction to unlock AudioContext on mobile */
+window.addEventListener('pointerdown', ()=>{ if((AudioContext || webkitAudioContext) && !window._audioUnlocked){ try{ new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} window._audioUnlocked=true; } }, {once:true});
 </script>
-
-<style>
-/* shake animation for input wrong guess */
-#error-shake {
-  animation: shake 0.4s;
-}
-@keyframes shake {
-  0% { transform: translateX(0);}
-  25% { transform: translateX(-5px);}
-  50% { transform: translateX(5px);}
-  75% { transform: translateX(-5px);}
-  100% { transform: translateX(0);}
-}
-.error-shake {
-  animation: shake 0.4s;
-}
-</style>
-
 </body>
 </html>
-
-
-
