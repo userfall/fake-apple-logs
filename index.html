@@ -1,89 +1,183 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jeux Kabir & Samuel</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Jeux Kabir — Ultimate 2D & Simon Musical</title>
+
+<!-- Police pro -->
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
+
 <style>
-  body {
-    margin: 0; font-family: 'Segoe UI', sans-serif; background: #111; color: #fff;
-    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-  }
-  h1,h2 { font-weight: bold; text-align: center; }
-  button { font-size: 1.5rem; padding: 12px 24px; margin: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
-  .active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .screen { display: none; width: 100%; height: 100vh; }
-  #menu button { background: #ff6600; color: #fff; }
-  #bon, #sim { flex-direction: column; gap: 15px; }
-  #cups { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
-  .cup { width: 100px; height: 120px; background: linear-gradient(to top, #c69c6d, #e0c097); border-radius: 0 0 20px 20px; display: flex; align-items: flex-end; justify-content: center; position: relative; font-weight: bold; font-size: 1.2rem; cursor: pointer; user-select: none; }
-  #ball { width: 28px; height: 28px; background: yellow; border-radius: 50%; position: absolute; transition: all 0.2s; bottom: 120px; }
-  .pad { width: 100px; height: 100px; margin: 10px; border-radius: 20px; background: #333; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; font-size: 2rem; }
-  .pad.active { background: #ff0; }
-  #pads { display: flex; flex-wrap: wrap; justify-content: center; }
-  #confetti { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:999; }
-  input { font-size: 1.2rem; padding: 8px; border-radius: 8px; border: none; }
-  #qMsg { color: red; font-weight: bold; margin-top: 10px; }
+:root{
+  --bg:#0f0f1f;
+  --panel:#1e1e38;
+  --muted:#cccccc;
+  --accent:#ff4081;
+  --accent-dark:#e91e63;
+  --gold:#ffca28;
+  --danger:#ff3b3b;
+  --success:#00e676;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);font-family:"Rubik",Segoe UI,Roboto,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+.app{max-width:980px;margin:10px auto;padding:14px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:grid;place-items:center;color:#fff;font-weight:900;font-size:26px;box-shadow:0 10px 24px rgba(0,0,0,.6)}
+.title{font-size:20px;font-weight:700;margin:0}
+.subtitle{font-size:13px;color:var(--muted)}
+.controls{display:flex;gap:8px;align-items:center}
+
+/* Cards */
+.card{background:var(--panel);padding:18px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.screen{display:none}
+.screen.active{display:block}
+.menuGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 18px;border-radius:12px;border:0;background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:#fff;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.5);transition:transform .12s}
+.btn:hover{transform:scale(1.06)}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--muted);font-weight:600}
+.small{font-size:14px;color:var(--muted)}
+
+/* Layout for games */
+.game-area{display:flex;flex-direction:column;align-items:center;gap:14px;padding:14px}
+#bnStage{width:100%;max-width:480px;height:240px;position:relative;border-radius:16px;background:linear-gradient(180deg,#111122,#222244);box-shadow:inset 0 -30px 60px rgba(255,255,255,.05);overflow:hidden}
+.cup{position:absolute;bottom:18px;width:90px;height:90px;border-radius:50% 50% 0 0;background:linear-gradient(180deg,#333355,#555588);box-shadow:0 8px 22px rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;padding-bottom:0;color:#fff;font-weight:900;cursor:pointer;touch-action:manipulation;transition:transform .2s}
+.ball{position:absolute;width:28px;height:28px;border-radius:50%;background:var(--danger);bottom:120px;left:50%;transform:translateX(-50%);box-shadow:0 6px 20px rgba(255,60,60,.6);transition:transform .18s}
+
+/* Controls row */
+.controls-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.scorebar{display:flex;gap:16px;justify-content:center;color:var(--muted);font-weight:700;font-size:15px}
+
+/* Simon */
+.pad-grid{display:grid;grid-template-columns:repeat(2,140px);grid-gap:18px}
+.pad{width:140px;height:140px;border-radius:16px;display:grid;place-items:center;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.5);transition:transform .12s,filter .12s}
+.pad.red{background:linear-gradient(180deg,#ff5b87,#c12b57)}
+.pad.green{background:linear-gradient(180deg,#5bff88,#2bc15b)}
+.pad.blue{background:linear-gradient(180deg,#5bbfff,#2b7bc1)}
+.pad.yellow{background:linear-gradient(180deg,#ffe55b,#c1aa2b)}
+.pad.active{transform:scale(1.08);filter:brightness(1.15)}
+
+/* Responsive tweaks */
+@media(max-width:650px){
+  .pad{width:100px;height:100px}
+  #bnStage{height:200px}
+  .cup{width:72px;height:72px}
+  .ball{width:22px;height:22px;bottom:100px}
+  .btn{padding:12px 14px;font-size:15px}
+  .title{font-size:18px}
+  .subtitle{font-size:12px}
+}
+
+/* tiny helper */
+.center{display:grid;place-items:center}
+.madeBy{font-size:13px;color:var(--gold);margin-bottom:8px;text-align:center;font-weight:700}
 </style>
 </head>
 <body>
-
-<div id="intro" class="screen active">
-  <h1>Made by Kabir & Samuel</h1>
-  <p>Réponds au quiz pour continuer</p>
-  <label id="qLabel"></label>
-  <p id="qText"></p>
-  <input id="qInput" type="text" placeholder="Réponse">
-  <button id="qBtn">Valider</button>
-  <div id="qMsg"></div>
-</div>
-
-<div id="menu" class="screen">
-  <h1>Menu</h1>
-  <button onclick="show('bon')">🎩 Bonneteau</button>
-  <button onclick="show('sim')">🎶 Simon</button>
-</div>
-
-<div id="bon" class="screen">
-  <h1>Bonneteau</h1>
-  <div id="bnMsg">Regarde la balle, puis clique sur Mélanger.</div>
-  <div id="cups">
-    <div id="cup0" class="cup">0</div>
-    <div id="cup1" class="cup">1</div>
-    <div id="cup2" class="cup">2</div>
-    <div id="ball"></div>
+<div class="app">
+  <div class="madeBy">🎮 Made by Kabir & Samuel — Ultimate Mini-Games</div>
+  <div class="header">
+    <div class="brand">
+      <div class="logo">K</div>
+      <div>
+        <div class="title">Jeux Kabir — Ultimate</div>
+        <div class="subtitle">Bonneteau 2D & Simon Musical — responsive</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button id="toggleAmb" class="btn ghost">Musique ON/OFF</button>
+    </div>
   </div>
-  <button id="mixBtn">Mélanger</button>
-  <button id="resetBn">Reset</button>
-  <button id="backMenuBn">Menu</button>
-  <p>Score: <span id="bnScore">0</span> | Niveau: <span id="bnLevel">1</span></p>
-</div>
 
-<div id="sim" class="screen">
-  <h1>Simon</h1>
-  <div id="smMsg">Appuie sur démarrer pour jouer</div>
-  <div id="pads">
-    <div class="pad">A</div>
-    <div class="pad">B</div>
-    <div class="pad">C</div>
-    <div class="pad">D</div>
+  <!-- INTRO -->
+  <div id="intro" class="card screen active">
+    <h3 style="margin:6px 0 8px 0">Accès — Réponds aux questions</h3>
+    <p class="small">Si la première réponse est correcte → accès direct. Sinon, deuxième question.</p>
+    <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+      <div style="font-weight:900" id="qLabel">Question 1/2</div>
+      <div style="flex:1" id="qText">Qui est le meilleur ami de Kabir ?</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <input id="qInput" placeholder="Ta réponse" style="flex:1;padding:12px;border-radius:10px;border:1px solid #333;background:#111;color:#fff;font-weight:700;font-size:16px">
+      <button id="qBtn" class="btn">Valider</button>
+    </div>
+    <div id="qMsg" class="small" style="margin-top:8px;color:var(--muted)"></div>
   </div>
-  <button id="startSim">Démarrer</button>
-  <button id="resetSim">Reset</button>
-  <button id="backMenuSim">Menu</button>
-  <p>Score: <span id="smScore">0</span> | Niveau: <span id="smLevel">0</span></p>
-</div>
 
-<canvas id="confetti"></canvas>
+  <!-- MENU -->
+  <div id="menu" class="card screen">
+    <h3 style="margin:6px 0 8px 0">Menu principal</h3>
+    <div class="menuGrid">
+      <button id="openBon" class="btn">🎩 Bonneteau 2D<div style="font-size:13px;color:var(--muted);font-weight:600">Bille visible → mélange fluide → niveaux</div></button>
+      <button id="openSim" class="btn">🎵 Simon Musical<div style="font-size:13px;color:var(--muted);font-weight:600">Couleurs = notes • séquences aléatoires</div></button>
+    </div>
+  </div>
+
+  <!-- BONNETEAU 2D -->
+  <div id="bon" class="card screen">
+    <h3 style="margin:6px 0 8px 0">Bonneteau — niveau <span id="bnLevel">1</span></h3>
+    <div class="game-area">
+      <div id="bnStage" aria-label="Zone bonneteau">
+        <div id="cup0" class="cup" data-index="0" style="left:40px"></div>
+        <div id="cup1" class="cup" data-index="1" style="left:170px"></div>
+        <div id="cup2" class="cup" data-index="2" style="left:300px"></div>
+        <div id="ball" class="ball" aria-hidden="false"></div>
+      </div>
+
+      <div class="controls-row">
+        <button id="mixBtn" class="btn">Mélanger</button>
+        <button id="resetBn" class="btn ghost">Réinitialiser</button>
+        <button id="backMenuBn" class="btn ghost">Retour</button>
+      </div>
+
+      <div class="scorebar">
+        <div>Score : <span id="bnScore">0</span></div>
+        <div>Vitesse : <span id="bnSpeed">normal</span></div>
+      </div>
+      <div id="bnMsg" class="small" style="margin-top:6px">Regarde la balle, puis clique sur Mélanger.</div>
+    </div>
+  </div>
+
+  <!-- SIMON -->
+  <div id="sim" class="card screen">
+    <h3 style="margin:6px 0 8px 0">Simon Musical — niveau <span id="smLevel">0</span></h3>
+    <div class="game-area">
+      <div class="pad-grid center" style="width:100%;max-width:300px">
+        <div class="pad red" data-idx="0"></div>
+        <div class="pad green" data-idx="1"></div>
+        <div class="pad blue" data-idx="2"></div>
+        <div class="pad yellow" data-idx="3"></div>
+      </div>
+
+      <div class="controls-row">
+        <button id="startSim" class="btn">Démarrer</button>
+        <button id="resetSim" class="btn ghost">Réinitialiser</button>
+        <button id="backMenuSim" class="btn ghost">Retour</button>
+      </div>
+
+      <div class="scorebar">
+        <div>Score : <span id="smScore">0</span></div>
+        <div>État : <span id="smMsg">Prêt</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:12px;color:var(--muted);font-size:14px">Développé — adapte / améliore à volonté</div>
+</div>
 
 <script>
-// ==== Audio Setup ====
+// ==== JS Bonneteau + Simon + audio + navigation ====
+
+// Audio context
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const audio = new AudioCtx();
 const master = audio.createGain(); master.gain.value = 0.9; master.connect(audio.destination);
 const bgGain = audio.createGain(); bgGain.gain.value = 0.06; bgGain.connect(master);
 
-function ensureAudio() { if(audio.state==='suspended') audio.resume(); }
+function ensureAudio(){ if(audio.state==='suspended') audio.resume(); }
 function playNote(freq,dur=0.36,type='sine',when=0){
   const t=audio.currentTime+when;
   const o=audio.createOscillator(); o.type=type; o.frequency.setValueAtTime(freq,t);
@@ -99,26 +193,45 @@ function clickSound(vol=0.12){
   const src=audio.createBufferSource(); src.buffer=buffer;
   const g=audio.createGain(); g.gain.value=vol; src.connect(g); g.connect(master); src.start();
 }
+let ambientOsc=null;
+function startAmbient(){
+  if(ambientOsc) return;
+  const o1=audio.createOscillator(); o1.type='sine'; o1.frequency.value=110;
+  const g1=audio.createGain(); g1.gain.value=0.02; o1.connect(g1); g1.connect(bgGain);
+  const o2=audio.createOscillator(); o2.type='sine'; o2.frequency.value=220;
+  const g2=audio.createGain(); g2.gain.value=0.01; o2.connect(g2); g2.connect(bgGain);
+  o1.start(); o2.start(); ambientOsc=[o1,o2];
+}
+function stopAmbient(){ if(!ambientOsc) return; ambientOsc.forEach(o=>o.stop()); ambientOsc=null; }
+document.getElementById('toggleAmb').addEventListener('click',()=>{
+  ensureAudio();
+  if(bgGain.gain.value>0.01){ bgGain.gain.value=0; stopAmbient(); }
+  else{ bgGain.gain.value=0.06; startAmbient(); }
+});
 document.addEventListener('pointerdown',()=>ensureAudio(),{once:true});
 
-// ==== Navigation ====
-const screens={intro:document.getElementById('intro'),menu:document.getElementById('menu'),
-bon:document.getElementById('bon'),sim:document.getElementById('sim')};
+// Navigation & questions
+const screens={intro:document.getElementById('intro'),menu:document.getElementById('menu'),bon:document.getElementById('bon'),sim:document.getElementById('sim')};
 function show(id){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[id].classList.add('active'); }
 
-// ==== Quiz ====
-const qA={text:"Qui est le meilleur ami de Kabir ?", answer:"jesus"};
-const qB={text:"Quelle est la première amoureuse de Kabir ?", answer:"francoise"};
+const qA={text:"Qui est le meilleur ami de Kabir ?",answer:"jesus"};
+const qB={text:"Quelle est la première amoureuse de Kabir ?",answer:"francoise"};
 let qStep=0;
-const qLabel=document.getElementById('qLabel'), qText=document.getElementById('qText'),
-qInput=document.getElementById('qInput'), qBtn=document.getElementById('qBtn'), qMsg=document.getElementById('qMsg');
+const qLabel=document.getElementById('qLabel'),qText=document.getElementById('qText'),qInput=document.getElementById('qInput'),qBtn=document.getElementById('qBtn'),qMsg=document.getElementById('qMsg');
 function setQuestion(){ qLabel.textContent=`Question ${qStep+1}/2`; qText.textContent=qStep===0?qA.text:qB.text; qInput.value=''; qMsg.textContent=''; }
-qBtn.addEventListener('click',()=>{ const val=qInput.value.trim().toLowerCase();
-if((qStep===0 && val===qA.answer)||(qStep===1 && val===qB.answer)){ show('menu'); return; }
-if(qStep===0){ qStep=1; setQuestion(); } else { qMsg.textContent='Désolé, mauvaise réponse'; }});
+qBtn.addEventListener('click',()=>{
+  const val=qInput.value.trim().toLowerCase();
+  if(qStep===0 && val===qA.answer){show('menu'); return;}
+  if(qStep===1 && val===qB.answer){show('menu'); return;}
+  if(qStep===0){ qStep=1; setQuestion(); } else{ qMsg.textContent='Désolé, mauvaise réponse'; }
+});
 setQuestion();
 
-// ==== Bonneteau ====
+// Menu buttons
+document.getElementById('openBon').addEventListener('click',()=>show('bon'));
+document.getElementById('openSim').addEventListener('click',()=>show('sim'));
+
+// ==== BONNETEAU ====
 const cups=[document.getElementById('cup0'),document.getElementById('cup1'),document.getElementById('cup2')];
 const ball=document.getElementById('ball');
 const mixBtn=document.getElementById('mixBtn');
@@ -127,31 +240,37 @@ const backMenuBn=document.getElementById('backMenuBn');
 const bnScoreEl=document.getElementById('bnScore');
 const bnLevelEl=document.getElementById('bnLevel');
 const bnMsg=document.getElementById('bnMsg');
-let bnPos=0,bnScore=0,bnLevel=1,bnMixing=false;
-let cupPositions=[0,0,0];
-function updateCupPositions(){ cups.forEach((cup,i)=>{ cup.style.transform=`translateX(${cupPositions[i]}px)`; }); }
-function placeBall(idx){ bnPos=idx; const cup=cups[idx]; const rect=cup.getBoundingClientRect();
-ball.style.left=rect.left+rect.width/2-14+'px'; ball.style.bottom='120px'; }
-function swapCups(a,b){ return new Promise(res=>{ const delta=100; let progress=0; const step=()=>{
-progress+=0.1; cupPositions[a]+=delta*0.1; cupPositions[b]-=delta*0.1; updateCupPositions();
-if(progress<1) requestAnimationFrame(step); else{ [cups[a],cups[b]]=[cups[b],cups[a]]; [cupPositions[a],cupPositions[b]]=[cupPositions[b],cupPositions[a]];
-updateCupPositions(); res(); } }; step(); }); }
-async function mixCups(){ if(bnMixing) return; bnMixing=true; bnMsg.textContent='Mélange en cours...';
-let moves=bnLevel+2;
-for(let i=0;i<moves;i++){ const a=Math.floor(Math.random()*3); let b; do{ b=Math.floor(Math.random()*3);}while(b===a); await swapCups(a,b); }
-bnMixing=false; bnMsg.textContent='Devine la balle !'; placeBall(bnPos); }
+
+let bnPos=0, bnScore=0, bnLevel=1, bnMixing=false, bnSpeed=600;
+function placeBall(idx){ bnPos=idx; const c=cups[idx].offsetLeft+cups[idx].offsetWidth/2-14; ball.style.left=c+'px'; ball.style.bottom='120px'; }
+placeBall( Math.floor(Math.random()*3) );
+
+function mixCups(){
+  if(bnMixing) return;
+  bnMixing=true; bnMsg.textContent='Mélange en cours...';
+  let moves=bnLevel+2, last=null;
+  const interval=setInterval(()=>{
+    let a,b; do{ a=Math.floor(Math.random()*3); b=Math.floor(Math.random()*3); } while(a===b || (a===last && b===last));
+    last=a; [cups[a].style.left,cups[b].style.left]=[cups[b].style.left,cups[a].style.left];
+    moves--; if(moves<=0){ clearInterval(interval); bnMixing=false; bnMsg.textContent='Devine la balle !'; placeBall(bnPos); }
+  },bnSpeed);
+}
 mixBtn.addEventListener('click',()=>{ clickSound(); mixCups(); });
-cups.forEach((cup,i)=>{ cup.dataset.index=i; cupPositions[i]=0; cup.addEventListener('click',()=>{
-if(bnMixing) return;
-if(parseInt(cup.dataset.index)===bnPos){ bnScore++; bnLevel++; bnMsg.textContent='✅ Bien joué !'; playNote(440,0.2); confettiBurst(); }
-else{ bnScore=0; bnLevel=1; bnMsg.textContent='❌ Perdu !'; playNote(180,0.3,'sawtooth'); }
-bnScoreEl.textContent=bnScore; bnLevelEl.textContent=bnLevel;
-placeBall(Math.floor(Math.random()*3)); }); });
-resetBn.addEventListener('click',()=>{ bnScore=0; bnLevel=1; bnScoreEl.textContent=0; bnLevelEl.textContent=1;
-bnMsg.textContent='Regarde la balle, puis clique sur Mélanger.'; placeBall(Math.floor(Math.random()*3)); });
+
+cups.forEach(cup=>{
+  cup.addEventListener('click',()=>{
+    if(bnMixing) return;
+    if(cup.dataset.index==bnPos){ bnScore+=1; bnLevel++; bnSpeed=Math.max(200,bnSpeed-20); bnMsg.textContent='✅ Bien joué !'; playNote(440,0.2); }
+    else{ bnMsg.textContent='❌ Perdu !'; bnLevel=1; bnSpeed=600; bnScore=0; playNote(180,0.3,'sawtooth'); }
+    bnScoreEl.textContent=bnScore; bnLevelEl.textContent=bnLevel;
+    placeBall(Math.floor(Math.random()*3));
+  });
+});
+
+resetBn.addEventListener('click',()=>{ bnScore=0; bnLevel=1; bnSpeed=600; bnScoreEl.textContent=0; bnLevelEl.textContent=1; placeBall(Math.floor(Math.random()*3)); bnMsg.textContent='Regarde la balle, puis clique sur Mélanger.'; });
 backMenuBn.addEventListener('click',()=>show('menu'));
 
-// ==== Simon ====
+// ==== SIMON ====
 const pads=[...document.querySelectorAll('.pad')];
 const startSim=document.getElementById('startSim');
 const resetSim=document.getElementById('resetSim');
@@ -159,36 +278,26 @@ const backMenuSim=document.getElementById('backMenuSim');
 const smLevelEl=document.getElementById('smLevel');
 const smScoreEl=document.getElementById('smScore');
 const smMsgEl=document.getElementById('smMsg');
-let simSeq=[], simUser=[], simLevel=0, simScore=0, simPlaying=false;
 
-function flashPad(idx){ pads[idx].classList.add('active'); playNote(220+idx*110,0.3); setTimeout(()=>pads[idx].classList.remove('active'),300);}
+let simSeq=[], simUser=[], simLevel=0, simScore=0, simPlaying=false;
+function flashPad(idx){ pads[idx].classList.add('active'); playNote(220+idx*110,0.3); setTimeout(()=>pads[idx].classList.remove('active'),300); }
+function nextRound(){ simUser=[]; simLevel++; smLevelEl.textContent=simLevel; simMsg('Regarde la séquence...'); simSeq.push(Math.floor(Math.random()*pads.length)); simSeq.forEach((v,i)=>setTimeout(()=>flashPad(v),i*500)); setTimeout(()=>{ simMsg('À toi !'); simPlaying=true; },simSeq.length*500+300); }
 function simMsg(msg){ smMsgEl.textContent=msg; }
 
-function nextRound(){ simUser=[]; simLevel++; smLevelEl.textContent=simLevel; simMsg('Regarde la séquence...'); simSeq.push(Math.floor(Math.random()*pads.length));
-simPlaying=false; startSim.style.display='none'; simSeq.forEach((v,i)=>setTimeout(()=>flashPad(v), i*600));
-setTimeout(()=>{ simMsg('À toi !'); simPlaying=true; startSim.style.display='none'; }, simSeq.length*600+300); }
+pads.forEach((pad,i)=>{
+  pad.addEventListener('click',()=>{
+    if(!simPlaying) return; flashPad(i); simUser.push(i);
+    if(simUser[simUser.length-1]!==simSeq[simUser.length-1]){
+      simMsg('❌ Perdu !'); playNote(150,0.3,'sawtooth'); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simPlaying=false;
+    } else if(simUser.length===simSeq.length){
+      simScore+=simLevel*10; smScoreEl.textContent=simScore; playNote(440,0.2); simPlaying=false; setTimeout(nextRound,500);
+    }
+  });
+});
 
-pads.forEach((pad,i)=>{ pad.addEventListener('click',()=>{ if(!simPlaying) return; flashPad(i); simUser.push(i);
-if(simUser[simUser.length-1]!==simSeq[simUser.length-1]){ simMsg('❌ Perdu !'); playNote(150,0.3,'sawtooth'); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simPlaying=false; startSim.style.display='inline-flex'; }
-else if(simUser.length===simSeq.length){ simScore+=simLevel*10; smScoreEl.textContent=simScore; playNote(440,0.2); confettiBurst(); simPlaying=false; setTimeout(nextRound,500); startSim.style.display='none'; } }); });
-
-startSim.addEventListener('click',()=>{ clickSound(); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; nextRound(); startSim.style.display='none'; });
-resetSim.addEventListener('click',()=>{ simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simMsg('Prêt !'); startSim.style.display='inline-flex'; });
+startSim.addEventListener('click',()=>{ clickSound(); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; nextRound(); });
+resetSim.addEventListener('click',()=>{ simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simMsg('Prêt'); });
 backMenuSim.addEventListener('click',()=>show('menu'));
-
-// ==== Confetti ====
-const confCanvas=document.getElementById('confetti'); const ctx=confCanvas.getContext('2d');
-let confettiParticles=[];
-function resizeCanvas(){ confCanvas.width=window.innerWidth; confCanvas.height=window.innerHeight; }
-window.addEventListener('resize',resizeCanvas); resizeCanvas();
-
-function confettiBurst(){
-  for(let i=0;i<50;i++){ confettiParticles.push({ x:Math.random()*confCanvas.width, y:Math.random()*confCanvas.height-100, r:Math.random()*6+2, dx:(Math.random()-0.5)*6, dy:Math.random()*6+2, color:`hsl(${Math.random()*360},100%,50%)` }); } 
-}
-function updateConfetti(){ ctx.clearRect(0,0,confCanvas.width,confCanvas.height);
-confettiParticles.forEach(p=>{ p.x+=p.dx; p.y+=p.dy; p.dy+=0.1; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); });
-confettiParticles=confettiParticles.filter(p=>p.y<confCanvas.height+20); requestAnimationFrame(updateConfetti); }
-updateConfetti();
 </script>
 </body>
 </html>
