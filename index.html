@@ -86,57 +86,60 @@ input::placeholder{color:#97a3b7}
 
 <!-- BONNETEAU -->
 <section id="screen-bonneteau" class="screen card section">
-  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
-    <h2>Bonneteau 🎩</h2>
-    <div class="hud">
-      <span class="tag">Niveau <span id="bn-level">1</span></span>
-      <span class="tag">Vitesse <span id="bn-speed">1.0x</span></span>
-      <button class="btn ghost" id="bn-back">Retour menu</button>
-    </div>
-  </div>
-  <div class="cup-container">
-    <div class="cupWrap" id="cup0"><div class="cup"><div class="cupLabel">A</div></div></div>
-    <div class="cupWrap" id="cup1"><div class="cup"><div class="cupLabel">B</div></div></div>
-    <div class="cupWrap" id="cup2"><div class="cup"><div class="cupLabel">C</div></div></div>
-  </div>
-  <div class="hud section">
-    <button class="btn ok" id="bn-shuffle">Mélanger</button>
-    <span class="tag">Choisis un gobelet après le mélange</span>
-  </div>
-  <p id="bn-msg" class="notice"></p>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+<h2>Bonneteau 🎩</h2>
+<div class="hud">
+<span class="tag">Niveau <span id="bn-level">1</span></span>
+<span class="tag">Score <span id="bn-score">0</span></span>
+<button class="btn ghost" id="bn-back">Retour menu</button>
+</div>
+</div>
+<div class="cup-container">
+<div class="cupWrap" id="cup0"><div class="cup"></div></div>
+<div class="cupWrap" id="cup1"><div class="cup"></div></div>
+<div class="cupWrap" id="cup2"><div class="cup"></div></div>
+</div>
+<div class="hud section">
+<button class="btn ok" id="bn-shuffle">Mélanger</button>
+<span class="tag">Regarde bien la bille puis choisis un gobelet</span>
+</div>
+<p id="bn-msg" class="notice"></p>
 </section>
 
 <!-- SIMON -->
 <section id="screen-simon" class="screen card section">
-  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
-    <h2>Simon Game 🎨</h2>
-    <div class="hud">
-      <span class="tag">Niveau <span id="sm-level">1</span></span>
-      <button class="btn ghost" id="sm-back">Retour menu</button>
-    </div>
-  </div>
-  <div class="padGrid">
-    <div class="pad red" data-pad="0"></div>
-    <div class="pad green" data-pad="1"></div>
-    <div class="pad blue" data-pad="2"></div>
-    <div class="pad yellow" data-pad="3"></div>
-  </div>
-  <div class="hud section">
-    <button class="btn ok" id="sm-start">Démarrer</button>
-    <span class="tag">Répète la séquence</span>
-  </div>
-  <p id="sm-msg" class="notice"></p>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+<h2>Simon Game 🎨</h2>
+<div class="hud">
+<span class="tag">Niveau <span id="sm-level">1</span></span>
+<span class="tag">Score <span id="sm-score">0</span></span>
+<button class="btn ghost" id="sm-back">Retour menu</button>
+</div>
+</div>
+<div class="padGrid">
+<div class="pad red" data-pad="0"></div>
+<div class="pad green" data-pad="1"></div>
+<div class="pad blue" data-pad="2"></div>
+<div class="pad yellow" data-pad="3"></div>
+</div>
+<div class="hud section">
+<button class="btn ok" id="sm-start">Démarrer</button>
+<span class="tag">Répète la séquence</span>
+</div>
+<p id="sm-msg" class="notice"></p>
 </section>
 
 </div> <!-- container -->
 
 <audio id="bgm" loop preload="auto">
-  <source src="https://cdn.pixabay.com/download/audio/2022/10/20/audio_d6a1a0f8bd.mp3?filename=cyber-dream-ambient-124841.mp3" type="audio/mpeg">
+<source src="https://cdn.pixabay.com/download/audio/2022/10/20/audio_d6a1a0f8bd.mp3?filename=cyber-dream-ambient-124841.mp3" type="audio/mpeg">
 </audio>
 <audio id="simon0" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
 <audio id="simon1" src="https://freesound.org/data/previews/256/256114_3263906-lq.mp3"></audio>
 <audio id="simon2" src="https://freesound.org/data/previews/256/256115_3263906-lq.mp3"></audio>
 <audio id="simon3" src="https://freesound.org/data/previews/256/256116_3263906-lq.mp3"></audio>
+<audio id="cupSound" src="https://freesound.org/data/previews/235/235968_3987620-lq.mp3"></audio>
+<audio id="winSound" src="https://freesound.org/data/previews/337/337049_3232308-lq.mp3"></audio>
 
 <script>
 // ==== Utilities ====
@@ -156,8 +159,8 @@ for(let i=0;i<22;i++){
 
 // ==== Intro verification ====
 const questions = [
-  {text:"Qui est le meilleur ami de Kabir ?",answer:"kabir"},
-  {text:"Qui est la première amoureuse de Kabir ?",answer:"sofia"}
+  {text:"Qui est le meilleur ami de Kabir ?",answer:"jesus"},
+  {text:"Qui est la première amoureuse de Kabir ?",answer:"francoise"}
 ];
 let step=0;
 const qLabel=qs('#questionLabel');
@@ -190,18 +193,21 @@ qs('#btn-simon').addEventListener('click',()=>{ show('screen-simon'); resetSimon
 const cupEls = [qs('#cup0'), qs('#cup1'), qs('#cup2')];
 const bnMsg = qs('#bn-msg');
 const bnLevelEl = qs('#bn-level');
-const bnSpeedEl = qs('#bn-speed');
+const bnScoreEl = qs('#bn-score');
 let bnLevel = 1;
+let bnScore = 0;
 let bnBaseT = 0.6;
 let cupPositions = [0,1,2];
 let ballUnder = -1;
 let interactEnabled = false;
+const cupSound = qs('#cupSound');
+const winSound = qs('#winSound');
 
 function resetBonneteauUI(){
-  bnMsg.textContent = 'Regarde la bille puis appuie sur "Mélanger".';
+  bnMsg.textContent = 'Regarde la bille 👀';
   interactEnabled=false;
   ballUnder=Math.floor(Math.random()*3);
-  cupEls.forEach((cup,idx)=>{ cup.querySelector('.cupLabel').style.visibility=(idx===ballUnder?'visible':'hidden'); });
+  cupEls.forEach((cup,idx)=>{ cup.style.background= (idx===ballUnder?'var(--gold)':'#0b0f17'); });
   placeCups();
 }
 
@@ -217,33 +223,35 @@ function placeCups(){
 async function shuffleSequence(){
   interactEnabled=false;
   bnMsg.textContent='Mélange en cours…';
-  cupEls.forEach(cup=>cup.querySelector('.cupLabel').style.visibility='hidden');
+  cupEls.forEach(cup=>cup.style.background='#0b0f17');
   cupPositions=[0,1,2];
   const swaps=Math.min(6+bnLevel*2,30);
   bnBaseT=Math.max(0.22,0.6-bnLevel*0.04);
-  bnSpeedEl.textContent=(0.6/bnBaseT).toFixed(1)+'x';
   for(let s=0;s<swaps;s++){
     const a=Math.floor(Math.random()*3);
     let b=Math.floor(Math.random()*3);
     while(b===a)b=Math.floor(Math.random()*3);
     [cupPositions[a],cupPositions[b]]=[cupPositions[b],cupPositions[a]];
+    cupSound.currentTime=0; cupSound.play();
     placeCups();
     await new Promise(r=>setTimeout(r,bnBaseT*1000+50));
   }
-  bnMsg.textContent='À toi de jouer ! Choisis un gobelet.';
+  bnMsg.textContent='À toi ! Choisis un gobelet.';
   interactEnabled=true;
 }
 
 qs('#bn-shuffle').addEventListener('click',shuffleSequence);
 qs('#bn-back').addEventListener('click',()=>show('screen-menu'));
+
 cupEls.forEach((cup,idx)=>{
   cup.addEventListener('click',()=>{
     if(!interactEnabled) return;
     interactEnabled=false;
     const win=idx===ballUnder;
-    bnMsg.textContent=win?'Bravo 🎉 Niveau suivant !':'Raté ❌';
-    bnLevel = win ? bnLevel+1 : Math.max(1,bnLevel-1);
+    if(win){bnMsg.textContent='Bravo 🎉'; bnLevel++; bnScore+=10; winSound.currentTime=0; winSound.play();}
+    else {bnMsg.textContent='Raté ❌'; bnLevel=Math.max(1,bnLevel-1); bnScore=Math.max(0,bnScore-5);}
     bnLevelEl.textContent=bnLevel;
+    bnScoreEl.textContent=bnScore;
     cup.style.transform+=' translateY(-46px)';
     setTimeout(()=>{cup.style.transform=cup.style.transform.replace(' translateY(-46px)',''); interactEnabled=true;},600);
   });
@@ -253,56 +261,54 @@ cupEls.forEach((cup,idx)=>{
 const pads=qsa('.pad');
 const smMsg=qs('#sm-msg');
 const smLevelEl=qs('#sm-level');
-let smSequence=[]; let smUserSeq=[]; let smLevel=1; let smActive=false;
-
+const smScoreEl=qs('#sm-score');
+let smSequence=[]; let smUserSeq=[]; let smLevel=1; let smActive=false; let smScore=0;
 const simonSounds=[qs('#simon0'),qs('#simon1'),qs('#simon2'),qs('#simon3')];
 
-function flashPad(pad,dur=400){
-  pad.classList.add('active'); const idx=+pad.dataset.pad; simonSounds[idx].currentTime=0; simonSounds[idx].play();
-  setTimeout(()=>pad.classList.remove('active'),dur);
+function resetSimon(){
+  smSequence=[]; smUserSeq=[]; smLevel=1; smScore=0; smActive=false;
+  smLevelEl.textContent=smLevel; smScoreEl.textContent=smScore; smMsg.textContent='Appuie sur Démarrer pour jouer.';
+}
+qs('#sm-back').addEventListener('click',()=>show('screen-menu'));
+
+function playSimonSeq(){
+  smActive=false; smUserSeq=[];
+  let i=0;
+  const interval = setInterval(()=>{
+    if(i>=smSequence.length){clearInterval(interval); smActive=true; smMsg.textContent='À toi !'; return;}
+    const idx=smSequence[i]; const pad=pads[idx];
+    pad.classList.add('active'); simonSounds[idx].currentTime=0; simonSounds[idx].play();
+    setTimeout(()=>pad.classList.remove('active'),400);
+    i++;
+  },600);
 }
 
-function playSequence(seq){
-  smActive=false; smUserSeq=[]; smMsg.textContent='Observe la séquence…';
-  seq.forEach((val,i)=>{
-    setTimeout(()=>flashPad(pads[val]), i*700);
-  });
-  setTimeout(()=>{smActive=true; smMsg.textContent='À toi !';}, seq.length*700);
-}
-
-function nextSimonLevel(){
+function addSimonStep(){
+  smSequence.push(Math.floor(Math.random()*4));
   smLevelEl.textContent=smLevel;
-  const nextPad = Math.floor(Math.random()*4);
-  smSequence.push(nextPad);
-  playSequence(smSequence);
+  playSimonSeq();
 }
 
-pads.forEach(pad=>{
+qs('#sm-start').addEventListener('click',()=>{smSequence=[]; smLevel=1; smScore=0; addSimonStep(); smScoreEl.textContent=smScore; smMsg.textContent='Observe !';});
+pads.forEach((pad,idx)=>{
   pad.addEventListener('click',()=>{
     if(!smActive) return;
-    flashPad(pad);
-    smUserSeq.push(+pad.dataset.pad);
-    const idx = smUserSeq.length-1;
-    if(smUserSeq[idx]!==smSequence[idx]){
-      smMsg.textContent='Raté ❌ Séquence recommence.';
-      smSequence=[]; smLevel=1; smLevelEl.textContent=smLevel;
-      setTimeout(nextSimonLevel,800);
+    smUserSeq.push(idx);
+    simonSounds[idx].currentTime=0; simonSounds[idx].play();
+    const currentStep = smUserSeq.length-1;
+    if(smUserSeq[currentStep]!==smSequence[currentStep]){
+      smMsg.textContent='Raté ❌'; smLevel=Math.max(1,smLevel-1); smScore=Math.max(0,smScore-5);
+      smLevelEl.textContent=smLevel; smScoreEl.textContent=smScore; smActive=false;
+      setTimeout(()=>addSimonStep(),800);
       return;
     }
     if(smUserSeq.length===smSequence.length){
-      smMsg.textContent='Bien joué 🎉 Niveau suivant !';
-      smLevel++; smLevelEl.textContent=smLevel;
-      setTimeout(nextSimonLevel,800);
+      smMsg.textContent='Bien ! 🎉'; smLevel++; smScore+=10; smLevelEl.textContent=smLevel; smScoreEl.textContent=smScore;
+      smActive=false;
+      setTimeout(()=>addSimonStep(),800);
     }
   });
 });
-
-qs('#sm-start').addEventListener('click',()=>{
-  smSequence=[]; smLevel=1; smLevelEl.textContent=smLevel; nextSimonLevel();
-});
-qs('#sm-back').addEventListener('click',()=>show('screen-menu'));
-function resetSimon(){smSequence=[]; smUserSeq=[]; smActive=false; smLevelEl.textContent='1'; smMsg.textContent='Clique sur "Démarrer" pour jouer';}
-
 </script>
 </body>
 </html>
