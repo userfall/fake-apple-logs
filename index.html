@@ -19,6 +19,7 @@
   --padBlue: #5bbfff;
   --padYellow: #ffe55b;
 }
+
 * { box-sizing: border-box; margin:0; padding:0; }
 body { font-family:'Poppins',sans-serif; background:var(--bg); color:var(--text); display:flex; justify-content:center; padding:16px; }
 .app { max-width:960px; width:100%; text-align:center; }
@@ -33,6 +34,7 @@ h2,h3 { font-family:'Rubik',sans-serif; }
 .btn:hover { transform:scale(1.05); box-shadow:0 6px 20px rgba(0,0,0,0.6); }
 .btn.ghost { background:transparent; border:1px solid var(--muted); color:var(--muted); }
 input { width:100%; padding:10px; border-radius:8px; border:none; margin-top:8px; font-size:16px; }
+
 #bnStage { position:relative; height:220px; margin:20px auto; background:#222; border-radius:12px; }
 .cup {
   position:absolute; bottom:20px; width:80px; height:80px; border-radius:50% 50% 0 0;
@@ -40,6 +42,7 @@ input { width:100%; padding:10px; border-radius:8px; border:none; margin-top:8px
 }
 #ball { position:absolute; width:28px; height:28px; border-radius:50%; background:var(--danger);
   bottom:140px; left:50%; transform:translateX(-50%); transition:left 0.5s, bottom 0.3s; }
+
 .pad { width:100px; height:100px; border-radius:16px; display:inline-block; margin:10px;
   cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,0.5); transition:transform 0.2s, box-shadow 0.2s; }
 .pad.active { transform:scale(1.1); box-shadow:0 0 20px #fff; }
@@ -47,6 +50,7 @@ input { width:100%; padding:10px; border-radius:8px; border:none; margin-top:8px
 .pad.green { background:var(--padGreen); }
 .pad.blue { background:var(--padBlue); }
 .pad.yellow { background:var(--padYellow); }
+
 #footer { margin-top:24px; font-size:14px; color:var(--muted); }
 
 /* Responsive */
@@ -116,7 +120,7 @@ input { width:100%; padding:10px; border-radius:8px; border:none; margin-top:8px
 </div>
 
 <script>
-// ==== Audio ====
+// ================= Audio & musique =================
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const audio = new AudioCtx();
 const master = audio.createGain(); master.gain.value=0.9; master.connect(audio.destination);
@@ -132,92 +136,171 @@ function playNote(freq,dur=0.3,type='sine'){ const t=audio.currentTime;
 function clickSound(){ const dur=0.04; const buffer=audio.createBuffer(1,audio.sampleRate*dur,audio.sampleRate);
   const data=buffer.getChannelData(0); for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.exp(-i/(data.length*0.02));
   const src=audio.createBufferSource(); src.buffer=buffer; const g=audio.createGain(); g.gain.value=0.12; src.connect(g); g.connect(master); src.start(); }
+
 let ambientOsc=null;
-function startAmbient(){ if(ambientOsc) return; const o1=audio.createOscillator(); o1.type='sine'; o1.frequency.value=110;
-const g1=audio.createGain(); g1.gain.value=0.02; o1.connect(g1); g1.connect(bgGain);
-const o2=audio.createOscillator(); o2.type='sine'; o2.frequency.value=220; const g2=audio.createGain(); g2.gain.value=0.01; o2.connect(g2); g2.connect(bgGain);
-o1.start(); o2.start(); ambientOsc=[o1,o2]; }
+function startAmbient(){ if(ambientOsc) return; 
+  const o1=audio.createOscillator(); o1.type='sine'; o1.frequency.value=110;
+  const g1=audio.createGain(); g1.gain.value=0.02; o1.connect(g1); g1.connect(bgGain);
+  const o2=audio.createOscillator(); o2.type='sine'; o2.frequency.value=220; const g2=audio.createGain(); g2.gain.value=0.01; o2.connect(g2); g2.connect(bgGain);
+  o1.start(); o2.start(); ambientOsc=[o1,o2];
+}
 function stopAmbient(){ if(!ambientOsc) return; ambientOsc.forEach(o=>o.stop()); ambientOsc=null; }
+
 document.getElementById('toggleAmb').addEventListener('click',()=>{
   ensureAudio();
-  if(bgGain.gain.value>0.01){ bgGain.gain.value=0; stopAmbient(); }else{ bgGain.gain.value=0.06; startAmbient(); } });
+  if(bgGain.gain.value>0.01){ bgGain.gain.value=0; stopAmbient(); }
+  else{ bgGain.gain.value=0.06; startAmbient(); }
+});
 document.addEventListener('pointerdown',()=>ensureAudio(),{once:true});
 
-// ==== Navigation ====
+// ================= Navigation =================
 const screens = { intro:document.getElementById('intro'), menu:document.getElementById('menu'),
 bon:document.getElementById('bon'), sim:document.getElementById('sim') };
 function show(id){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[id].classList.add('active'); }
 
-// ==== Questions ====
+// ================= Questions =================
 const qA={text:"Qui est le meilleur ami de Kabir ?",answer:"jesus"};
 const qB={text:"Quelle est la première amoureuse de Kabir ?",answer:"francoise"};
 let qStep=0;
 const qLabel=document.getElementById('qLabel'), qText=document.getElementById('qText'),
 qInput=document.getElementById('qInput'), qBtn=document.getElementById('qBtn'), qMsg=document.getElementById('qMsg');
+
 function setQuestion(){ qLabel.textContent=`Question ${qStep+1}/2`; qText.textContent=qStep===0?qA.text:qB.text; qInput.value=''; qMsg.textContent=''; }
 qBtn.addEventListener('click',()=>{
   const val=qInput.value.trim().toLowerCase();
   if((qStep===0&&val===qA.answer)||(qStep===1&&val===qB.answer)){ show('menu'); return; }
-  if(qStep===0){ qStep=1; setQuestion(); } else { qMsg.textContent='❌ Mauvaise réponse'; }});
+  if(qStep===0){ qStep=1; setQuestion(); } else { qMsg.textContent='❌ Mauvaise réponse'; }
+});
 setQuestion();
 
-// ==== Bonneteau ====
-const cups=[document.getElementById('cup0'),document.getElementById('cup1'),document.getElementById('cup2')];
-const ball=document.getElementById('ball');
-const mixBtn=document.getElementById('mixBtn'), resetBn=document.getElementById('resetBn'), backMenuBn=document.getElementById('backMenuBn');
-const bnScoreEl=document.getElementById('bnScore'), bnLevelEl=document.getElementById('bnLevel'), bnMsg=document.getElementById('bnMsg');
-let bnPos=0,bnScore=0,bnLevel=1,bnMixing=false;
-function placeBall(idx){ bnPos=idx; const cup=cups[idx]; const rect=cup.offsetLeft; ball.style.left=(rect+cup.offsetWidth/2-14)+'px'; }
-function swapCups(a,b){ return new Promise(res=>{ const dx=120; let progress=0; const step=()=>{
-  progress+=0.1; cups[a].style.transform=`translateX(${dx*progress}px)`; cups[b].style.transform=`translateX(${-dx*progress}px)`;
-  if(progress<1) requestAnimationFrame(step); else { [cups[a],cups[b]]=[cups[b],cups[a]]; cups[a].style.transform=''; cups[b].style.transform=''; res(); } }; step(); }); }
-async function mixCups(){
-  if(bnMixing) return; bnMixing=true; bnMsg.textContent='🔀 Mélange en cours...'; ball.style.display='none';
-  let moves=bnLevel+2;
-  for(let i=0;i<moves;i++){
-    const a=Math.floor(Math.random()*3); let b; do{b=Math.floor(Math.random()*3);}while(b===a);
-    await swapCups(a,b);
-  }
-  ball.style.display='block';
-  bnMsg.textContent='🎯 Devine la balle !'; placeBall(bnPos); bnMixing=false; }
-mixBtn.addEventListener('click',()=>{ clickSound(); mixCups(); });
-cups.forEach((cup,i)=>{ cup.dataset.index=i; cup.addEventListener('click',()=>{
-  if(bnMixing) return;
-  if(parseInt(cup.dataset.index)===bnPos){ bnScore++; bnLevel++; bnMsg.textContent='✅ Bien joué !'; playNote(440,0.2); }
-  else{ bnScore=0; bnLevel=1; bnMsg.textContent='❌ Perdu !'; playNote(220,0.3,'sawtooth'); }
-  bnScoreEl.textContent=bnScore; bnLevelEl.textContent=bnLevel;
-  placeBall(Math.floor(Math.random()*3));
-}); });
-resetBn.addEventListener('click',()=>{
-  bnScore=0; bnLevel=1; bnScoreEl.textContent=0; bnLevelEl.textContent=1;
-  bnMsg.textContent='Regarde la balle, puis clique sur Mélanger.';
-  placeBall(Math.floor(Math.random()*3));
-});
-backMenuBn.addEventListener('click',()=>show('menu'));
-document.getElementById('openBon').addEventListener('click',()=>show('bon'));
+// ================= Bonneteau =================
+const bnCups=[document.getElementById('cup0'),document.getElementById('cup1'),document.getElementById('cup2')];
+const bnBall=document.getElementById('ball');
+const bnMixBtn=document.getElementById('mixBtn'), bnReset=document.getElementById('resetBn'), bnBack=document.getElementById('backMenuBn');
+const bnScoreEl=document.getElementById('bnScore'), bnLevelEl=document.getElementById('bnLevel'), bnMsgEl=document.getElementById('bnMsg');
 
-// ==== Simon ====
+let bnPos=0, bnScore=0, bnLevel=1, bnMixing=false;
+
+function placeBall(idx){
+    bnPos=idx;
+    const cup = bnCups[idx];
+    const rect = cup.offsetLeft;
+    const cupWidth = cup.offsetWidth;
+    const ballWidth = bnBall.offsetWidth;
+    bnBall.style.left = (rect + cupWidth/2 - ballWidth/2) + 'px';
+}
+
+function swapCups(a,b){
+    return new Promise(res=>{
+        const dx = bnCups[b].offsetLeft - bnCups[a].offsetLeft;
+        let progress=0;
+        function step(){
+            progress += 0.1;
+            bnCups[a].style.transform = `translateX(${dx*progress}px)`;
+            bnCups[b].style.transform = `translateX(${-dx*progress}px)`;
+            if(progress<1) requestAnimationFrame(step);
+            else{
+                [bnCups[a],bnCups[b]]=[bnCups[b],bnCups[a]];
+                bnCups[a].style.transform=''; bnCups[b].style.transform='';
+                res();
+            }
+        }
+        step();
+    });
+}
+
+async function mixBn(){
+    if(bnMixing) return;
+    bnMixing=true; bnMsgEl.textContent='🔀 Mélange en cours...'; bnBall.style.display='none';
+    let moves = bnLevel+2;
+    for(let i=0;i<moves;i++){
+        let a=Math.floor(Math.random()*3); let b;
+        do{ b=Math.floor(Math.random()*3); }while(b===a);
+        await swapCups(a,b);
+        if(bnPos===a) bnPos=b;
+        else if(bnPos===b) bnPos=a;
+    }
+    bnBall.style.display='block';
+    placeBall(bnPos);
+    bnMsgEl.textContent='🎯 Devine la balle !';
+    bnMixing=false;
+}
+
+bnMixBtn.addEventListener('click',()=>{ clickSound(); mixBn(); });
+bnCups.forEach((cup,i)=>{
+    cup.addEventListener('click',()=>{
+        if(bnMixing) return;
+        if(i===bnPos){ bnScore++; bnLevel++; bnMsgEl.textContent='✅ Bien joué !'; playNote(440,0.2); }
+        else{ bnScore=0; bnLevel=1; bnMsgEl.textContent='❌ Perdu !'; playNote(220,0.3,'sawtooth'); }
+        bnScoreEl.textContent=bnScore; bnLevelEl.textContent=bnLevel;
+        placeBall(Math.floor(Math.random()*3));
+    });
+});
+bnReset.addEventListener('click',()=>{
+    bnScore=0; bnLevel=1; bnScoreEl.textContent=0; bnLevelEl.textContent=1;
+    bnMsgEl.textContent='Regarde la balle, puis clique sur Mélanger.';
+    placeBall(Math.floor(Math.random()*3));
+});
+bnBack.addEventListener('click',()=>show('menu'));
+document.getElementById('openBon').addEventListener('click',()=>show('bon'));
+placeBall(Math.floor(Math.random()*3));
+
+// ================= Simon =================
 const pads=[...document.querySelectorAll('.pad')];
 const startSim=document.getElementById('startSim'), resetSim=document.getElementById('resetSim'), backMenuSim=document.getElementById('backMenuSim');
 const smLevelEl=document.getElementById('smLevel'), smScoreEl=document.getElementById('smScore'), smMsg=document.getElementById('smMsg');
+
 let simSeq=[], simUser=[], simLevel=0, simScore=0, simPlaying=false;
-function flashPad(idx){ pads[idx].classList.add('active'); const freqs=[261,329,392,523]; playNote(freqs[idx],0.3,'sawtooth'); setTimeout(()=>pads[idx].classList.remove('active'),300); }
-function nextRound(){ simUser=[]; simLevel++; smLevelEl.textContent=simLevel; smMsg.textContent='👀 Regarde la séquence...';
-simSeq.push(Math.floor(Math.random()*pads.length)); simPlaying=false; startSim.style.display='none';
-simSeq.forEach((v,i)=>setTimeout(()=>flashPad(v),i*600));
-setTimeout(()=>{ smMsg.textContent='👉 À toi !'; simPlaying=true; },simSeq.length*600+400); }
-pads.forEach((pad,i)=>{ pad.addEventListener('click',()=>{
-  if(!simPlaying) return; flashPad(i); simUser.push(i);
-  if(simUser[simUser.length-1]!==simSeq[simUser.length-1]){
-    smMsg.textContent='❌ Perdu !'; playNote(150,0.3,'sawtooth');
-    simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0;
-    simPlaying=false; startSim.style.display='inline-block';
-  } else if(simUser.length===simSeq.length){ simScore+=simLevel*10; smScoreEl.textContent=simScore; playNote(880,0.2);
-    simPlaying=false; setTimeout(nextRound,800);
-  }
-}); });
-startSim.addEventListener('click',()=>{ clickSound(); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; nextRound(); });
-resetSim.addEventListener('click',()=>{ simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; smMsg.textContent='Prêt'; startSim.style.display='inline-block'; });
+
+function flashPad(idx){
+    pads[idx].classList.add('active');
+    const freqs=[261,329,392,523];
+    playNote(freqs[idx],0.3,'sawtooth');
+    setTimeout(()=>pads[idx].classList.remove('active'),300);
+}
+
+function nextRound(){
+    simUser=[];
+    simLevel++;
+    smLevelEl.textContent=simLevel;
+    smMsg.textContent='👀 Regarde la séquence...';
+    simSeq.push(Math.floor(Math.random()*pads.length));
+    simPlaying=false;
+    startSim.style.display='none';
+    simSeq.forEach((v,i)=>setTimeout(()=>flashPad(v),i*600));
+    setTimeout(()=>{ smMsg.textContent='👉 À toi !'; simPlaying=true; }, simSeq.length*600+400);
+}
+
+pads.forEach((pad,i)=>{
+    pad.addEventListener('click',()=>{
+        if(!simPlaying) return;
+        flashPad(i);
+        simUser.push(i);
+        if(simUser[simUser.length-1]!==simSeq[simUser.length-1]){
+            smMsg.textContent='❌ Perdu !'; playNote(150,0.3,'sawtooth');
+            simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0;
+            simPlaying=false; startSim.style.display='inline-block';
+        } else if(simUser.length===simSeq.length){
+            simScore+=simLevel*10; smScoreEl.textContent=simScore; playNote(880,0.2);
+            simPlaying=false; setTimeout(nextRound,800);
+        }
+    });
+});
+
+startSim.addEventListener('click',()=>{
+    clickSound();
+    simSeq=[]; simUser=[]; simLevel=0; simScore=0;
+    smScoreEl.textContent=0; smLevelEl.textContent=0;
+    nextRound();
+});
+
+resetSim.addEventListener('click',()=>{
+    simSeq=[]; simUser=[]; simLevel=0; simScore=0;
+    smScoreEl.textContent=0; smLevelEl.textContent=0;
+    smMsg.textContent='Prêt';
+    startSim.style.display='inline-block';
+});
+
 backMenuSim.addEventListener('click',()=>show('menu'));
 document.getElementById('openSim').addEventListener('click',()=>show('sim'));
 </script>
