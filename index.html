@@ -7,8 +7,8 @@
 <style>
 :root{
   --bg1:#0f0c29; --bg2:#302b63; --bg3:#24243e;
-  --card:#10131aee; --muted:#aab3c4; --primary:#7cf5ff; --accent:#8b5cf6; --danger:#ff6b6b; --success:#22c55e; --gold:#facc15;
-  --glass: rgba(255,255,255,0.08);
+  --card:#10131aee; --muted:#aab3c4; --primary:#7cf5ff; --accent:#8b5cf6;
+  --danger:#ff6b6b; --success:#22c55e; --gold:#facc15; --glass: rgba(255,255,255,0.08);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif;color:#eef3ff;background: linear-gradient(-45deg,var(--bg1),var(--bg2),var(--bg3));background-size:400% 400%;animation:bgMove 18s ease infinite;overflow-x:hidden;}
@@ -42,106 +42,114 @@ input::placeholder{color:#97a3b7}
 .footerHint{margin-top:18px;font-size:12px;opacity:.7;text-align:center;}
 .particle{position:fixed;pointer-events:none;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle,#fff,rgba(255,255,255,0));opacity:.2;animation:float 12s linear infinite}
 @keyframes float{from{transform:translateY(110vh)}to{transform:translateY(-20vh)}}
+/* BONNETEAU */
+.cup-container{display:flex;justify-content:space-around;align-items:flex-end;margin-top:30px;gap:60px;position:relative;perspective:800px;}
+.cupWrap{width:90px;height:120px;position:relative;cursor:pointer;}
+.cup{width:100%;height:100%;background:linear-gradient(to top,#c69c6d,#e0c097);border-radius:0 0 12px 12px;display:flex;align-items:flex-end;justify-content:center;position:relative;}
+.cupLabel{position:absolute;bottom:10px;font-weight:700;color:#0b0f17;}
+.padGrid{display:grid;grid-template-columns:repeat(2,120px);grid-template-rows:repeat(2,120px);gap:16px;justify-content:center;margin-top:20px;}
+.pad{border-radius:16px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.35);transition:.2s transform, .2s box-shadow;}
+.pad.red{background:#ff4b5c;} .pad.green{background:#00ff94;} .pad.blue{background:#4d7cff;} .pad.yellow{background:#ffea00;}
+.pad.active{filter:brightness(1.8);transform:scale(1.1);box-shadow:0 10px 28px rgba(0,0,0,.55);}
 </style>
 </head>
 <body>
 <div class="container">
-<div class="brand"><span class="dot"></span><strong>Jeux Kabir</strong><span class="tag">Bonneteau & Simon</span></div>
+  <div class="brand"><span class="dot"></span><strong>Jeux Kabir</strong><span class="tag">Bonneteau & Simon</span></div>
 
-<!-- INTRO -->
-<section id="screen-intro" class="screen active card section">
-<h1>Bienvenue 👋</h1>
-<p class="muted">Accès réservé. Réponds correctement pour entrer.</p>
-<div class="section">
-<h2 id="questionLabel">Question 1/2</h2>
-<p id="questionText" class="notice"></p>
-<div class="inputRow section">
-<input id="answerInput" type="text" placeholder="Ta réponse ici" autocomplete="off">
-<button id="answerBtn" class="btn">Valider</button>
-</div>
-<p id="introMsg" class="notice"></p>
-<div class="footerHint">⚠️ Aucun indice n'est affiché. Les réponses doivent être exactes.</div>
-</div>
-</section>
-
-<!-- MENU -->
-<section id="screen-menu" class="screen card section">
-<h1>Menu principal</h1>
-<p class="muted">Choisis un mini‑jeu. Bonne chance !</p>
-<div class="menuCard grid cols-2">
-<button class="gameBtn" id="btn-bonneteau"><div class="gameIcon">🎩</div><div><div style="font-weight:800">Bonneteau</div><div class="muted" style="font-size:13px">Suis la bille… si elle existe 😉</div></div></button>
-<button class="gameBtn" id="btn-simon"><div class="gameIcon">🎨</div><div><div style="font-weight:800">Simon Game</div><div class="muted" style="font-size:13px">Mémorise la séquence lumineuse</div></div></button>
-</div>
-<div class="hud section"><span class="tag">Musique : <span id="musicState">off</span></span><button id="toggleMusic" class="btn ghost">Activer/Désactiver</button></div>
-</section>
-<!-- BONNETEAU -->
-<section id="screen-bonneteau" class="screen card section">
-  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
-    <h2>Bonneteau 🎩</h2>
-    <div class="hud">
-      <span class="tag">Niveau <span id="bn-level">1</span></span>
-      <span class="tag">Vitesse <span id="bn-speed">1.0x</span></span>
-      <button class="btn ghost" id="bn-back">Retour menu</button>
+  <!-- INTRO -->
+  <section id="screen-intro" class="screen active card section">
+    <h1>Bienvenue 👋</h1>
+    <p class="muted">Accès réservé. Réponds correctement pour entrer.</p>
+    <div class="section">
+      <h2 id="questionLabel">Question 1/2</h2>
+      <p id="questionText" class="notice"></p>
+      <div class="inputRow section">
+        <input id="answerInput" type="text" placeholder="Ta réponse ici" autocomplete="off">
+        <button id="answerBtn" class="btn">Valider</button>
+      </div>
+      <p id="introMsg" class="notice"></p>
+      <div class="footerHint">⚠️ Aucun indice n'est affiché. Les réponses doivent être exactes.</div>
     </div>
-  </div>
-  <div class="cup-container">
-    <div class="cupWrap" id="cup0"><div class="cup"><div class="cupLabel">A</div></div></div>
-    <div class="cupWrap" id="cup1"><div class="cup"><div class="cupLabel">B</div></div></div>
-    <div class="cupWrap" id="cup2"><div class="cup"><div class="cupLabel">C</div></div></div>
-  </div>
-  <div class="hud section">
-    <button class="btn ok" id="bn-shuffle">Mélanger</button>
-    <span class="tag">Choisis un gobelet après le mélange</span>
-  </div>
-  <p id="bn-msg" class="notice"></p>
-</section>
+  </section>
 
-<!-- SIMON -->
-<section id="screen-simon" class="screen card section">
-  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
-    <h2>Simon Game 🎨</h2>
-    <div class="hud">
-      <span class="tag">Niveau <span id="sm-level">1</span></span>
-      <button class="btn ghost" id="sm-back">Retour menu</button>
+  <!-- MENU -->
+  <section id="screen-menu" class="screen card section">
+    <h1>Menu principal</h1>
+    <p class="muted">Choisis un mini‑jeu. Bonne chance !</p>
+    <div class="menuCard grid cols-2">
+      <button class="gameBtn" id="btn-bonneteau"><div class="gameIcon">🎩</div><div><div style="font-weight:800">Bonneteau</div><div class="muted" style="font-size:13px">Suis la bille… si elle existe 😉</div></div></button>
+      <button class="gameBtn" id="btn-simon"><div class="gameIcon">🎨</div><div><div style="font-weight:800">Simon Game</div><div class="muted" style="font-size:13px">Mémorise la séquence lumineuse</div></div></button>
     </div>
-  </div>
-  <div class="padGrid">
-    <div class="pad red" data-pad="0"></div>
-    <div class="pad green" data-pad="1"></div>
-    <div class="pad blue" data-pad="2"></div>
-    <div class="pad yellow" data-pad="3"></div>
-  </div>
-  <div class="hud section">
-    <button class="btn ok" id="sm-start">Démarrer</button>
-    <span class="tag">Répète la séquence</span>
-  </div>
-  <p id="sm-msg" class="notice"></p>
-</section>
+    <div class="hud section"><span class="tag">Musique : <span id="musicState">off</span></span><button id="toggleMusic" class="btn ghost">Activer/Désactiver</button></div>
+  </section>
 
-</div> <!-- container -->
+  <!-- BONNETEAU -->
+  <section id="screen-bonneteau" class="screen card section">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+      <h2>Bonneteau 🎩</h2>
+      <div class="hud">
+        <span class="tag">Niveau <span id="bn-level">1</span></span>
+        <span class="tag">Vitesse <span id="bn-speed">1.0x</span></span>
+        <button class="btn ghost" id="bn-back">Retour menu</button>
+      </div>
+    </div>
+    <div class="cup-container">
+      <div class="cupWrap" id="cup0"><div class="cup"><div class="cupLabel">A</div></div></div>
+      <div class="cupWrap" id="cup1"><div class="cup"><div class="cupLabel">B</div></div></div>
+      <div class="cupWrap" id="cup2"><div class="cup"><div class="cupLabel">C</div></div></div>
+    </div>
+    <div class="hud section">
+      <button class="btn ok" id="bn-shuffle">Mélanger</button>
+      <span class="tag">Choisis un gobelet après le mélange</span>
+    </div>
+    <p id="bn-msg" class="notice"></p>
+  </section>
+
+  <!-- SIMON -->
+  <section id="screen-simon" class="screen card section">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+      <h2>Simon Game 🎨</h2>
+      <div class="hud">
+        <span class="tag">Niveau <span id="sm-level">1</span></span>
+        <button class="btn ghost" id="sm-back">Retour menu</button>
+      </div>
+    </div>
+    <div class="padGrid">
+      <div class="pad red" data-pad="0"></div>
+      <div class="pad green" data-pad="1"></div>
+      <div class="pad blue" data-pad="2"></div>
+      <div class="pad yellow" data-pad="3"></div>
+    </div>
+    <div class="hud section">
+      <button class="btn ok" id="sm-start">Démarrer</button>
+      <span class="tag">Répète la séquence</span>
+    </div>
+    <p id="sm-msg" class="notice"></p>
+  </section>
+</div>
 
 <audio id="bgm" loop preload="auto">
   <source src="https://cdn.pixabay.com/download/audio/2022/10/20/audio_d6a1a0f8bd.mp3?filename=cyber-dream-ambient-124841.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-// ==== Utilities ====
-const qs = s => document.querySelector(s);
-const qsa = s => Array.from(document.querySelectorAll(s));
-const show = id => { qsa('.screen').forEach(el=>el.classList.remove('active')); qs('#'+id).classList.add('active'); };
+// ==== UTILITAIRES ====
+const qs = s=>document.querySelector(s);
+const qsa = s=>Array.from(document.querySelectorAll(s));
+const show = id=>{ qsa('.screen').forEach(el=>el.classList.remove('active')); qs('#'+id).classList.add('active'); };
 
-// Floating particles
+// ==== PARTICULES FLOTTANTES ====
 for(let i=0;i<22;i++){
-  const p = document.createElement('div');
-  p.className = 'particle';
-  p.style.left = Math.random()*100+'vw';
-  p.style.animationDelay = (Math.random()*-12)+'s';
-  p.style.opacity = .12+Math.random()*.25;
+  const p=document.createElement('div'); p.className='particle';
+  p.style.left=Math.random()*100+'vw';
+  p.style.animationDelay=(Math.random()*-12)+'s';
+  p.style.opacity=.12+Math.random()*.25;
   document.body.appendChild(p);
 }
 
-// ==== Intro verification ====
-const questions = [
+// ==== INTRO QUESTIONS ====
+const questions=[
   {text:"Qui est le meilleur ami de Kabir ?",hash:"f2a1a0b492d4dbdc2d8ef9e4f668924bc0a80cd86f5f4b31b3ae9f0c2b9e5b0b"},
   {text:"Qui est la première amoureuse de Kabir ?",hash:"0a8a8ab2c6a5a3b9b4ef6a4d6b6f4a6f9e8c1b2a3a0d3f1e2c5b0a9f7d6c5e4f"}
 ];
@@ -157,159 +165,54 @@ const introMsg=qs('#introMsg');
 const answerInput=qs('#answerInput');
 const answerBtn=qs('#answerBtn');
 
-function setQuestion(){
-  qLabel.textContent=`Question ${step+1}/2`;
-  qText.textContent=questions[step].text;
-  answerInput.value='';
-  introMsg.textContent='';
-  answerInput.focus();
-}
-
+function setQuestion(){ qLabel.textContent=`Question ${step+1}/2`; qText.textContent=questions[step].text; answerInput.value=''; introMsg.textContent=''; answerInput.focus(); }
 async function verifyCurrent(){
   const raw=(answerInput.value||'').trim().toLowerCase();
   if(!raw){introMsg.textContent='Entre une réponse.'; return;}
-  const salted = raw+'|'+SALT;
-  const hash = await sha256Hex(salted);
-  const target = step===0 ? await sha256Hex(expectedA+'|'+SALT) : await sha256Hex(expectedB+'|'+SALT);
+  const salted=raw+'|'+SALT;
+  const hash=await sha256Hex(salted);
+  const target=step===0?await sha256Hex(expectedA+'|'+SALT):await sha256Hex(expectedB+'|'+SALT);
   if(hash===target){ enterMenu(); }
-  else {
-    if(step===0){ step=1; introMsg.textContent='Raté. Dernière chance.'; setQuestion(); }
-    else {
-      introMsg.textContent='Accès refusé.';
-      answerInput.disabled=true; answerBtn.disabled=true;
-      setTimeout(()=>{answerInput.disabled=false; answerBtn.disabled=false; step=0; setQuestion(); introMsg.textContent='Tu peux réessayer.';},20000);
-    }
-  }
+  else{ if(step===0){ step=1; introMsg.textContent='Raté. Dernière chance.'; setQuestion(); } 
+        else{ introMsg.textContent='Accès refusé.'; answerInput.disabled=true; answerBtn.disabled=true;
+              setTimeout(()=>{answerInput.disabled=false; answerBtn.disabled=false; step=0; setQuestion(); introMsg.textContent='Tu peux réessayer.';},20000);}}
 }
-
 answerBtn.addEventListener('click',verifyCurrent);
 answerInput.addEventListener('keydown',e=>{if(e.key==='Enter') verifyCurrent();});
 function enterMenu(){show('screen-menu'); tryStartMusic();}
 setQuestion();
 
-// ==== Music ====
-const bgm = qs('#bgm'); const musicState = qs('#musicState'); const toggleMusic = qs('#toggleMusic'); let musicEnabled=false;
+// ==== MUSIQUE ====
+const bgm=qs('#bgm'); const musicState=qs('#musicState'); const toggleMusic=qs('#toggleMusic'); let musicEnabled=false;
 function tryStartMusic(){if(!musicEnabled){bgm.currentTime=0; bgm.play().then(()=>{musicEnabled=true; musicState.textContent='on';}).catch(()=>{});}}
-toggleMusic.addEventListener('click',()=>{if(bgm.paused){bgm.play(); musicEnabled=true; musicState.textContent='on';} else {bgm.pause(); musicEnabled=false; musicState.textContent='off';}});
+toggleMusic.addEventListener('click',()=>{if(bgm.paused){bgm.play(); musicEnabled=true; musicState.textContent='on';}else{bgm.pause(); musicEnabled=false; musicState.textContent='off';}});
 
-// ==== Menu nav ====
+// ==== NAVIGATION MENU ====
 qs('#btn-bonneteau').addEventListener('click',()=>{ show('screen-bonneteau'); resetBonneteauUI(); });
 qs('#btn-simon').addEventListener('click',()=>{ show('screen-simon'); resetSimon(); });
 
-// ===== BONNETEAU LOGIC =====
-const cupEls = [qs('#cup0'), qs('#cup1'), qs('#cup2')];
-const bnMsg = qs('#bn-msg');
-const bnLevelEl = qs('#bn-level');
-const bnSpeedEl = qs('#bn-speed');
+// ==== BONNETEAU ====
+const cupEls=[qs('#cup0'),qs('#cup1'),qs('#cup2')];
+const bnMsg=qs('#bn-msg'); const bnLevelEl=qs('#bn-level'); const bnSpeedEl=qs('#bn-speed');
+let bnLevel=1; let bnBaseT=0.6; let cupPositions=[0,1,2]; let ballUnder=-1; let ballMode=1; let interactEnabled=false;
 
-let bnLevel = 1;
-let bnBaseT = 0.6;
-let cupPositions = [0,1,2];
-let ballUnder = -1;
-let ballMode = 1;
-let interactEnabled = false;
-
-function resetBonneteauUI(){
-  bnMsg.textContent = 'Appuie sur "Mélanger" puis choisis un gobelet.';
-  interactEnabled = false;
-  placeCups();
-}
-
-function placeCups(){
-  const spots = ['20px','calc(50% - 60px)','calc(100% - 140px)'];
-  for(let i=0;i<3;i++){
-    const idx = cupPositions.indexOf(i);
-    cupEls[i].style.transition = `transform ${bnBaseT}s ease`;
-    cupEls[i].style.transform = `translateX(${spots[idx]}) translateY(0)`;
-  }
-}
-
-function chooseBallMode(){
-  const r = Math.random();
-  if(r<0.2){ ballMode=0; ballUnder=-1; }
-  else if(r<0.5){ ballMode=2; const a=Math.floor(Math.random()*3); let b=Math.floor(Math.random()*3); while(b===a)b=Math.floor(Math.random()*3); ballUnder=[a,b]; }
-  else{ ballMode=1; ballUnder=Math.floor(Math.random()*3); }
-}
-
-async function shuffleSequence(){
-  interactEnabled=false;
-  bnMsg.textContent='Mélange en cours…';
-  chooseBallMode();
-  cupPositions=[0,1,2];
-  const swaps=Math.min(6+bnLevel*2,30);
-  bnBaseT=Math.max(0.22,0.6-bnLevel*0.04);
-  bnSpeedEl.textContent=(0.6/bnBaseT).toFixed(1)+'x';
-  for(let s=0;s<swaps;s++){
-    const a=Math.floor(Math.random()*3);
-    let b=Math.floor(Math.random()*3);
-    while(b===a)b=Math.floor(Math.random()*3);
-    [cupPositions[a],cupPositions[b]]=[cupPositions[b],cupPositions[a]];
-    placeCups();
-    await new Promise(r=>setTimeout(r,bnBaseT*1000+80));
-  }
-  bnMsg.textContent='À toi de jouer ! Choisis un gobelet.';
-  interactEnabled=true;
-}
-
+function resetBonneteauUI(){ bnMsg.textContent='Appuie sur "Mélanger" puis choisis un gobelet.'; interactEnabled=false; placeCups(); }
+function placeCups(){ const spots=['20px','calc(50% - 60px)','calc(100% - 140px)']; for(let i=0;i<3;i++){ const idx=cupPositions.indexOf(i); cupEls[i].style.transition=`transform ${bnBaseT}s ease`; cupEls[i].style.transform=`translateX(${spots[idx]}) translateY(0)`; }}
+function chooseBallMode(){ const r=Math.random(); if(r<0.2){ballMode=0;ballUnder=-1;}else if(r<0.5){ballMode=2;const a=Math.floor(Math.random()*3); let b=Math.floor(Math.random()*3); while(b===a)b=Math.floor(Math.random()*3); ballUnder=[a,b];}else{ballMode=1; ballUnder=Math.floor(Math.random()*3);}}
+async function shuffleSequence(){ interactEnabled=false; bnMsg.textContent='Mélange en cours…'; chooseBallMode(); cupPositions=[0,1,2]; const swaps=Math.min(6+bnLevel*2,30); bnBaseT=Math.max(0.22,0.6-bnLevel*0.04); bnSpeedEl.textContent=(0.6/bnBaseT).toFixed(1)+'x'; for(let s=0;s<swaps;s++){ const a=Math.floor(Math.random()*3); let b=Math.floor(Math.random()*3); while(b===a)b=Math.floor(Math.random()*3); [cupPositions[a],cupPositions[b]]=[cupPositions[b],cupPositions[a]]; placeCups(); await new Promise(r=>setTimeout(r,bnBaseT*1000+80)); } bnMsg.textContent='À toi de jouer ! Choisis un gobelet.'; interactEnabled=true;}
 qs('#bn-shuffle').addEventListener('click',shuffleSequence);
 qs('#bn-back').addEventListener('click',()=>show('screen-menu'));
+cupEls.forEach((cup,idx)=>{ cup.addEventListener('click',()=>{ if(!interactEnabled)return; interactEnabled=false; let win=false; if(ballMode===1 && idx===ballUnder)win=true; if(ballMode===2 && ballUnder.includes(idx))win=true; bnMsg.textContent=win?'Bravo 🎉 Niveau suivant !':'Raté ❌'; bnLevel=win?bnLevel+1:Math.max(1,bnLevel-1); bnLevelEl.textContent=bnLevel; cup.style.transform+=' translateY(-46px)'; setTimeout(()=>{cup.style.transform=cup.style.transform.replace(' translateY(-46px)',''); interactEnabled=true;},600);});});
 
-cupEls.forEach((cup,idx)=>{
-  cup.addEventListener('click',()=>{
-    if(!interactEnabled) return;
-    interactEnabled=false;
-    let win=false;
-    if(ballMode===1 && idx===ballUnder) win=true;
-    if(ballMode===2 && ballUnder.includes(idx)) win=true;
-    bnMsg.textContent=win?'Bravo 🎉 Niveau suivant !':'Raté ❌';
-    bnLevel = win ? bnLevel+1 : Math.max(1,bnLevel-1);
-    bnLevelEl.textContent=bnLevel;
-    cup.style.transform+=' translateY(-46px)';
-    setTimeout(()=>{cup.style.transform=cup.style.transform.replace(' translateY(-46px)',''); interactEnabled=true;},600);
-  });
-});
-
-// ===== SIMON GAME LOGIC =====
-const pads=qsa('.pad');
-const smMsg=qs('#sm-msg');
-const smLevelEl=qs('#sm-level');
+// ==== SIMON ====
+const pads=qsa('.pad'); const smMsg=qs('#sm-msg'); const smLevelEl=qs('#sm-level');
 let smSequence=[]; let smUserSeq=[]; let smLevel=1; let smActive=false;
 
-function flashPad(pad,dur=400){ pad.classList.add('active'); setTimeout(()=>pad.classList.remove('active'),dur); }
-
-function playSequence(seq){
-  smActive=false;
-  smUserSeq=[];
-  smMsg.textContent='Regarde la séquence…';
-  let delay=0;
-  seq.forEach(idx=>{setTimeout(()=>flashPad(pads[idx]),delay); delay+=600;});
-  setTimeout(()=>{ smActive=true; smMsg.textContent='À toi !'; },delay);
-}
-
+function flashPad(pad,dur=400){ pad.classList.add('active'); setTimeout(()=>pad.classList.remove('active'),dur);}
+function playSequence(seq){ smActive=false; smUserSeq=[]; smMsg.textContent='Regarde la séquence…'; let delay=0; seq.forEach(idx=>{setTimeout(()=>flashPad(pads[idx]),delay); delay+=600;}); setTimeout(()=>{smActive=true; smMsg.textContent='À toi !';},delay);}
 function resetSimon(){ smSequence=[]; smUserSeq=[]; smLevel=1; smLevelEl.textContent=smLevel; smMsg.textContent='Appuie sur "Démarrer"'; smActive=false; }
-
-qs('#sm-start').addEventListener('click',()=>{
-  smSequence.push(Math.floor(Math.random()*4));
-  smLevel=smSequence.length; smLevelEl.textContent=smLevel;
-  playSequence(smSequence);
-});
-
-pads.forEach((pad,idx)=>{
-  pad.addEventListener('click',()=>{
-    if(!smActive) return;
-    flashPad(pad,200);
-    smUserSeq.push(idx);
-    const step=smUserSeq.length-1;
-    if(smUserSeq[step]!==smSequence[step]){ smMsg.textContent='Raté ❌'; setTimeout(resetSimon,1200); return; }
-    if(smUserSeq.length===smSequence.length){
-      smMsg.textContent='Bravo 🎉';
-      smSequence.push(Math.floor(Math.random()*4));
-      smLevel=smSequence.length; smLevelEl.textContent=smLevel;
-      setTimeout(()=>playSequence(smSequence),800);
-    }
-  });
-});
-
+qs('#sm-start').addEventListener('click',()=>{ smSequence.push(Math.floor(Math.random()*4)); smLevel=smSequence.length; smLevelEl.textContent=smLevel; playSequence(smSequence); });
+pads.forEach((pad,idx)=>{ pad.addEventListener('click',()=>{ if(!smActive)return; flashPad(pad,200); smUserSeq.push(idx); const step=smUserSeq.length-1; if(smUserSeq[step]!==smSequence[step]){ smMsg.textContent='Raté ❌'; setTimeout(resetSimon,1200); return;} if(smUserSeq.length===smSequence.length){ smMsg.textContent='Bravo 🎉'; smSequence.push(Math.floor(Math.random()*4)); smLevel=smSequence.length; smLevelEl.textContent=smLevel; setTimeout(()=>playSequence(smSequence),800);} });});
 qs('#sm-back').addEventListener('click',()=>show('screen-menu'));
 </script>
 </body>
