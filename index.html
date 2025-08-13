@@ -5,52 +5,57 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Jeux Kabir — Bonneteau 2D & Simon Musical (Pro)</title>
 
-<!-- Modern readable font -->
+<!-- Police pro -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --bg:#eef1f7; --panel:#fff; --muted:#6b7280;
-  --accent:#4f46e5; --accent-dark:#3b36c3; --gold:#f5c45b; --danger:#ef4444;
+  --bg:#0a0a0a;          /* fond global noir */
+  --panel:#1c1c1c;       /* cartes gris foncé */
+  --muted:#aaaaaa;        /* texte secondaire */
+  --accent:#1e90ff;       /* boutons / accents bleu électrique */
+  --accent-dark:#1565c0;  /* dégradé boutons */
+  --gold:#f5c45b;         /* optionnel */
+  --danger:#ff3b3b;       /* balles / erreurs */
 }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;background:linear-gradient(180deg,#f9fafc,#e0e7ff);font-family:"Inter",Segoe UI,Roboto,Arial,sans-serif;color:#111; -webkit-font-smoothing:antialiased}
+html,body{height:100%;margin:0;background:var(--bg);font-family:"Inter",Segoe UI,Roboto,Arial,sans-serif;color:#ffffff;-webkit-font-smoothing:antialiased}
 .app{max-width:980px;margin:14px auto;padding:14px}
 .header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
 .brand{display:flex;align-items:center;gap:12px}
-.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:grid;place-items:center;color:#fff;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,.1)}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:grid;place-items:center;color:#fff;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,.5)}
 .title{font-size:18px;margin:0}
 .subtitle{font-size:12px;color:var(--muted)}
 .controls{display:flex;gap:8px;align-items:center}
 
 /* Card / screens */
-.card{background:var(--panel);padding:14px;border-radius:12px;box-shadow:0 8px 30px rgba(17,24,39,.06)}
+.card{background:var(--panel);padding:14px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
 .screen{display:none}
 .screen.active{display:block}
 .menuGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
 
 /* Buttons */
-.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:0;background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:#fff;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.1)}
-.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,.1);color:var(--muted);font-weight:500}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:0;background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:#fff;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.5)}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--muted);font-weight:600}
 .small{font-size:13px;color:var(--muted)}
 
 /* Layout for games */
 .game-area{display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px}
-#bnStage{width:100%;max-width:460px;height:220px;position:relative;border-radius:12px;background:linear-gradient(180deg,#e5e7eb,#d1d5db);box-shadow:inset 0 -30px 60px rgba(0,0,0,.05);overflow:hidden}
-.cup{position:absolute;bottom:18px;width:82px;height:82px;border-radius:50% 50% 0 0;background:linear-gradient(180deg,#4b5563,#9ca3af);box-shadow:0 8px 20px rgba(0,0,0,.15);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;color:#fff;font-weight:800;cursor:pointer;touch-action:manipulation}
-.ball{position:absolute;width:26px;height:26px;border-radius:50%;background:var(--danger);bottom:110px;left:50%;transform:translateX(-50%);box-shadow:0 6px 18px rgba(239,68,68,.25);transition:transform .18s}
+#bnStage{width:100%;max-width:460px;height:220px;position:relative;border-radius:12px;background:linear-gradient(180deg,#111111,#222222);box-shadow:inset 0 -30px 60px rgba(255,255,255,.05);overflow:hidden}
+.cup{position:absolute;bottom:18px;width:82px;height:82px;border-radius:50% 50% 0 0;background:linear-gradient(180deg,#333333,#555555);box-shadow:0 8px 20px rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;padding-bottom:0;color:#fff;font-weight:800;cursor:pointer;touch-action:manipulation}
+.ball{position:absolute;width:26px;height:26px;border-radius:50%;background:var(--danger);bottom:110px;left:50%;transform:translateX(-50%);box-shadow:0 6px 18px rgba(255,60,60,.5);transition:transform .18s}
 
 /* controls row */
 .controls-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px}
-.scorebar{display:flex;gap:14px;justify-content:center;color:var(--muted);font-weight:600}
+.scorebar{display:flex;gap:14px;justify-content:center;color:var(--muted);font-weight:700}
 
 /* Simon */
 .pad-grid{display:grid;grid-template-columns:repeat(2,120px);grid-gap:16px}
-.pad{width:120px;height:120px;border-radius:12px;display:grid;place-items:center;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.08);transition:transform .12s,filter .12s}
-.pad.red{background:linear-gradient(180deg,#f87171,#b91c1c)}
-.pad.green{background:linear-gradient(180deg,#4ade80,#15803d)}
-.pad.blue{background:linear-gradient(180deg,#60a5fa,#1e3a8a)}
-.pad.yellow{background:linear-gradient(180deg,#facc15,#b45309)}
+.pad{width:120px;height:120px;border-radius:12px;display:grid;place-items:center;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.5);transition:transform .12s,filter .12s}
+.pad.red{background:linear-gradient(180deg,#ff5b5b,#c12b2b)}
+.pad.green{background:linear-gradient(180deg,#5bff88,#2bc15b)}
+.pad.blue{background:linear-gradient(180deg,#5bbfff,#2b7bc1)}
+.pad.yellow{background:linear-gradient(180deg,#ffe55b,#c1aa2b)}
 .pad.active{transform:scale(1.06);filter:brightness(1.12)}
 
 /* Responsive tweaks */
@@ -90,7 +95,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,#f9fafc,#e0e7ff
       <div style="flex:1" id="qText">Qui est le meilleur ami de Kabir ?</div>
     </div>
     <div style="display:flex;gap:8px;margin-top:10px">
-      <input id="qInput" placeholder="Ta réponse" style="flex:1;padding:10px;border-radius:8px;border:1px solid #e6e6e6">
+      <input id="qInput" placeholder="Ta réponse" style="flex:1;padding:10px;border-radius:8px;border:1px solid #333;background:#111;color:#fff">
       <button id="qBtn" class="btn">Valider</button>
     </div>
     <div id="qMsg" class="small" style="margin-top:8px;color:var(--muted)"></div>
@@ -100,8 +105,8 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,#f9fafc,#e0e7ff
   <div id="menu" class="card screen">
     <h3 style="margin:6px 0 8px 0">Menu principal</h3>
     <div class="menuGrid">
-      <button id="openBon" class="btn">🎩 Bonneteau 2D <div style="font-size:12px;color:var(--muted);font-weight:500">Bille visible → mélange fluide → niveaux</div></button>
-      <button id="openSim" class="btn">🎵 Simon Musical <div style="font-size:12px;color:var(--muted);font-weight:500">Chaque couleur = note • séquences aléatoires</div></button>
+      <button id="openBon" class="btn">🎩 Bonneteau 2D <div style="font-size:12px;color:var(--muted);font-weight:600">Bille visible → mélange fluide → niveaux</div></button>
+      <button id="openSim" class="btn">🎵 Simon Musical <div style="font-size:12px;color:var(--muted);font-weight:600">Chaque couleur = note • séquences aléatoires</div></button>
     </div>
   </div>
 
@@ -157,7 +162,13 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,#f9fafc,#e0e7ff
   <div style="text-align:center;margin-top:12px;color:var(--muted);font-size:13px">Développé — adapte / améliore à volonté</div>
 </div>
 
+<!-- Ici tu peux garder tout ton JS existant, il fonctionne sans modification majeure -->
+
 <script>
+// ... JS du jeu (Bonneteau + Simon + audio + navigation) ...
+// Garde exactement le même JS que dans ton code initial, aucune modification nécessaire pour les couleurs
+
+
 /* ================= WebAudio (no external files) ================= */
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const audio = new AudioCtx();
