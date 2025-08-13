@@ -1,433 +1,422 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Jeux Kabir — Ultimate 2D & Simon Musical</title>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#0f0f1f;
-  --panel:#1e1e38;
-  --muted:#cccccc;
-  --accent:#ff4081;
-  --accent-dark:#e91e63;
-  --gold:#ffca28;
-  --danger:#ff3b3b;
-  --success:#00e676;
-  --padRed:#ff5b87;
-  --padGreen:#5bff88;
-  --padBlue:#5bbfff;
-  --padYellow:#ffe55b;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);font-family:"Rubik",sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
-.app{max-width:980px;margin:10px auto;padding:14px}
-.header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:grid;place-items:center;color:#fff;font-weight:900;font-size:26px;box-shadow:0 10px 24px rgba(0,0,0,.6)}
-.title{font-size:20px;font-weight:700;margin:0}
-.subtitle{font-size:13px;color:var(--muted)}
-.controls{display:flex;gap:8px;align-items:center}
-
-/* Cards */
-.card{background:var(--panel);padding:18px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
-.screen{display:none}
-.screen.active{display:block}
-.menuGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
-
-/* Buttons */
-.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 18px;border-radius:12px;border:0;background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:#fff;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.5);transition:transform .12s}
-.btn:hover{transform:scale(1.06)}
-.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--muted);font-weight:600}
-.small{font-size:14px;color:var(--muted)}
-
-/* Layout for games */
-.game-area{display:flex;flex-direction:column;align-items:center;gap:14px;padding:14px}
-#bnStage{width:100%;max-width:480px;height:240px;position:relative;border-radius:16px;background:linear-gradient(180deg,#111122,#222244);box-shadow:inset 0 -30px 60px rgba(255,255,255,.05);overflow:hidden}
-.cup{position:absolute;bottom:18px;width:90px;height:90px;border-radius:50% 50% 0 0;background:linear-gradient(180deg,#333355,#555588);box-shadow:0 8px 22px rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;padding-bottom:0;color:#fff;font-weight:900;cursor:pointer;touch-action:manipulation;transition:transform .2s}
-.ball{position:absolute;width:28px;height:28px;border-radius:50%;background:var(--danger);bottom:120px;left:50%;transform:translateX(-50%);box-shadow:0 6px 20px rgba(255,60,60,.6);transition:transform .18s}
-
-/* Controls row */
-.controls-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-.scorebar{display:flex;gap:16px;justify-content:center;color:var(--muted);font-weight:700;font-size:15px}
-
-/* Simon */
-.pad-grid{display:grid;grid-template-columns:repeat(2,140px);grid-gap:18px;perspective:800px}
-.pad{width:140px;height:140px;border-radius:16px;display:grid;place-items:center;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.5);transition:transform .12s,filter .12s,box-shadow .12s}
-.pad.red{background:var(--padRed)}
-.pad.green{background:var(--padGreen)}
-.pad.blue{background:var(--padBlue)}
-.pad.yellow{background:var(--padYellow)}
-.pad.active{transform:scale(1.12) rotateX(10deg) rotateY(10deg);filter:brightness(1.35);box-shadow:0 0 30px #fff}
-
-/* Responsive tweaks */
-@media(max-width:650px){
-  .pad{width:100px;height:100px}
-  #bnStage{height:200px}
-  .cup{width:72px;height:72px}
-  .ball{width:22px;height:22px;bottom:100px}
-  .btn{padding:12px 14px;font-size:15px}
-  .title{font-size:18px}
-  .subtitle{font-size:12px}
-}
-
-/* tiny helper */
-.center{display:grid;place-items:center}
-.madeBy{font-size:13px;color:var(--gold);margin-bottom:8px;text-align:center;font-weight:700}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Jeux Kabir — Bonneteau & Simon</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Styles optimisés */
+    :root {
+      --bg: #0f0f1f;
+      --panel: #1e1e38;
+      --muted: #cccccc;
+      --accent: #ff4081;
+      --accent-dark: #e91e63;
+      --danger: #ff3b3b;
+      --padRed: #ff5b87;
+      --padGreen: #5bff88;
+      --padBlue: #5bbfff;
+      --padYellow: #ffe55b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: "Rubik", sans-serif;
+      color: #fff;
+    }
+    .app { max-width: 960px; margin: auto; padding: 16px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .btn {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 6px;
+    }
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid #fff;
+      color: var(--muted);
+    }
+    .pad {
+      width: 120px;
+      height: 120px;
+      border-radius: 16px;
+      display: inline-block;
+      margin: 10px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    }
+    .pad.red { background: var(--padRed); }
+    .pad.green { background: var(--padGreen); }
+    .pad.blue { background: var(--padBlue); }
+    .pad.yellow { background: var(--padYellow); }
+    .pad.active {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px #fff;
+    }
+    #bnStage {
+      position: relative;
+      height: 200px;
+      background: #222;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .cup {
+      position: absolute;
+      bottom: 20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50% 50% 0 0;
+      background: #555;
+      cursor: pointer;
+    }
+    #ball {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--danger);
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  </style>
 </head>
 <body>
-<div class="app">
-  <div class="madeBy">🎮 Made by Kabir — Ultimate Mini-Games</div>
-  <div class="header">
-    <div class="brand">
-      <div class="logo">K</div>
-      <div>
-        <div class="title">Jeux Kabir — Ultimate</div>
-        <div class="subtitle">Bonneteau 2D & Simon Musical — responsive</div>
-      </div>
-    </div>
-    <div class="controls">
-      <button id="toggleAmb" class="btn ghost">Musique ON/OFF</button>
-    </div>
-  </div>
+  <div class="app">
+    <h2>🎮 Jeux Kabir — Bonneteau & Simon</h2>
+    <button id="toggleAmb" class="btn ghost">🎵 Musique ON/OFF</button>
 
-  <!-- INTRO -->
-  <div id="intro" class="card screen active">
-    <h3 style="margin:6px 0 8px 0">Accès — Réponds aux questions</h3>
-    <p class="small">Si la première réponse est correcte → accès direct. Sinon, deuxième question.</p>
-    <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-      <div style="font-weight:900" id="qLabel">Question 1/2</div>
-      <div style="flex:1" id="qText">Qui est le meilleur ami de Kabir ?</div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <input id="qInput" placeholder="Ta réponse" style="flex:1;padding:12px;border-radius:10px;border:1px solid #333;background:#111;color:#fff;font-weight:700;font-size:16px">
+    <!-- Écran Intro -->
+    <div id="intro" class="screen active">
+      <h3>🔐 Accès sécurisé</h3>
+      <p id="qLabel">Question 1/2</p>
+      <p id="qText">Qui est le meilleur ami de Kabir ?</p>
+      <input id="qInput" placeholder="Ta réponse">
       <button id="qBtn" class="btn">Valider</button>
+      <p id="qMsg"></p>
     </div>
-    <div id="qMsg" class="small" style="margin-top:8px;color:var(--muted)"></div>
-  </div>
 
-  <!-- MENU -->
-  <div id="menu" class="card screen">
-    <h3 style="margin:6px 0 8px 0">Menu principal</h3>
-    <div class="menuGrid">
-      <button id="openBon" class="btn">🎩 Bonneteau 2D<div style="font-size:13px;color:var(--muted);font-weight:600">Bille visible → mélange fluide → niveaux</div></button>
-      <button id="openSim" class="btn">🎵 Simon Musical<div style="font-size:13px;color:var(--muted);font-weight:600">Couleurs = notes • séquences aléatoires</div></button>
+    <!-- Menu -->
+    <div id="menu" class="screen">
+      <h3>📋 Menu Principal</h3>
+      <button id="openBon" class="btn">🎩 Bonneteau</button>
+      <button id="openSim" class="btn">🎵 Simon</button>
     </div>
-  </div>
 
-  <!-- BONNETEAU 2D -->
-  <div id="bon" class="card screen">
-    <h3 style="margin:6px 0 8px 0">Bonneteau — niveau <span id="bnLevel">1</span></h3>
-    <div class="game-area">
-      <div id="bnStage" aria-label="Zone bonneteau">
-        <div id="cup0" class="cup" data-index="0" style="left:40px"></div>
-        <div id="cup1" class="cup" data-index="1" style="left:170px"></div>
-        <div id="cup2" class="cup" data-index="2" style="left:300px"></div>
-        <div id="ball" class="ball" aria-hidden="false"></div>
+    <!-- Bonneteau -->
+    <div id="bon" class="screen">
+      <h3>🎩 Bonneteau — Niveau <span id="bnLevel">1</span></h3>
+      <div id="bnStage">
+        <div id="cup0" class="cup" style="left:40px"></div>
+        <div id="cup1" class="cup" style="left:160px"></div>
+        <div id="cup2" class="cup" style="left:280px"></div>
+        <div id="ball"></div>
       </div>
-
-      <div class="controls-row">
-        <button id="mixBtn" class="btn">Mélanger</button>
-        <button id="resetBn" class="btn ghost">Réinitialiser</button>
-        <button id="backMenuBn" class="btn ghost">Retour</button>
-      </div>
-
-      <div class="scorebar">
-        <div>Score : <span id="bnScore">0</span></div>
-        <div>Vitesse : <span id="bnSpeed">normal</span></div>
-      </div>
-      <div id="bnMsg" class="small" style="margin-top:6px">Regarde la balle, puis clique sur Mélanger.</div>
+      <button id="mixBtn" class="btn">🔀 Mélanger</button>
+      <button id="resetBn" class="btn ghost">🔄 Réinitialiser</button>
+      <button id="backMenuBn" class="btn ghost">⬅ Retour</button>
+      <p id="bnMsg">Regarde la balle, puis clique sur Mélanger.</p>
+      <p>Score : <span id="bnScore">0</span></p>
     </div>
-  </div>
 
-  <!-- SIMON -->
-  <div id="sim" class="card screen">
-    <h3 style="margin:6px 0 8px 0">Simon Musical — niveau <span id="smLevel">0</span></h3>
-    <div class="game-area">
-      <div class="pad-grid center" style="width:100%;max-width:300px">
+    <!-- Simon -->
+    <div id="sim" class="screen">
+      <h3>🎵 Simon — Niveau <span id="smLevel">0</span></h3>
+      <div>
         <div class="pad red" data-idx="0"></div>
         <div class="pad green" data-idx="1"></div>
         <div class="pad blue" data-idx="2"></div>
         <div class="pad yellow" data-idx="3"></div>
       </div>
-
-      <div class="controls-row">
-        <button id="startSim" class="btn">Démarrer</button>
-        <button id="resetSim" class="btn ghost">Réinitialiser</button>
-        <button id="backMenuSim" class="btn ghost">Retour</button>
-      </div>
-
-      <div class="scorebar">
-        <div>Score : <span id="smScore">0</span></div>
-        <div>État : <span id="smMsg">Prêt</span></div>
-      </div>
+      <button id="startSim" class="btn">▶ Démarrer</button>
+      <button id="resetSim" class="btn ghost">🔄 Réinitialiser</button>
+      <button id="backMenuSim" class="btn ghost">⬅ Retour</button>
+      <p>Score : <span id="smScore">0</span></p>
+      <p id="smMsg">Prêt</p>
     </div>
   </div>
 
-  <div style="text-align:center;margin-top:12px;color:var(--muted);font-size:14px">Développé — ultra fluide • Sons immersifs</div>
-</div>
+  <script>
+    // ==== Audio ====
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    const audio = new AudioCtx();
+    const master = audio.createGain(); master.gain.value = 0.9; master.connect(audio.destination);
+    const bgGain = audio.createGain(); bgGain.gain.value = 0.06; bgGain.connect(master);
 
-<script>
-// ==== Audio context ====
-// ==== Audio context ====
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-const audio = new AudioCtx();
-const master = audio.createGain(); master.gain.value = 0.9; master.connect(audio.destination);
-const bgGain = audio.createGain(); bgGain.gain.value = 0.06; bgGain.connect(master);
-
-function ensureAudio() {
-  if (audio.state === 'suspended') audio.resume();
-}
-function playNote(freq, dur = 0.36, type = 'sine', when = 0) {
-  const t = audio.currentTime + when;
-  const o = audio.createOscillator(); o.type = type; o.frequency.setValueAtTime(freq, t);
-  const g = audio.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(1.0, t + 0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  const f = audio.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = Math.max(800, freq * 5);
-  o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
-}
-function clickSound(vol = 0.12) {
-  const dur = 0.04;
-  const buffer = audio.createBuffer(1, audio.sampleRate * dur, audio.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (data.length * 0.02));
-  const src = audio.createBufferSource(); src.buffer = buffer;
-  const g = audio.createGain(); g.gain.value = vol; src.connect(g); g.connect(master); src.start();
-}
-let ambientOsc = null;
-function startAmbient() {
-  if (ambientOsc) return;
-  const o1 = audio.createOscillator(); o1.type = 'sine'; o1.frequency.value = 110;
-  const g1 = audio.createGain(); g1.gain.value = 0.02; o1.connect(g1); g1.connect(bgGain);
-  const o2 = audio.createOscillator(); o2.type = 'sine'; o2.frequency.value = 220;
-  const g2 = audio.createGain(); g2.gain.value = 0.01; o2.connect(g2); g2.connect(bgGain);
-  o1.start(); o2.start(); ambientOsc = [o1, o2];
-}
-function stopAmbient() {
-  if (!ambientOsc) return;
-  ambientOsc.forEach(o => o.stop());
-  ambientOsc = null;
-}
-document.getElementById('toggleAmb').addEventListener('click', () => {
-  ensureAudio();
-  if (bgGain.gain.value > 0.01) { bgGain.gain.value = 0; stopAmbient(); }
-  else { bgGain.gain.value = 0.06; startAmbient(); }
-});
-document.addEventListener('pointerdown', () => ensureAudio(), { once: true });
-
-// ==== Navigation & questions ====
-const screens = {
-  intro: document.getElementById('intro'),
-  menu: document.getElementById('menu'),
-  bon: document.getElementById('bon'),
-  sim: document.getElementById('sim')
-};
-function show(id) {
-  Object.values(screens).forEach(s => s.classList.remove('active'));
-  screens[id].classList.add('active');
-}
-
-const qA = { text: "Qui est le meilleur ami de Kabir ?", answer: "jesus" };
-const qB = { text: "Quelle est la première amoureuse de Kabir ?", answer: "francoise" };
-let qStep = 0;
-const qLabel = document.getElementById('qLabel'), qText = document.getElementById('qText'),
-  qInput = document.getElementById('qInput'), qBtn = document.getElementById('qBtn'), qMsg = document.getElementById('qMsg');
-function setQuestion() {
-  qLabel.textContent = `Question ${qStep + 1}/2`;
-  qText.textContent = qStep === 0 ? qA.text : qB.text;
-  qInput.value = ''; qMsg.textContent = '';
-}
-qBtn.addEventListener('click', () => {
-  const val = qInput.value.trim().toLowerCase();
-  if ((qStep === 0 && val === qA.answer) || (qStep === 1 && val === qB.answer)) {
-    show('menu'); return;
-  }
-  if (qStep === 0) { qStep = 1; setQuestion(); }
-  else { qMsg.textContent = 'Désolé, mauvaise réponse'; }
-});
-setQuestion();
-document.getElementById('openBon').addEventListener('click', () => show('bon'));
-document.getElementById('openSim').addEventListener('click', () => show('sim'));
-
-// ==== BONNETEAU ====
-const cups = [document.getElementById('cup0'), document.getElementById('cup1'), document.getElementById('cup2')];
-const ball = document.getElementById('ball');
-const mixBtn = document.getElementById('mixBtn');
-const resetBn = document.getElementById('resetBn');
-const backMenuBn = document.getElementById('backMenuBn');
-const bnScoreEl = document.getElementById('bnScore');
-const bnLevelEl = document.getElementById('bnLevel');
-const bnMsg = document.getElementById('bnMsg');
-
-let bnPos = 0, bnScore = 0, bnLevel = 1, bnMixing = false;
-let cupOffsets = [0, 0, 0];
-
-function placeBall(idx) {
-  bnPos = idx;
-  const cup = cups[idx];
-  const rect = cup.getBoundingClientRect();
-  ball.style.left = rect.left + rect.width / 2 - 14 + 'px';
-  ball.style.bottom = '120px';
-}
-
-function swapCups(a, b) {
-  return new Promise(res => {
-    const cupA = cups[a], cupB = cups[b];
-    const dx = 100;
-    let progress = 0;
-    const step = () => {
-      progress += 0.1;
-      cupOffsets[a] += dx * 0.1;
-      cupOffsets[b] -= dx * 0.1;
-      cups.forEach((cup, i) => cup.style.transform = `translateX(${cupOffsets[i]}px)`);
-      if (progress < 1) requestAnimationFrame(step);
-      else {
-        [cups[a], cups[b]] = [cups[b], cups[a]];
-        [cupOffsets[a], cupOffsets[b]] = [cupOffsets[b], cupOffsets[a]];
-        res();
-      }
-    };
-    step();
-  });
-}
-
-async function mixCups() {
-  if (bnMixing) return;
-  bnMixing = true;
-  bnMsg.textContent = 'Mélange en cours...';
-  let moves = bnLevel + 2;
-  for (let i = 0; i < moves; i++) {
-    const a = Math.floor(Math.random() * 3);
-    let b; do { b = Math.floor(Math.random() * 3); } while (b === a);
-    await swapCups(a, b);
-  }
-  bnMixing = false;
-  bnMsg.textContent = 'Devine la balle !';
-  placeBall(bnPos);
-}
-
-mixBtn.addEventListener('click', () => { clickSound(); mixCups(); });
-
-cups.forEach((cup, i) => {
-  cup.dataset.index = i;
-  cup.addEventListener('click', () => {
-    if (bnMixing) return;
-    if (parseInt(cup.dataset.index) === bnPos) {
-      bnScore++; bnLevel++; bnMsg.textContent = '✅ Bien joué !'; playNote(440, 0.2);
-    } else {
-      bnScore = 0; bnLevel = 1; bnMsg.textContent = '❌ Perdu !'; playNote(220, 0.3, 'sawtooth');
+    function ensureAudio() {
+      if (audio.state === 'suspended') audio.resume();
     }
-    bnScoreEl.textContent = bnScore;
-    bnLevelEl.textContent = bnLevel;
-    placeBall(Math.floor(Math.random() * 3));
-  });
-});
 
-resetBn.addEventListener('click', () => {
-  bnScore = 0;
-  bnLevel = 1;
-  bnScoreEl.textContent = 0;
-  bnLevelEl.textContent = 1;
-  bnMsg.textContent = 'Regarde la balle, puis clique sur Mélanger.';
-  placeBall(Math.floor(Math.random() * 3));
-});
+    function playNote(freq, dur = 0.3, type = 'sine') {
+      const t = audio.currentTime;
+      const o = audio.createOscillator(); o.type = type; o.frequency.setValueAtTime(freq, t);
+      const g = audio.createGain(); g.gain.setValueAtTime(0.001, t);
+      g.gain.exponentialRampToValueAtTime(1, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+    }
 
-backMenuBn.addEventListener('click', () => show('menu'));
+    function clickSound() {
+      const dur = 0.04;
+      const buffer = audio.createBuffer(1, audio.sampleRate * dur, audio.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (data.length * 0.02));
+      }
+      const src = audio.createBufferSource(); src.buffer = buffer;
+      const g = audio.createGain(); g.gain.value = 0.12;
+      src.connect(g); g.connect(master); src.start();
+    }
 
-// ==== SIMON ====
-const pads = [...document.querySelectorAll('.pad')];
-const startSim = document.getElementById('startSim');
-const resetSim = document.getElementById('resetSim');
-const backMenuSim = document.getElementById('backMenuSim');
-const smLevelEl = document.getElementById('smLevel');
-const smScoreEl = document.getElementById('smScore');
-const smMsgEl = document.getElementById('smMsg');
+    let ambientOsc = null;
+    function startAmbient() {
+      if (ambientOsc) return;
+      const o1 = audio.createOscillator(); o1.type = 'sine'; o1.frequency.value = 110;
+      const g1 = audio.createGain(); g1.gain.value = 0.02; o1.connect(g1); g1.connect(bgGain);
+      const o2 = audio.createOscillator(); o2.type = 'sine'; o2.frequency.value = 220;
+      const g2 = audio.createGain(); g2.gain.value = 0.01; o2.connect(g2); g2.connect(bgGain);
+      o1.start(); o2.start(); ambientOsc = [o1, o2];
+    }
+        function stopAmbient() {
+      if (!ambientOsc) return;
+      ambientOsc.forEach(o => o.stop());
+      ambientOsc = null;
+    }
 
-let simSeq = [], simUser = [], simLevel = 0, simScore = 0, simPlaying = false;
+    document.getElementById('toggleAmb').addEventListener('click', () => {
+      ensureAudio();
+      if (bgGain.gain.value > 0.01) {
+        bgGain.gain.value = 0;
+        stopAmbient();
+      } else {
+        bgGain.gain.value = 0.06;
+        startAmbient();
+      }
+    });
 
-function flashPad(idx) {
-  pads[idx].classList.add('active');
-  const freqs = [261, 329, 392, 523]; // C4, E4, G4, C5
-  playNote(freqs[idx], 0.38, 'sawtooth');
-  setTimeout(() => pads[idx].classList.remove('active'), 300);
-}
+    document.addEventListener('pointerdown', () => ensureAudio(), { once: true });
 
-function simMsg(msg) {
-  smMsgEl.textContent = msg;
-}
+    // ==== Navigation ====
+    const screens = {
+      intro: document.getElementById('intro'),
+      menu: document.getElementById('menu'),
+      bon: document.getElementById('bon'),
+      sim: document.getElementById('sim')
+    };
+    function show(id) {
+      Object.values(screens).forEach(s => s.classList.remove('active'));
+      screens[id].classList.add('active');
+    }
 
-function nextRound() {
-  simUser = [];
-  simLevel++;
-  smLevelEl.textContent = simLevel;
-  simMsg('Regarde la séquence...');
-  simSeq.push(Math.floor(Math.random() * pads.length));
-  simPlaying = false;
-  startSim.style.display = 'none'; // Masquer pendant le jeu
+    // ==== Questions ====
+    const qA = { text: "Qui est le meilleur ami de Kabir ?", answer: "jesus" };
+    const qB = { text: "Quelle est la première amoureuse de Kabir ?", answer: "francoise" };
+    let qStep = 0;
+    const qLabel = document.getElementById('qLabel'),
+          qText = document.getElementById('qText'),
+          qInput = document.getElementById('qInput'),
+          qBtn = document.getElementById('qBtn'),
+          qMsg = document.getElementById('qMsg');
 
-  simSeq.forEach((v, i) => {
-    setTimeout(() => flashPad(v), i * 600);
-  });
+    function setQuestion() {
+      qLabel.textContent = `Question ${qStep + 1}/2`;
+      qText.textContent = qStep === 0 ? qA.text : qB.text;
+      qInput.value = '';
+      qMsg.textContent = '';
+    }
 
-  setTimeout(() => {
-    simMsg('À toi !');
-    simPlaying = true;
-  }, simSeq.length * 600 + 400);
-}
+    qBtn.addEventListener('click', () => {
+      const val = qInput.value.trim().toLowerCase();
+      if ((qStep === 0 && val === qA.answer) || (qStep === 1 && val === qB.answer)) {
+        show('menu');
+        return;
+      }
+      if (qStep === 0) {
+        qStep = 1;
+        setQuestion();
+      } else {
+        qMsg.textContent = '❌ Mauvaise réponse';
+      }
+    });
 
-pads.forEach((pad, i) => {
-  pad.addEventListener('click', () => {
-    if (!simPlaying) return;
-    flashPad(i);
-    simUser.push(i);
+    setQuestion();
 
-    if (simUser[simUser.length - 1] !== simSeq[simUser.length - 1]) {
-      simMsg('❌ Perdu !');
-      playNote(150, 0.3, 'sawtooth');
+    // ==== Bonneteau ====
+    const cups = [document.getElementById('cup0'), document.getElementById('cup1'), document.getElementById('cup2')];
+    const ball = document.getElementById('ball');
+    const mixBtn = document.getElementById('mixBtn');
+    const resetBn = document.getElementById('resetBn');
+    const backMenuBn = document.getElementById('backMenuBn');
+    const bnScoreEl = document.getElementById('bnScore');
+    const bnLevelEl = document.getElementById('bnLevel');
+    const bnMsg = document.getElementById('bnMsg');
+
+    let bnPos = 0, bnScore = 0, bnLevel = 1, bnMixing = false;
+    let cupOffsets = [0, 0, 0];
+
+    function placeBall(idx) {
+      bnPos = idx;
+      const cup = cups[idx];
+      const rect = cup.getBoundingClientRect();
+      ball.style.left = rect.left + rect.width / 2 - 14 + 'px';
+    }
+
+    function swapCups(a, b) {
+      return new Promise(res => {
+        const dx = 100;
+        let progress = 0;
+        const step = () => {
+          progress += 0.1;
+          cupOffsets[a] += dx * 0.1;
+          cupOffsets[b] -= dx * 0.1;
+          cups.forEach((cup, i) => cup.style.transform = `translateX(${cupOffsets[i]}px)`);
+          if (progress < 1) requestAnimationFrame(step);
+          else {
+            [cups[a], cups[b]] = [cups[b], cups[a]];
+            [cupOffsets[a], cupOffsets[b]] = [cupOffsets[b], cupOffsets[a]];
+            res();
+          }
+        };
+        step();
+      });
+    }
+
+    async function mixCups() {
+      if (bnMixing) return;
+      bnMixing = true;
+      bnMsg.textContent = '🔀 Mélange en cours...';
+      let moves = bnLevel + 2;
+      for (let i = 0; i < moves; i++) {
+        const a = Math.floor(Math.random() * 3);
+        let b; do { b = Math.floor(Math.random() * 3); } while (b === a);
+        await swapCups(a, b);
+      }
+      bnMixing = false;
+      bnMsg.textContent = '🎯 Devine la balle !';
+      placeBall(bnPos);
+    }
+
+    mixBtn.addEventListener('click', () => {
+      clickSound();
+      mixCups();
+    });
+
+    cups.forEach((cup, i) => {
+      cup.dataset.index = i;
+      cup.addEventListener('click', () => {
+        if (bnMixing) return;
+        if (parseInt(cup.dataset.index) === bnPos) {
+          bnScore++; bnLevel++; bnMsg.textContent = '✅ Bien joué !'; playNote(440, 0.2);
+        } else {
+          bnScore = 0; bnLevel = 1; bnMsg.textContent = '❌ Perdu !'; playNote(220, 0.3, 'sawtooth');
+        }
+        bnScoreEl.textContent = bnScore;
+        bnLevelEl.textContent = bnLevel;
+        placeBall(Math.floor(Math.random() * 3));
+      });
+    });
+
+    resetBn.addEventListener('click', () => {
+      bnScore = 0; bnLevel = 1;
+      bnScoreEl.textContent = 0;
+      bnLevelEl.textContent = 1;
+      bnMsg.textContent = 'Regarde la balle, puis clique sur Mélanger.';
+      placeBall(Math.floor(Math.random() * 3));
+    });
+
+    backMenuBn.addEventListener('click', () => show('menu'));
+    document.getElementById('openBon').addEventListener('click', () => show('bon'));
+
+    // ==== Simon ====
+    const pads = [...document.querySelectorAll('.pad')];
+    const startSim = document.getElementById('startSim');
+    const resetSim = document.getElementById('resetSim');
+    const backMenuSim = document.getElementById('backMenuSim');
+    const smLevelEl = document.getElementById('smLevel');
+    const smScoreEl = document.getElementById('smScore');
+    const smMsg = document.getElementById('smMsg');
+
+    let simSeq = [], simUser = [], simLevel = 0, simScore = 0, simPlaying = false;
+
+    function flashPad(idx) {
+      pads[idx].classList.add('active');
+      const freqs = [261, 329, 392, 523];
+      playNote(freqs[idx], 0.3, 'sawtooth');
+      setTimeout(() => pads[idx].classList.remove('active'), 300);
+    }
+
+    function nextRound() {
+      simUser = [];
+      simLevel++;
+      smLevelEl.textContent = simLevel;
+      smMsg.textContent = '👀 Regarde la séquence...';
+      simSeq.push(Math.floor(Math.random() * pads.length));
+      simPlaying = false;
+      startSim.style.display = 'none';
+
+      simSeq.forEach((v, i) => {
+        setTimeout(() => flashPad(v), i * 600);
+      });
+
+      setTimeout(() => {
+        smMsg.textContent = '👉 À toi !';
+        simPlaying = true;
+      }, simSeq.length * 600 + 400);
+    }
+
+    pads.forEach((pad, i) => {
+      pad.addEventListener('click', () => {
+        if (!simPlaying) return;
+        flashPad(i);
+        simUser.push(i);
+        if (simUser[simUser.length - 1] !== simSeq[simUser.length - 1]) {
+          smMsg.textContent = '❌ Perdu !';
+          playNote(150, 0.3, 'sawtooth');
+          simSeq = []; simUser = []; simLevel = 0; simScore = 0;
+          smScoreEl.textContent = 0; smLevelEl.textContent = 0;
+          simPlaying = false;
+          startSim.style.display = 'inline-block';
+        } else if (simUser.length === simSeq.length) {
+          simScore += simLevel * 10;
+          smScoreEl.textContent = simScore;
+          playNote(880, 0.2);
+          simPlaying = false;
+          setTimeout(nextRound, 800);
+        }
+      });
+    });
+
+    startSim.addEventListener('click', () => {
+      clickSound();
+      simSeq = []; simUser = []; simLevel = 0; simScore = 0;
+      smScoreEl.textContent = 0; smLevelEl.textContent = 0;
+      nextRound();
+    });
+        resetSim.addEventListener('click', () => {
       simSeq = [];
       simUser = [];
       simLevel = 0;
       simScore = 0;
       smScoreEl.textContent = 0;
       smLevelEl.textContent = 0;
-      simPlaying = false;
-      startSim.style.display = 'inline-flex'; // Réaffiche le bouton
-    } else if (simUser.length === simSeq.length) {
-      simScore += simLevel * 10;
-      smScoreEl.textContent = simScore;
-      playNote(880, 0.2);
-      simPlaying = false;
-      setTimeout(nextRound, 800);
-    }
-  });
-});
+      smMsg.textContent = 'Prêt';
+      startSim.style.display = 'inline-block';
+    });
 
-startSim.addEventListener('click', () => {
-  clickSound();
-  simSeq = [];
-  simUser = [];
-  simLevel = 0;
-  simScore = 0;
-  smScoreEl.textContent = 0;
-  smLevelEl.textContent = 0;
-  nextRound();
-});
-
-resetSim.addEventListener('click', () => {
-  simSeq = [];
-  simUser = [];
-  simLevel = 0;
-  simScore = 0;
-  smScoreEl.textContent = 0;
-  smLevelEl.textContent = 0;
-  simMsg('Prêt');
-  startSim.style.display = 'inline-flex'; // Réaffiche le bouton
-});
-
-backMenuSim.addEventListener('click', () => show('menu'));
-</script>
+    backMenuSim.addEventListener('click', () => show('menu'));
+    document.getElementById('openSim').addEventListener('click', () => show('sim'));
+  </script>
 </body>
 </html>
 
+    
+
+   
