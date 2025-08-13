@@ -171,131 +171,263 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:"Rubik",sans-ser
 
 <script>
 // ==== Audio context ====
+// ==== Audio context ====
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const audio = new AudioCtx();
-const master = audio.createGain(); master.gain.value=0.9; master.connect(audio.destination);
-const bgGain = audio.createGain(); bgGain.gain.value=0.06; bgGain.connect(master);
+const master = audio.createGain(); master.gain.value = 0.9; master.connect(audio.destination);
+const bgGain = audio.createGain(); bgGain.gain.value = 0.06; bgGain.connect(master);
 
-function ensureAudio(){ if(audio.state==='suspended') audio.resume(); }
-function playNote(freq,dur=0.36,type='sine',when=0){
-  const t=audio.currentTime+when;
-  const o=audio.createOscillator(); o.type=type; o.frequency.setValueAtTime(freq,t);
-  const g=audio.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(1.0,t+0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-  const f=audio.createBiquadFilter(); f.type='lowpass'; f.frequency.value=Math.max(800,freq*5);
-  o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t+dur+0.02);
+function ensureAudio() {
+  if (audio.state === 'suspended') audio.resume();
 }
-function clickSound(vol=0.12){ const dur=0.04; const buffer=audio.createBuffer(1,audio.sampleRate*dur,audio.sampleRate); const data=buffer.getChannelData(0); for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.exp(-i/(data.length*0.02)); const src=audio.createBufferSource(); src.buffer=buffer; const g=audio.createGain(); g.gain.value=vol; src.connect(g); g.connect(master); src.start();}
-let ambientOsc=null;
-function startAmbient(){ if(ambientOsc) return; const o1=audio.createOscillator(); o1.type='sine'; o1.frequency.value=110; const g1=audio.createGain(); g1.gain.value=0.02; o1.connect(g1); g1.connect(bgGain); const o2=audio.createOscillator(); o2.type='sine'; o2.frequency.value=220; const g2=audio.createGain(); g2.gain.value=0.01; o2.connect(g2); g2.connect(bgGain); o1.start(); o2.start(); ambientOsc=[o1,o2]; }
-function stopAmbient(){ if(!ambientOsc) return; ambientOsc.forEach(o=>o.stop()); ambientOsc=null; }
-document.getElementById('toggleAmb').addEventListener('click',()=>{
+function playNote(freq, dur = 0.36, type = 'sine', when = 0) {
+  const t = audio.currentTime + when;
+  const o = audio.createOscillator(); o.type = type; o.frequency.setValueAtTime(freq, t);
+  const g = audio.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(1.0, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  const f = audio.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = Math.max(800, freq * 5);
+  o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+}
+function clickSound(vol = 0.12) {
+  const dur = 0.04;
+  const buffer = audio.createBuffer(1, audio.sampleRate * dur, audio.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (data.length * 0.02));
+  const src = audio.createBufferSource(); src.buffer = buffer;
+  const g = audio.createGain(); g.gain.value = vol; src.connect(g); g.connect(master); src.start();
+}
+let ambientOsc = null;
+function startAmbient() {
+  if (ambientOsc) return;
+  const o1 = audio.createOscillator(); o1.type = 'sine'; o1.frequency.value = 110;
+  const g1 = audio.createGain(); g1.gain.value = 0.02; o1.connect(g1); g1.connect(bgGain);
+  const o2 = audio.createOscillator(); o2.type = 'sine'; o2.frequency.value = 220;
+  const g2 = audio.createGain(); g2.gain.value = 0.01; o2.connect(g2); g2.connect(bgGain);
+  o1.start(); o2.start(); ambientOsc = [o1, o2];
+}
+function stopAmbient() {
+  if (!ambientOsc) return;
+  ambientOsc.forEach(o => o.stop());
+  ambientOsc = null;
+}
+document.getElementById('toggleAmb').addEventListener('click', () => {
   ensureAudio();
-  if(bgGain.gain.value>0.01){ bgGain.gain.value=0; stopAmbient(); } else{ bgGain.gain.value=0.06; startAmbient(); }
+  if (bgGain.gain.value > 0.01) { bgGain.gain.value = 0; stopAmbient(); }
+  else { bgGain.gain.value = 0.06; startAmbient(); }
 });
-document.addEventListener('pointerdown',()=>ensureAudio(),{once:true});
+document.addEventListener('pointerdown', () => ensureAudio(), { once: true });
 
 // ==== Navigation & questions ====
-const screens={intro:document.getElementById('intro'),menu:document.getElementById('menu'),bon:document.getElementById('bon'),sim:document.getElementById('sim')};
-function show(id){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[id].classList.add('active'); }
+const screens = {
+  intro: document.getElementById('intro'),
+  menu: document.getElementById('menu'),
+  bon: document.getElementById('bon'),
+  sim: document.getElementById('sim')
+};
+function show(id) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[id].classList.add('active');
+}
 
-const qA={text:"Qui est le meilleur ami de Kabir ?",answer:"jesus"};
-const qB={text:"Quelle est la première amoureuse de Kabir ?",answer:"francoise"};
-let qStep=0;
-const qLabel=document.getElementById('qLabel'),qText=document.getElementById('qText'),qInput=document.getElementById('qInput'),qBtn=document.getElementById('qBtn'),qMsg=document.getElementById('qMsg');
-function setQuestion(){ qLabel.textContent=`Question ${qStep+1}/2`; qText.textContent=qStep===0?qA.text:qB.text; qInput.value=''; qMsg.textContent=''; }
-qBtn.addEventListener('click',()=>{
-  const val=qInput.value.trim().toLowerCase();
-  if(qStep===0 && val===qA.answer){show('menu'); return;}
-  if(qStep===1 && val===qB.answer){show('menu'); return;}
-  if(qStep===0){ qStep=1; setQuestion(); } else{ qMsg.textContent='Désolé, mauvaise réponse'; }
+const qA = { text: "Qui est le meilleur ami de Kabir ?", answer: "jesus" };
+const qB = { text: "Quelle est la première amoureuse de Kabir ?", answer: "francoise" };
+let qStep = 0;
+const qLabel = document.getElementById('qLabel'), qText = document.getElementById('qText'),
+  qInput = document.getElementById('qInput'), qBtn = document.getElementById('qBtn'), qMsg = document.getElementById('qMsg');
+function setQuestion() {
+  qLabel.textContent = `Question ${qStep + 1}/2`;
+  qText.textContent = qStep === 0 ? qA.text : qB.text;
+  qInput.value = ''; qMsg.textContent = '';
+}
+qBtn.addEventListener('click', () => {
+  const val = qInput.value.trim().toLowerCase();
+  if ((qStep === 0 && val === qA.answer) || (qStep === 1 && val === qB.answer)) {
+    show('menu'); return;
+  }
+  if (qStep === 0) { qStep = 1; setQuestion(); }
+  else { qMsg.textContent = 'Désolé, mauvaise réponse'; }
 });
 setQuestion();
-document.getElementById('openBon').addEventListener('click',()=>show('bon'));
-document.getElementById('openSim').addEventListener('click',()=>show('sim'));
+document.getElementById('openBon').addEventListener('click', () => show('bon'));
+document.getElementById('openSim').addEventListener('click', () => show('sim'));
 
 // ==== BONNETEAU ====
-const cups=[document.getElementById('cup0'),document.getElementById('cup1'),document.getElementById('cup2')];
-const ball=document.getElementById('ball');
-const mixBtn=document.getElementById('mixBtn');
-const resetBn=document.getElementById('resetBn');
-const backMenuBn=document.getElementById('backMenuBn');
-const bnScoreEl=document.getElementById('bnScore');
-const bnLevelEl=document.getElementById('bnLevel');
-const bnMsg=document.getElementById('bnMsg');
+const cups = [document.getElementById('cup0'), document.getElementById('cup1'), document.getElementById('cup2')];
+const ball = document.getElementById('ball');
+const mixBtn = document.getElementById('mixBtn');
+const resetBn = document.getElementById('resetBn');
+const backMenuBn = document.getElementById('backMenuBn');
+const bnScoreEl = document.getElementById('bnScore');
+const bnLevelEl = document.getElementById('bnLevel');
+const bnMsg = document.getElementById('bnMsg');
 
-let bnPos=0, bnScore=0, bnLevel=1, bnMixing=false, bnSpeed=600;
-function placeBall(idx){ bnPos=idx; const c=cups[idx].offsetLeft+cups[idx].offsetWidth/2-14; ball.style.left=c+'px'; ball.style.bottom='120px'; }
-placeBall( Math.floor(Math.random()*3) );
+let bnPos = 0, bnScore = 0, bnLevel = 1, bnMixing = false;
+let cupOffsets = [0, 0, 0];
 
-function mixCups(){
-  if(bnMixing) return;
-  bnMixing=true; bnMsg.textContent='Mélange en cours...';
-  let moves=bnLevel+2, last=null;
-  const interval=setInterval(()=>{
-    let a,b; do{ a=Math.floor(Math.random()*3); b=Math.floor(Math.random()*3); } while(a===b || (a===last && b===last));
-    last=a; [cups[a].style.left,cups[b].style.left]=[cups[b].style.left,cups[a].style.left];
-    moves--; if(moves<=0){ clearInterval(interval); bnMixing=false; bnMsg.textContent='Devine la balle !'; placeBall(bnPos); }
-  },bnSpeed);
+function placeBall(idx) {
+  bnPos = idx;
+  const cup = cups[idx];
+  const rect = cup.getBoundingClientRect();
+  ball.style.left = rect.left + rect.width / 2 - 14 + 'px';
+  ball.style.bottom = '120px';
 }
-mixBtn.addEventListener('click',()=>{ clickSound(); mixCups(); });
 
-cups.forEach(cup=>{
-  cup.addEventListener('click',()=>{
-    if(bnMixing) return;
-    if(cup.dataset.index==bnPos){ bnScore+=1; bnLevel++; bnSpeed=Math.max(200,bnSpeed-20); bnMsg.textContent='✅ Bien joué !'; playNote(440,0.2); }
-    else{ bnMsg.textContent='❌ Perdu !'; bnLevel=1; bnSpeed=600; playNote(220,0.3,'sawtooth'); }
-    bnScoreEl.textContent=bnScore; bnLevelEl.textContent=bnLevel;
-    placeBall(Math.floor(Math.random()*3));
+function swapCups(a, b) {
+  return new Promise(res => {
+    const cupA = cups[a], cupB = cups[b];
+    const dx = 100;
+    let progress = 0;
+    const step = () => {
+      progress += 0.1;
+      cupOffsets[a] += dx * 0.1;
+      cupOffsets[b] -= dx * 0.1;
+      cups.forEach((cup, i) => cup.style.transform = `translateX(${cupOffsets[i]}px)`);
+      if (progress < 1) requestAnimationFrame(step);
+      else {
+        [cups[a], cups[b]] = [cups[b], cups[a]];
+        [cupOffsets[a], cupOffsets[b]] = [cupOffsets[b], cupOffsets[a]];
+        res();
+      }
+    };
+    step();
+  });
+}
+
+async function mixCups() {
+  if (bnMixing) return;
+  bnMixing = true;
+  bnMsg.textContent = 'Mélange en cours...';
+  let moves = bnLevel + 2;
+  for (let i = 0; i < moves; i++) {
+    const a = Math.floor(Math.random() * 3);
+    let b; do { b = Math.floor(Math.random() * 3); } while (b === a);
+    await swapCups(a, b);
+  }
+  bnMixing = false;
+  bnMsg.textContent = 'Devine la balle !';
+  placeBall(bnPos);
+}
+
+mixBtn.addEventListener('click', () => { clickSound(); mixCups(); });
+
+cups.forEach((cup, i) => {
+  cup.dataset.index = i;
+  cup.addEventListener('click', () => {
+    if (bnMixing) return;
+    if (parseInt(cup.dataset.index) === bnPos) {
+      bnScore++; bnLevel++; bnMsg.textContent = '✅ Bien joué !'; playNote(440, 0.2);
+    } else {
+      bnScore = 0; bnLevel = 1; bnMsg.textContent = '❌ Perdu !'; playNote(220, 0.3, 'sawtooth');
+    }
+    bnScoreEl.textContent = bnScore;
+    bnLevelEl.textContent = bnLevel;
+    placeBall(Math.floor(Math.random() * 3));
   });
 });
-resetBn.addEventListener('click',()=>{ bnScore=0; bnLevel=1; bnSpeed=600; bnScoreEl.textContent=0; bnLevelEl.textContent=1; bnMsg.textContent='Regarde la balle, puis clique sur Mélanger.'; placeBall(Math.floor(Math.random()*3)); });
-backMenuBn.addEventListener('click',()=>show('menu'));
+
+resetBn.addEventListener('click', () => {
+  bnScore = 0;
+  bnLevel = 1;
+  bnScoreEl.textContent = 0;
+  bnLevelEl.textContent = 1;
+  bnMsg.textContent = 'Regarde la balle, puis clique sur Mélanger.';
+  placeBall(Math.floor(Math.random() * 3));
+});
+
+backMenuBn.addEventListener('click', () => show('menu'));
 
 // ==== SIMON ====
-const pads=[...document.querySelectorAll('.pad')];
-const startSim=document.getElementById('startSim');
-const resetSim=document.getElementById('resetSim');
-const backMenuSim=document.getElementById('backMenuSim');
-const smLevelEl=document.getElementById('smLevel');
-const smScoreEl=document.getElementById('smScore');
-const smMsgEl=document.getElementById('smMsg');
+const pads = [...document.querySelectorAll('.pad')];
+const startSim = document.getElementById('startSim');
+const resetSim = document.getElementById('resetSim');
+const backMenuSim = document.getElementById('backMenuSim');
+const smLevelEl = document.getElementById('smLevel');
+const smScoreEl = document.getElementById('smScore');
+const smMsgEl = document.getElementById('smMsg');
 
-let simSeq=[], simUser=[], simLevel=0, simScore=0, simPlaying=false;
+let simSeq = [], simUser = [], simLevel = 0, simScore = 0, simPlaying = false;
 
-function flashPad(idx){
+function flashPad(idx) {
   pads[idx].classList.add('active');
-  const freqs=[261,329,392,523]; // C4, E4, G4, C5
-  playNote(freqs[idx],0.38,'sawtooth');
-  setTimeout(()=>pads[idx].classList.remove('active'),300);
+  const freqs = [261, 329, 392, 523]; // C4, E4, G4, C5
+  playNote(freqs[idx], 0.38, 'sawtooth');
+  setTimeout(() => pads[idx].classList.remove('active'), 300);
 }
 
-function nextRound(){
-  simUser=[]; simLevel++; smLevelEl.textContent=simLevel;
+function simMsg(msg) {
+  smMsgEl.textContent = msg;
+}
+
+function nextRound() {
+  simUser = [];
+  simLevel++;
+  smLevelEl.textContent = simLevel;
   simMsg('Regarde la séquence...');
-  simSeq.push(Math.floor(Math.random()*pads.length));
-  simSeq.forEach((v,i)=>setTimeout(()=>flashPad(v),i*500));
-  setTimeout(()=>{ simMsg('À toi !'); simPlaying=true; },simSeq.length*500+400);
-}
-function simMsg(msg){ smMsgEl.textContent=msg; }
+  simSeq.push(Math.floor(Math.random() * pads.length));
+  simPlaying = false;
+  startSim.style.display = 'none'; // Masquer pendant le jeu
 
-pads.forEach((pad,i)=>{
-  pad.addEventListener('click',()=>{
-    if(!simPlaying) return;
+  simSeq.forEach((v, i) => {
+    setTimeout(() => flashPad(v), i * 600);
+  });
+
+  setTimeout(() => {
+    simMsg('À toi !');
+    simPlaying = true;
+  }, simSeq.length * 600 + 400);
+}
+
+pads.forEach((pad, i) => {
+  pad.addEventListener('click', () => {
+    if (!simPlaying) return;
     flashPad(i);
     simUser.push(i);
-    if(simUser[simUser.length-1]!==simSeq[simUser.length-1]){
-      simMsg('❌ Perdu !'); playNote(150,0.3,'sawtooth'); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simPlaying=false;
-    } else if(simUser.length===simSeq.length){
-      simScore+=simLevel*10; smScoreEl.textContent=simScore; playNote(880,0.2); simPlaying=false; setTimeout(nextRound,500);
+
+    if (simUser[simUser.length - 1] !== simSeq[simUser.length - 1]) {
+      simMsg('❌ Perdu !');
+      playNote(150, 0.3, 'sawtooth');
+      simSeq = [];
+      simUser = [];
+      simLevel = 0;
+      simScore = 0;
+      smScoreEl.textContent = 0;
+      smLevelEl.textContent = 0;
+      simPlaying = false;
+      startSim.style.display = 'inline-flex'; // Réaffiche le bouton
+    } else if (simUser.length === simSeq.length) {
+      simScore += simLevel * 10;
+      smScoreEl.textContent = simScore;
+      playNote(880, 0.2);
+      simPlaying = false;
+      setTimeout(nextRound, 800);
     }
   });
 });
 
-startSim.addEventListener('click',()=>{ clickSound(); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; nextRound(); });
-resetSim.addEventListener('click',()=>{ simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simMsg('Prêt'); });
-backMenuSim.addEventListener('click',()=>show('menu'));
+startSim.addEventListener('click', () => {
+  clickSound();
+  simSeq = [];
+  simUser = [];
+  simLevel = 0;
+  simScore = 0;
+  smScoreEl.textContent = 0;
+  smLevelEl.textContent = 0;
+  nextRound();
+});
 
+resetSim.addEventListener('click', () => {
+  simSeq = [];
+  simUser = [];
+  simLevel = 0;
+  simScore = 0;
+  smScoreEl.textContent = 0;
+  smLevelEl.textContent = 0;
+  simMsg('Prêt');
+  startSim.style.display = 'inline-flex'; // Réaffiche le bouton
+});
+
+backMenuSim.addEventListener('click', () => show('menu'));
 </script>
 </body>
 </html>
+
