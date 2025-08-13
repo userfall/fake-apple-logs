@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jeux Kabir – Ultimate Art</title>
+<title>Jeux Kabir – Ultimate Pro</title>
 <style>
 :root{
   --bg1:#0f0c29; --bg2:#302b63; --bg3:#24243e;
@@ -27,8 +27,8 @@ input[type="text"]{flex:1;min-width:140px;padding:14px 16px;border-radius:12px;b
 input::placeholder{color:#97a3b7;}
 .notice{margin-top:10px;font-weight:600;text-align:center;}
 .cup-container{display:flex;justify-content:space-between;align-items:flex-end;gap:60px;margin-top:50px;perspective:900px;}
-.cupWrap{position:relative;width:90px;height:120px;cursor:pointer;transform-style:preserve-3d;}
-.cup{width:100%;height:100%;background:linear-gradient(to top,#c69c6d,#e0c097);border-radius:0 0 20px 20px;display:flex;align-items:flex-end;justify-content:center;transition:transform 0.6s ease,box-shadow 0.5s;box-shadow:0 10px 20px rgba(0,0,0,.5);}
+.cupWrap{position:relative;width:90px;height:120px;cursor:pointer;transform-style:preserve-3d;transition:transform 0.6s ease;}
+.cup{width:100%;height:100%;background:linear-gradient(to top,#c69c6d,#e0c097);border-radius:0 0 20px 20px;display:flex;align-items:flex-end;justify-content:center;box-shadow:0 10px 20px rgba(0,0,0,.5);}
 .cupLabel{color:#fff;font-weight:700;font-size:22px;margin-bottom:12px;text-shadow:0 0 6px #fff;}
 .padGrid{display:grid;grid-template-columns:repeat(2,150px);grid-template-rows:repeat(2,150px);gap:20px;justify-content:center;margin-top:20px;}
 .pad{border-radius:16px;cursor:pointer;box-shadow:0 5px 15px rgba(0,0,0,.4);transition:filter .2s,transform .2s;}
@@ -73,9 +73,9 @@ input::placeholder{color:#97a3b7;}
 <section id="screen-bonneteau" class="screen card">
 <h2>Bonneteau 🎩</h2>
 <div class="cup-container">
-  <div class="cupWrap" data-index="0"><div class="cup"><div class="cupLabel"></div></div></div>
-  <div class="cupWrap" data-index="1"><div class="cup"><div class="cupLabel"></div></div></div>
-  <div class="cupWrap" data-index="2"><div class="cup"><div class="cupLabel"></div></div></div>
+  <div class="cupWrap" data-index="0"><div class="cup"><div class="cupLabel">●</div></div></div>
+  <div class="cupWrap" data-index="1"><div class="cup"><div class="cupLabel">●</div></div></div>
+  <div class="cupWrap" data-index="2"><div class="cup"><div class="cupLabel">●</div></div></div>
 </div>
 <div style="margin-top:20px;text-align:center;">
 <button class="btn" id="bn-shuffle">Mélanger</button>
@@ -124,79 +124,104 @@ const questions=[
   {text:"Quelle est la première amoureuse de Kabir ?",answer:"francoise"}
 ];
 let step=0;
-const qLabel=qs('#questionLabel'), qText=qs('#questionText'), introMsg=qs('#introMsg');
-const answerInput=qs('#answerInput'), answerBtn=qs('#answerBtn');
-function setQuestion(){ qLabel.textContent=`Question ${step+1}/2`; qText.textContent=questions[step].text; answerInput.value=''; introMsg.textContent=''; answerInput.focus(); }
+const qLabel=document.querySelector('#questionLabel');
+const qText=document.querySelector('#questionText');
+const introMsg=document.querySelector('#introMsg');
+const answerInput=document.querySelector('#answerInput');
+const answerBtn=document.querySelector('#answerBtn');
+
+function setQuestion(){ 
+  qLabel.textContent=`Question ${step+1}/2`; 
+  qText.textContent=questions[step].text; 
+  answerInput.value=''; introMsg.textContent=''; answerInput.focus();
+}
 function verifyCurrent(){
   const raw=(answerInput.value||'').trim().toLowerCase();
-  step++; if(raw===questions[step-1].answer||step>1) enterMenu(); else setQuestion();
+  if(raw===questions[step].answer){ step=2; enterMenu(); }
+  else{ step++; if(step<questions.length){ setQuestion(); } else enterMenu(); }
 }
 answerBtn.addEventListener('click',verifyCurrent);
 answerInput.addEventListener('keydown',e=>{if(e.key==='Enter') verifyCurrent();});
 setQuestion();
-function enterMenu(){show('screen-menu'); qs('#bgm').play().catch(()=>{});}
 
-// ==== UTILS ====
-const qs=s=>document.querySelector(s);
-function show(id){ qsa('.screen').forEach(el=>el.classList.remove('active')); qs('#'+id).classList.add('active'); }
-const qsa=s=>Array.from(document.querySelectorAll(s));
+function show(id){ document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active')); document.querySelector('#'+id).classList.add('active');}
+function enterMenu(){ show('screen-menu'); document.querySelector('#bgm').play();}
+
+// ==== MENU ====
+document.querySelector('#btn-bonneteau').addEventListener('click',()=>{show('screen-bonneteau'); initBonneteau();});
+document.querySelector('#btn-simon').addEventListener('click',()=>{show('screen-simon'); initSimon();});
 
 // ==== BONNETEAU ====
-const cups=qsa('.cupWrap'); let ballUnder=0; let interact=false;
-function resetBonneteau(){
-  ballUnder=Math.floor(Math.random()*3);
-  cups.forEach((c,idx)=>{
-    const label=c.querySelector('.cupLabel');
-    label.textContent='●'; label.style.visibility=idx===ballUnder?'visible':'hidden';
-    c.style.transform='rotateY(0deg)';
-  });
-  qs('#bn-msg').textContent='Regarde bien la bille puis clique sur "Mélanger".';
-  interact=false;
+let cupOrder=[0,1,2],ballIndex=0,shuffling=false;
+function initBonneteau(){
+  const cups=document.querySelectorAll('.cupWrap');
+  // visible au départ
+  cupOrder=[0,1,2];
+  ballIndex=Math.floor(Math.random()*3);
+  cups.forEach((c,i)=>c.querySelector('.cupLabel').style.visibility=(i===ballIndex?'visible':'hidden'));
+  document.querySelector('#bn-msg').textContent='Clique sur "Mélanger" pour commencer';
 }
-function shuffleBonneteau(){
-  interact=false; qs('#bn-msg').textContent='Mélange en cours…';
+
+document.querySelector('#bn-shuffle').addEventListener('click',()=>{
+  if(shuffling) return; shuffling=true; const cups=document.querySelectorAll('.cupWrap'); document.querySelector('#bn-msg').textContent='Mélange en cours...';
+  // cache la balle
   cups.forEach(c=>c.querySelector('.cupLabel').style.visibility='hidden');
-  const swaps=8; let seq=0;
-  const anim=setInterval(()=>{
-    const a=Math.floor(Math.random()*3),b=Math.floor(Math.random()*3); if(a===b)return;
-    [cups[a].style.transform,cups[b].style.transform]=[cups[b].style.transform,cups[a].style.transform];
-    seq++; if(seq>=swaps){ clearInterval(anim); qs('#bn-msg').textContent='À toi !'; interact=true; }
-  },400);
-}
-cups.forEach((c,idx)=>{
-  c.addEventListener('click',()=>{
-    if(!interact) return; interact=false;
-    if(idx===ballUnder){ qs('#bn-msg').textContent='Bravo 🎉'; ballUnder=Math.floor(Math.random()*3);}
-    else qs('#bn-msg').textContent='Raté ❌';
-    c.querySelector('.cupLabel').style.visibility='visible';
-  });
+  let moves=0;
+  const interval=setInterval(()=>{
+    const a=Math.floor(Math.random()*3),b=Math.floor(Math.random()*3); if(a!==b){[cupOrder[a],cupOrder[b]]=[cupOrder[b],cupOrder[a]];}
+    cups.forEach((c,i)=>{c.style.transform=`rotateY(${360*moves}deg) translateX(${cupOrder[i]*0}px)`});
+    moves++; if(moves>20){clearInterval(interval); shuffling=false; document.querySelector('#bn-msg').textContent='Clique sur un gobelet pour deviner la balle'; addCupClicks(); }
+  },150);
 });
-qs('#bn-shuffle').addEventListener('click',shuffleBonneteau);
-qs('#btn-bonneteau').addEventListener('click',()=>{ show('screen-bonneteau'); resetBonneteau(); });
+
+function addCupClicks(){
+  const cups=document.querySelectorAll('.cupWrap');
+  cups.forEach(c=>c.addEventListener('click',cupClick));
+}
+function cupClick(e){
+  const idx=parseInt(e.currentTarget.dataset.index);
+  if(idx===ballIndex){document.querySelector('#bn-msg').textContent='Bravo! 🎉';document.querySelector('#billeSound').play();}
+  else{document.querySelector('#bn-msg').textContent='Raté 😢 La balle était ici.';document.querySelectorAll('.cupWrap')[ballIndex].querySelector('.cupLabel').style.visibility='visible';}
+  document.querySelectorAll('.cupWrap').forEach(c=>c.removeEventListener('click',cupClick));
+}
 
 // ==== SIMON GAME ====
-const pads=qsa('.pad'), simonSounds=[qs('#redNote'),qs('#greenNote'),qs('#blueNote'),qs('#yellowNote')];
-let smSeq=[], smUser=[], smActive=false, smLevel=1;
-function flashPad(pad,dur=400){ pad.classList.add('active'); const idx=+pad.dataset.pad; simonSounds[idx].currentTime=0; simonSounds[idx].play(); setTimeout(()=>pad.classList.remove('active'),dur); }
-function playSeq(seq){
-  smActive=false; smUser=[]; qs('#sm-msg').textContent='Observe la séquence…';
-  seq.forEach((v,i)=>setTimeout(()=>flashPad(pads[v]), i*700));
-  setTimeout(()=>{smActive=true; qs('#sm-msg').textContent='À toi !';}, seq.length*700);
-}
-function nextSimonLevel(){
-  smLevel++; qs('#sm-msg').textContent=`Niveau ${smLevel}`; const next=Math.floor(Math.random()*4); smSeq.push(next); playSeq(smSeq);
-}
-pads.forEach(p=>{
-  p.addEventListener('click',()=>{
-    if(!smActive) return;
-    flashPad(p); smUser.push(+p.dataset.pad);
-    const idx=smUser.length-1;
-    if(smUser[idx]!==smSeq[idx]){ qs('#sm-msg').textContent='Raté ❌'; smSeq=[]; smLevel=0; setTimeout(()=>{smSeq=[]; nextSimonLevel();},800); return;}
-    if(smUser.length===smSeq.length) setTimeout(nextSimonLevel,600);
+let sequence=[],userSeq=[],level=0,canClick=false;
+const pads=document.querySelectorAll('.pad');
+const sounds=['redNote','greenNote','blueNote','yellowNote'];
+function initSimon(){sequence=[];userSeq=[];level=0;canClick=false; document.querySelector('#sm-msg').textContent='Appuie sur Démarrer';}
+document.querySelector('#sm-start').addEventListener('click',nextSimonLevel);
+
+pads.forEach(pad=>{
+  pad.addEventListener('click',()=>{
+    if(!canClick) return;
+    const idx=parseInt(pad.dataset.pad);
+    userSeq.push(idx); playPad(idx);
+    if(idx!==sequence[userSeq.length-1]){ document.querySelector('#sm-msg').textContent='Raté 😢'; canClick=false; return;}
+    if(userSeq.length===sequence.length){ canClick=false; setTimeout(nextSimonLevel,800);}
   });
 });
-qs('#sm-start').addEventListener('click',()=>{ smSeq=[]; smLevel=0; nextSimonLevel(); });
-qs('#btn-simon').addEventListener('click',()=>{ show('screen-simon'); smSeq=[]; smUser=[]; smLevel=0; qs('#sm-msg').textContent='Clique sur "Démarrer"'; });
+
+function nextSimonLevel(){
+  level++; document.querySelector('#sm-msg').textContent='Niveau '+level;
+  sequence.push(Math.floor(Math.random()*4));
+  userSeq=[]; playSequence();
+}
+
+function playSequence(){
+  canClick=false;
+  sequence.forEach((val,i)=>{
+    setTimeout(()=>{playPad(val);}, i*800);
+  });
+  setTimeout(()=>{canClick=true;}, sequence.length*800);
+}
+
+function playPad(idx){
+  const pad=pads[idx];
+  pad.classList.add('active');
+  document.getElementById(sounds[idx]).currentTime=0; document.getElementById(sounds[idx]).play();
+  setTimeout(()=>pad.classList.remove('active'),400);
+}
 </script>
 </body>
 </html>
