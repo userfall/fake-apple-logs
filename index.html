@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jeux Kabir — Ultimate 2D & Simon Musical</title>
-
-<!-- Police pro -->
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
-
 <style>
 :root{
   --bg:#0f0f1f;
@@ -18,9 +15,13 @@
   --gold:#ffca28;
   --danger:#ff3b3b;
   --success:#00e676;
+  --padRed:#ff5b87;
+  --padGreen:#5bff88;
+  --padBlue:#5bbfff;
+  --padYellow:#ffe55b;
 }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);font-family:"Rubik",Segoe UI,Roboto,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+html,body{height:100%;margin:0;background:var(--bg);font-family:"Rubik",sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
 .app{max-width:980px;margin:10px auto;padding:14px}
 .header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
 .brand{display:flex;align-items:center;gap:12px}
@@ -52,13 +53,13 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:"Rubik",Segoe UI
 .scorebar{display:flex;gap:16px;justify-content:center;color:var(--muted);font-weight:700;font-size:15px}
 
 /* Simon */
-.pad-grid{display:grid;grid-template-columns:repeat(2,140px);grid-gap:18px}
-.pad{width:140px;height:140px;border-radius:16px;display:grid;place-items:center;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.5);transition:transform .12s,filter .12s}
-.pad.red{background:linear-gradient(180deg,#ff5b87,#c12b57)}
-.pad.green{background:linear-gradient(180deg,#5bff88,#2bc15b)}
-.pad.blue{background:linear-gradient(180deg,#5bbfff,#2b7bc1)}
-.pad.yellow{background:linear-gradient(180deg,#ffe55b,#c1aa2b)}
-.pad.active{transform:scale(1.08);filter:brightness(1.15)}
+.pad-grid{display:grid;grid-template-columns:repeat(2,140px);grid-gap:18px;perspective:800px}
+.pad{width:140px;height:140px;border-radius:16px;display:grid;place-items:center;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.5);transition:transform .12s,filter .12s,box-shadow .12s}
+.pad.red{background:var(--padRed)}
+.pad.green{background:var(--padGreen)}
+.pad.blue{background:var(--padBlue)}
+.pad.yellow{background:var(--padYellow)}
+.pad.active{transform:scale(1.12) rotateX(10deg) rotateY(10deg);filter:brightness(1.35);box-shadow:0 0 30px #fff}
 
 /* Responsive tweaks */
 @media(max-width:650px){
@@ -78,7 +79,7 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:"Rubik",Segoe UI
 </head>
 <body>
 <div class="app">
-  <div class="madeBy">🎮 Made by Kabir & Samuel — Ultimate Mini-Games</div>
+  <div class="madeBy">🎮 Made by Kabir — Ultimate Mini-Games</div>
   <div class="header">
     <div class="brand">
       <div class="logo">K</div>
@@ -165,17 +166,15 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:"Rubik",Segoe UI
     </div>
   </div>
 
-  <div style="text-align:center;margin-top:12px;color:var(--muted);font-size:14px">Développé — adapte / améliore à volonté</div>
+  <div style="text-align:center;margin-top:12px;color:var(--muted);font-size:14px">Développé — ultra fluide • Sons immersifs</div>
 </div>
 
 <script>
-// ==== JS Bonneteau + Simon + audio + navigation ====
-
-// Audio context
+// ==== Audio context ====
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const audio = new AudioCtx();
-const master = audio.createGain(); master.gain.value = 0.9; master.connect(audio.destination);
-const bgGain = audio.createGain(); bgGain.gain.value = 0.06; bgGain.connect(master);
+const master = audio.createGain(); master.gain.value=0.9; master.connect(audio.destination);
+const bgGain = audio.createGain(); bgGain.gain.value=0.06; bgGain.connect(master);
 
 function ensureAudio(){ if(audio.state==='suspended') audio.resume(); }
 function playNote(freq,dur=0.36,type='sine',when=0){
@@ -186,31 +185,17 @@ function playNote(freq,dur=0.36,type='sine',when=0){
   const f=audio.createBiquadFilter(); f.type='lowpass'; f.frequency.value=Math.max(800,freq*5);
   o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t+dur+0.02);
 }
-function clickSound(vol=0.12){
-  const dur=0.04; const buffer=audio.createBuffer(1,audio.sampleRate*dur,audio.sampleRate);
-  const data=buffer.getChannelData(0);
-  for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.exp(-i/(data.length*0.02));
-  const src=audio.createBufferSource(); src.buffer=buffer;
-  const g=audio.createGain(); g.gain.value=vol; src.connect(g); g.connect(master); src.start();
-}
+function clickSound(vol=0.12){ const dur=0.04; const buffer=audio.createBuffer(1,audio.sampleRate*dur,audio.sampleRate); const data=buffer.getChannelData(0); for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.exp(-i/(data.length*0.02)); const src=audio.createBufferSource(); src.buffer=buffer; const g=audio.createGain(); g.gain.value=vol; src.connect(g); g.connect(master); src.start();}
 let ambientOsc=null;
-function startAmbient(){
-  if(ambientOsc) return;
-  const o1=audio.createOscillator(); o1.type='sine'; o1.frequency.value=110;
-  const g1=audio.createGain(); g1.gain.value=0.02; o1.connect(g1); g1.connect(bgGain);
-  const o2=audio.createOscillator(); o2.type='sine'; o2.frequency.value=220;
-  const g2=audio.createGain(); g2.gain.value=0.01; o2.connect(g2); g2.connect(bgGain);
-  o1.start(); o2.start(); ambientOsc=[o1,o2];
-}
+function startAmbient(){ if(ambientOsc) return; const o1=audio.createOscillator(); o1.type='sine'; o1.frequency.value=110; const g1=audio.createGain(); g1.gain.value=0.02; o1.connect(g1); g1.connect(bgGain); const o2=audio.createOscillator(); o2.type='sine'; o2.frequency.value=220; const g2=audio.createGain(); g2.gain.value=0.01; o2.connect(g2); g2.connect(bgGain); o1.start(); o2.start(); ambientOsc=[o1,o2]; }
 function stopAmbient(){ if(!ambientOsc) return; ambientOsc.forEach(o=>o.stop()); ambientOsc=null; }
 document.getElementById('toggleAmb').addEventListener('click',()=>{
   ensureAudio();
-  if(bgGain.gain.value>0.01){ bgGain.gain.value=0; stopAmbient(); }
-  else{ bgGain.gain.value=0.06; startAmbient(); }
+  if(bgGain.gain.value>0.01){ bgGain.gain.value=0; stopAmbient(); } else{ bgGain.gain.value=0.06; startAmbient(); }
 });
 document.addEventListener('pointerdown',()=>ensureAudio(),{once:true});
 
-// Navigation & questions
+// ==== Navigation & questions ====
 const screens={intro:document.getElementById('intro'),menu:document.getElementById('menu'),bon:document.getElementById('bon'),sim:document.getElementById('sim')};
 function show(id){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[id].classList.add('active'); }
 
@@ -226,8 +211,6 @@ qBtn.addEventListener('click',()=>{
   if(qStep===0){ qStep=1; setQuestion(); } else{ qMsg.textContent='Désolé, mauvaise réponse'; }
 });
 setQuestion();
-
-// Menu buttons
 document.getElementById('openBon').addEventListener('click',()=>show('bon'));
 document.getElementById('openSim').addEventListener('click',()=>show('sim'));
 
@@ -261,13 +244,12 @@ cups.forEach(cup=>{
   cup.addEventListener('click',()=>{
     if(bnMixing) return;
     if(cup.dataset.index==bnPos){ bnScore+=1; bnLevel++; bnSpeed=Math.max(200,bnSpeed-20); bnMsg.textContent='✅ Bien joué !'; playNote(440,0.2); }
-    else{ bnMsg.textContent='❌ Perdu !'; bnLevel=1; bnSpeed=600; bnScore=0; playNote(180,0.3,'sawtooth'); }
+    else{ bnMsg.textContent='❌ Perdu !'; bnLevel=1; bnSpeed=600; playNote(220,0.3,'sawtooth'); }
     bnScoreEl.textContent=bnScore; bnLevelEl.textContent=bnLevel;
     placeBall(Math.floor(Math.random()*3));
   });
 });
-
-resetBn.addEventListener('click',()=>{ bnScore=0; bnLevel=1; bnSpeed=600; bnScoreEl.textContent=0; bnLevelEl.textContent=1; placeBall(Math.floor(Math.random()*3)); bnMsg.textContent='Regarde la balle, puis clique sur Mélanger.'; });
+resetBn.addEventListener('click',()=>{ bnScore=0; bnLevel=1; bnSpeed=600; bnScoreEl.textContent=0; bnLevelEl.textContent=1; bnMsg.textContent='Regarde la balle, puis clique sur Mélanger.'; placeBall(Math.floor(Math.random()*3)); });
 backMenuBn.addEventListener('click',()=>show('menu'));
 
 // ==== SIMON ====
@@ -280,17 +262,32 @@ const smScoreEl=document.getElementById('smScore');
 const smMsgEl=document.getElementById('smMsg');
 
 let simSeq=[], simUser=[], simLevel=0, simScore=0, simPlaying=false;
-function flashPad(idx){ pads[idx].classList.add('active'); playNote(220+idx*110,0.3); setTimeout(()=>pads[idx].classList.remove('active'),300); }
-function nextRound(){ simUser=[]; simLevel++; smLevelEl.textContent=simLevel; simMsg('Regarde la séquence...'); simSeq.push(Math.floor(Math.random()*pads.length)); simSeq.forEach((v,i)=>setTimeout(()=>flashPad(v),i*500)); setTimeout(()=>{ simMsg('À toi !'); simPlaying=true; },simSeq.length*500+300); }
+
+function flashPad(idx){
+  pads[idx].classList.add('active');
+  const freqs=[261,329,392,523]; // C4, E4, G4, C5
+  playNote(freqs[idx],0.38,'sawtooth');
+  setTimeout(()=>pads[idx].classList.remove('active'),300);
+}
+
+function nextRound(){
+  simUser=[]; simLevel++; smLevelEl.textContent=simLevel;
+  simMsg('Regarde la séquence...');
+  simSeq.push(Math.floor(Math.random()*pads.length));
+  simSeq.forEach((v,i)=>setTimeout(()=>flashPad(v),i*500));
+  setTimeout(()=>{ simMsg('À toi !'); simPlaying=true; },simSeq.length*500+400);
+}
 function simMsg(msg){ smMsgEl.textContent=msg; }
 
 pads.forEach((pad,i)=>{
   pad.addEventListener('click',()=>{
-    if(!simPlaying) return; flashPad(i); simUser.push(i);
+    if(!simPlaying) return;
+    flashPad(i);
+    simUser.push(i);
     if(simUser[simUser.length-1]!==simSeq[simUser.length-1]){
       simMsg('❌ Perdu !'); playNote(150,0.3,'sawtooth'); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simPlaying=false;
     } else if(simUser.length===simSeq.length){
-      simScore+=simLevel*10; smScoreEl.textContent=simScore; playNote(440,0.2); simPlaying=false; setTimeout(nextRound,500);
+      simScore+=simLevel*10; smScoreEl.textContent=simScore; playNote(880,0.2); simPlaying=false; setTimeout(nextRound,500);
     }
   });
 });
@@ -298,6 +295,7 @@ pads.forEach((pad,i)=>{
 startSim.addEventListener('click',()=>{ clickSound(); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; nextRound(); });
 resetSim.addEventListener('click',()=>{ simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simMsg('Prêt'); });
 backMenuSim.addEventListener('click',()=>show('menu'));
+
 </script>
 </body>
 </html>
