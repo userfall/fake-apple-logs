@@ -171,7 +171,11 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:"Rubik",Segoe UI
 <script>
 // ==== JS Bonneteau + Simon + audio + navigation ====
 
-// WebAudio context
+<!-- Partie JS corrigée pour Bonneteau & Simon -->
+<script>
+// ==== JS Bonneteau + Simon + audio + navigation ====
+
+// WebAudio context (inchangé)
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const audio = new AudioCtx();
 const master = audio.createGain(); master.gain.value = 0.9; master.connect(audio.destination);
@@ -210,7 +214,7 @@ document.getElementById('toggleAmb').addEventListener('click',()=>{
 });
 document.addEventListener('pointerdown',()=>ensureAudio(),{once:true});
 
-// Navigation & questions
+// Navigation & questions (inchangé)
 const screens={intro:document.getElementById('intro'),menu:document.getElementById('menu'),bon:document.getElementById('bon'),sim:document.getElementById('sim')};
 function show(id){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[id].classList.add('active'); }
 
@@ -246,18 +250,36 @@ let bnPos=0, bnScore=0, bnLevel=1, bnMixing=false, bnSpeed=600;
 function placeBall(idx){ bnPos=idx; const c=cups[idx].offsetLeft+cups[idx].offsetWidth/2-14; ball.style.left=c+'px'; ball.style.bottom='120px'; }
 placeBall( Math.floor(Math.random()*3) );
 
-function mixCups(){
+// Fonction pour animer le swap
+function swapCups(a,b){
+  return new Promise(res=>{
+    const cupA=cups[a], cupB=cups[b];
+    const posA=cupA.offsetLeft, posB=cupB.offsetLeft;
+    let t=0;
+    const steps=15;
+    const diffA=(posB-posA)/steps, diffB=(posA-posB)/steps;
+    const interval=setInterval(()=>{
+      t++; cupA.style.left=(cupA.offsetLeft+diffA)+'px'; cupB.style.left=(cupB.offsetLeft+diffB)+'px';
+      if(t>=steps){ clearInterval(interval); res(); }
+    },20);
+  });
+}
+
+async function mixCups(){
   if(bnMixing) return;
   bnMixing=true;
   bnMsg.textContent='Mélange en cours...';
-  let moves=bnLevel+2; let last=null;
-  const interval=setInterval(()=>{
-    let a,b; do{ a=Math.floor(Math.random()*3); b=Math.floor(Math.random()*3); } while(a===b || (a===last && b===last));
-    last=a;
-    [cups[a].style.left,cups[b].style.left]=[cups[b].style.left,cups[a].style.left];
-    moves--; if(moves<=0){ clearInterval(interval); bnMixing=false; bnMsg.textContent='Devine la balle !'; placeBall(bnPos); } 
-  },bnSpeed);
+  let moves=bnLevel+2;
+  for(let i=0;i<moves;i++){
+    const a=Math.floor(Math.random()*3);
+    let b; do{ b=Math.floor(Math.random()*3); }while(b===a);
+    await swapCups(a,b);
+  }
+  bnMixing=false;
+  bnMsg.textContent='Devine la balle !';
+  placeBall(bnPos);
 }
+
 mixBtn.addEventListener('click',()=>{ clickSound(); mixCups(); });
 
 cups.forEach(cup=>{
@@ -297,7 +319,7 @@ function nextRound(){
   smLevelEl.textContent=simLevel; smMsgEl.textContent='Regarde la séquence...';
   simSeq.push(Math.floor(Math.random()*pads.length));
   simSeq.forEach((v,i)=>setTimeout(()=>flashPad(v),i*500));
-  setTimeout(()=>{ simMsg('À toi !'); simPlaying=true; },simSeq.length*500+300);
+  setTimeout(()=>{ simMsg('À toi !'); simPlaying=true; startSim.style.display='inline-flex'; },simSeq.length*500+300);
 }
 
 function simMsg(msg){ smMsgEl.textContent=msg; }
@@ -309,15 +331,18 @@ pads.forEach((pad,i)=>{
     simUser.push(i);
     if(simUser[simUser.length-1]!==simSeq[simUser.length-1]){
       simMsg('❌ Perdu !'); playNote(150,0.3,'sawtooth'); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simPlaying=false;
+      startSim.style.display='inline-flex';
     } else if(simUser.length===simSeq.length){
       simScore+=simLevel*10; smScoreEl.textContent=simScore; playNote(440,0.2); simPlaying=false; setTimeout(nextRound,500);
+      startSim.style.display='none';
     }
   });
 });
 
-startSim.addEventListener('click',()=>{ clickSound(); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; nextRound(); });
-resetSim.addEventListener('click',()=>{ simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simMsg('Prêt'); });
+startSim.addEventListener('click',()=>{ clickSound(); simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; nextRound(); startSim.style.display='none'; });
+resetSim.addEventListener('click',()=>{ simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0; simMsg('Prêt'); startSim.style.display='inline-flex'; });
 backMenuSim.addEventListener('click',()=>show('menu'));
 </script>
 </body>
 </html>
+
