@@ -51,6 +51,9 @@ input::placeholder{color:#97a3b7}
 .pad.blue{background:#4c4cff;}
 .pad.yellow{background:#ffff4c;}
 .pad.active{filter:brightness(1.5);}
+.cup-container{display:flex;justify-content:center;align-items:flex-end;gap:60px;margin-top:50px;}
+.cup{width:90px;height:120px;background:linear-gradient(to top,#c69c6d,#e0c097);border-radius:0 0 22px 22px;display:flex;justify-content:center;align-items:center;position:relative;cursor:pointer;transition:transform 0.4s ease;}
+.bille{width:20px;height:20px;border-radius:50%;background:gold;position:absolute;top:10px;left:calc(50% - 10px);}
 </style>
 </head>
 <body>
@@ -69,7 +72,6 @@ input::placeholder{color:#97a3b7}
 <button id="answerBtn" class="btn">Valider</button>
 </div>
 <p id="introMsg" class="notice"></p>
-<div class="footerHint">⚠️ Aucun indice n'est affiché. Les réponses doivent être exactes.</div>
 </div>
 </section>
 
@@ -86,79 +88,78 @@ input::placeholder{color:#97a3b7}
 
 <!-- BONNETEAU -->
 <section id="screen-bonneteau" class="screen card section">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
-<h2>Bonneteau 🎩</h2>
-<div class="hud">
-<span class="tag">Niveau <span id="bn-level">1</span></span>
-<span class="tag">Score <span id="bn-score">0</span></span>
-<button class="btn ghost" id="bn-back">Retour menu</button>
-</div>
-</div>
-<div class="cup-container">
-<div class="cupWrap" id="cup0"><div class="cup"></div></div>
-<div class="cupWrap" id="cup1"><div class="cup"></div></div>
-<div class="cupWrap" id="cup2"><div class="cup"></div></div>
-</div>
-<div class="hud section">
-<button class="btn ok" id="bn-shuffle">Mélanger</button>
-<span class="tag">Regarde bien la bille puis choisis un gobelet</span>
-</div>
-<p id="bn-msg" class="notice"></p>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+    <h2>Bonneteau 🎩</h2>
+    <div class="hud">
+      <span class="tag">Niveau <span id="bn-level">1</span></span>
+      <span class="tag">Vitesse <span id="bn-speed">1.0x</span></span>
+      <button class="btn ghost" id="bn-back">Retour menu</button>
+    </div>
+  </div>
+  <div class="cup-container">
+    <div class="cup" data-index="0"></div>
+    <div class="cup" data-index="1"></div>
+    <div class="cup" data-index="2"></div>
+  </div>
+  <div class="hud section">
+    <button class="btn ok" id="bn-shuffle">Mélanger</button>
+    <span class="tag">Choisis un gobelet après le mélange</span>
+  </div>
+  <p id="bn-msg" class="notice"></p>
 </section>
 
 <!-- SIMON -->
 <section id="screen-simon" class="screen card section">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
-<h2>Simon Game 🎨</h2>
-<div class="hud">
-<span class="tag">Niveau <span id="sm-level">1</span></span>
-<span class="tag">Score <span id="sm-score">0</span></span>
-<button class="btn ghost" id="sm-back">Retour menu</button>
-</div>
-</div>
-<div class="padGrid">
-<div class="pad red" data-pad="0"></div>
-<div class="pad green" data-pad="1"></div>
-<div class="pad blue" data-pad="2"></div>
-<div class="pad yellow" data-pad="3"></div>
-</div>
-<div class="hud section">
-<button class="btn ok" id="sm-start">Démarrer</button>
-<span class="tag">Répète la séquence</span>
-</div>
-<p id="sm-msg" class="notice"></p>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+    <h2>Simon Game 🎨</h2>
+    <div class="hud">
+      <span class="tag">Niveau <span id="sm-level">1</span></span>
+      <button class="btn ghost" id="sm-back">Retour menu</button>
+    </div>
+  </div>
+  <div class="padGrid">
+    <div class="pad red" data-pad="0"></div>
+    <div class="pad green" data-pad="1"></div>
+    <div class="pad blue" data-pad="2"></div>
+    <div class="pad yellow" data-pad="3"></div>
+  </div>
+  <div class="hud section">
+    <button class="btn ok" id="sm-start">Démarrer</button>
+    <span class="tag">Répète la séquence</span>
+  </div>
+  <p id="sm-msg" class="notice"></p>
 </section>
 
-</div> <!-- container -->
+</div>
 
 <audio id="bgm" loop preload="auto">
-<source src="https://cdn.pixabay.com/download/audio/2022/10/20/audio_d6a1a0f8bd.mp3?filename=cyber-dream-ambient-124841.mp3" type="audio/mpeg">
+  <source src="https://cdn.pixabay.com/download/audio/2022/10/20/audio_d6a1a0f8bd.mp3?filename=cyber-dream-ambient-124841.mp3" type="audio/mpeg">
 </audio>
+<audio id="shuffle-sound" src="https://freesound.org/data/previews/66/66717_931655-lq.mp3"></audio>
+<audio id="bille-sound" src="https://freesound.org/data/previews/331/331912_3248244-lq.mp3"></audio>
 <audio id="simon0" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
 <audio id="simon1" src="https://freesound.org/data/previews/256/256114_3263906-lq.mp3"></audio>
 <audio id="simon2" src="https://freesound.org/data/previews/256/256115_3263906-lq.mp3"></audio>
 <audio id="simon3" src="https://freesound.org/data/previews/256/256116_3263906-lq.mp3"></audio>
-<audio id="cupSound" src="https://freesound.org/data/previews/235/235968_3987620-lq.mp3"></audio>
-<audio id="winSound" src="https://freesound.org/data/previews/337/337049_3232308-lq.mp3"></audio>
 
 <script>
 // ==== Utilities ====
-const qs = s => document.querySelector(s);
-const qsa = s => Array.from(document.querySelectorAll(s));
-const show = id => { qsa('.screen').forEach(el=>el.classList.remove('active')); qs('#'+id).classList.add('active'); };
+const qs = s=>document.querySelector(s);
+const qsa = s=>Array.from(document.querySelectorAll(s));
+const show = id=>{qsa('.screen').forEach(el=>el.classList.remove('active')); qs('#'+id).classList.add('active');};
 
 // Floating particles
 for(let i=0;i<22;i++){
-  const p = document.createElement('div');
-  p.className = 'particle';
-  p.style.left = Math.random()*100+'vw';
-  p.style.animationDelay = (Math.random()*-12)+'s';
-  p.style.opacity = .12+Math.random()*.25;
+  const p=document.createElement('div');
+  p.className='particle';
+  p.style.left=Math.random()*100+'vw';
+  p.style.animationDelay=(Math.random()*-12)+'s';
+  p.style.opacity=.12+Math.random()*.25;
   document.body.appendChild(p);
 }
 
-// ==== Intro verification ====
-const questions = [
+// ==== Intro questions ====
+const questions=[
   {text:"Qui est le meilleur ami de Kabir ?",answer:"jesus"},
   {text:"Qui est la première amoureuse de Kabir ?",answer:"francoise"}
 ];
@@ -169,70 +170,69 @@ const introMsg=qs('#introMsg');
 const answerInput=qs('#answerInput');
 const answerBtn=qs('#answerBtn');
 function setQuestion(){qLabel.textContent=`Question ${step+1}/2`;qText.textContent=questions[step].text;answerInput.value='';introMsg.textContent='';answerInput.focus();}
-async function verifyCurrent(){
+function verifyCurrent(){
   const raw=(answerInput.value||'').trim().toLowerCase();
   if(!raw){introMsg.textContent='Entre une réponse.'; return;}
-  if(raw===questions[step].answer){ step++; if(step>=questions.length) enterMenu(); else setQuestion(); }
-  else {introMsg.textContent='Raté ❌'; answerInput.value='';}
+  if(step===0){ // première question
+    if(raw===questions[0].answer){ enterMenu(); } // correct → menu
+    else { step=1; setQuestion(); } // incorrect → deuxième question
+  } else { // deuxième question
+    if(raw===questions[1].answer){ enterMenu(); }
+    else { introMsg.textContent='Raté ❌'; answerInput.value=''; }
+  }
 }
 answerBtn.addEventListener('click',verifyCurrent);
 answerInput.addEventListener('keydown',e=>{if(e.key==='Enter') verifyCurrent();});
-function enterMenu(){show('screen-menu'); tryStartMusic();}
 setQuestion();
 
 // ==== Music ====
-const bgm = qs('#bgm'); const musicState = qs('#musicState'); const toggleMusic = qs('#toggleMusic'); let musicEnabled=false;
+const bgm=qs('#bgm'); const musicState=qs('#musicState'); const toggleMusic=qs('#toggleMusic'); let musicEnabled=false;
 function tryStartMusic(){if(!musicEnabled){bgm.currentTime=0; bgm.play().then(()=>{musicEnabled=true; musicState.textContent='on';}).catch(()=>{});}}
 toggleMusic.addEventListener('click',()=>{if(bgm.paused){bgm.play(); musicEnabled=true; musicState.textContent='on';} else {bgm.pause(); musicEnabled=false; musicState.textContent='off';}});
 
 // ==== Menu nav ====
 qs('#btn-bonneteau').addEventListener('click',()=>{ show('screen-bonneteau'); resetBonneteauUI(); });
 qs('#btn-simon').addEventListener('click',()=>{ show('screen-simon'); resetSimon(); });
+function enterMenu(){show('screen-menu'); tryStartMusic();}
 
 // ===== BONNETEAU LOGIC =====
-const cupEls = [qs('#cup0'), qs('#cup1'), qs('#cup2')];
-const bnMsg = qs('#bn-msg');
-const bnLevelEl = qs('#bn-level');
-const bnScoreEl = qs('#bn-score');
-let bnLevel = 1;
-let bnScore = 0;
-let bnBaseT = 0.6;
-let cupPositions = [0,1,2];
-let ballUnder = -1;
-let interactEnabled = false;
-const cupSound = qs('#cupSound');
-const winSound = qs('#winSound');
+const cupEls=qsa('.cup'); const bnMsg=qs('#bn-msg'); const bnLevelEl=qs('#bn-level'); const bnSpeedEl=qs('#bn-speed');
+let bnLevel=1; let bnBaseT=0.6; let cupPositions=[0,1,2]; let ballUnder=-1; let interactEnabled=false;
+const shuffleSound=qs('#shuffle-sound'); const billeSound=qs('#bille-sound');
 
 function resetBonneteauUI(){
-  bnMsg.textContent = 'Regarde la bille 👀';
+  bnMsg.textContent='Regarde la bille…';
   interactEnabled=false;
   ballUnder=Math.floor(Math.random()*3);
-  cupEls.forEach((cup,idx)=>{ cup.style.background= (idx===ballUnder?'var(--gold)':'#0b0f17'); });
-  placeCups();
+  cupEls.forEach((cup,idx)=>{
+    cup.innerHTML='';
+    if(idx===ballUnder){
+      const b=document.createElement('div'); b.className='bille'; cup.appendChild(b);
+    }
+  });
+  cupPositions=[0,1,2];
 }
 
 function placeCups(){
-  const spots = ['20px','calc(50% - 60px)','calc(100% - 140px)'];
+  const spots=['20px','calc(50% - 60px)','calc(100% - 140px)'];
   for(let i=0;i<3;i++){
-    const idx = cupPositions.indexOf(i);
-    cupEls[i].style.transition = `transform ${bnBaseT}s ease`;
-    cupEls[i].style.transform = `translateX(${spots[idx]}) translateY(0)`;
+    const idx=cupPositions.indexOf(i);
+    cupEls[i].style.transition=`transform ${bnBaseT}s ease`;
+    cupEls[i].style.transform=`translateX(${spots[idx]})`;
   }
 }
 
 async function shuffleSequence(){
-  interactEnabled=false;
-  bnMsg.textContent='Mélange en cours…';
-  cupEls.forEach(cup=>cup.style.background='#0b0f17');
-  cupPositions=[0,1,2];
+  interactEnabled=false; bnMsg.textContent='Mélange en cours…';
+  shuffleSound.currentTime=0; shuffleSound.play();
+  cupEls.forEach(cup=>{ cup.innerHTML=''; }); // cache bille
   const swaps=Math.min(6+bnLevel*2,30);
   bnBaseT=Math.max(0.22,0.6-bnLevel*0.04);
+  bnSpeedEl.textContent=(0.6/bnBaseT).toFixed(1)+'x';
   for(let s=0;s<swaps;s++){
-    const a=Math.floor(Math.random()*3);
-    let b=Math.floor(Math.random()*3);
+    const a=Math.floor(Math.random()*3); let b=Math.floor(Math.random()*3);
     while(b===a)b=Math.floor(Math.random()*3);
     [cupPositions[a],cupPositions[b]]=[cupPositions[b],cupPositions[a]];
-    cupSound.currentTime=0; cupSound.play();
     placeCups();
     await new Promise(r=>setTimeout(r,bnBaseT*1000+50));
   }
@@ -240,75 +240,57 @@ async function shuffleSequence(){
   interactEnabled=true;
 }
 
+cupEls.forEach(cup=>{ cup.addEventListener('click',()=>{
+  if(!interactEnabled) return;
+  const idx=parseInt(cup.dataset.index);
+  if(cupPositions[idx]===ballUnder){
+    bnMsg.textContent='Bravo 🎉';
+    billeSound.currentTime=0; billeSound.play();
+    bnLevel++; bnLevelEl.textContent=bnLevel;
+    setTimeout(resetBonneteauUI,1000);
+  } else {
+    bnMsg.textContent='Raté ❌ La bille était ici.';
+    setTimeout(resetBonneteauUI,1000);
+  }
+});});
+
 qs('#bn-shuffle').addEventListener('click',shuffleSequence);
-qs('#bn-back').addEventListener('click',()=>show('screen-menu'));
+qs('#bn-back').addEventListener('click',()=>{enterMenu();});
 
-cupEls.forEach((cup,idx)=>{
-  cup.addEventListener('click',()=>{
-    if(!interactEnabled) return;
-    interactEnabled=false;
-    const win=idx===ballUnder;
-    if(win){bnMsg.textContent='Bravo 🎉'; bnLevel++; bnScore+=10; winSound.currentTime=0; winSound.play();}
-    else {bnMsg.textContent='Raté ❌'; bnLevel=Math.max(1,bnLevel-1); bnScore=Math.max(0,bnScore-5);}
-    bnLevelEl.textContent=bnLevel;
-    bnScoreEl.textContent=bnScore;
-    cup.style.transform+=' translateY(-46px)';
-    setTimeout(()=>{cup.style.transform=cup.style.transform.replace(' translateY(-46px)',''); interactEnabled=true;},600);
-  });
-});
-
-// ===== SIMON GAME LOGIC =====
-const pads=qsa('.pad');
-const smMsg=qs('#sm-msg');
-const smLevelEl=qs('#sm-level');
-const smScoreEl=qs('#sm-score');
-let smSequence=[]; let smUserSeq=[]; let smLevel=1; let smActive=false; let smScore=0;
+// ===== SIMON LOGIC =====
+const pads=qsa('.pad'); const smMsg=qs('#sm-msg'); const smLevelEl=qs('#sm-level');
 const simonSounds=[qs('#simon0'),qs('#simon1'),qs('#simon2'),qs('#simon3')];
+let smSequence=[]; let smUser=[]; let smLevel=1; let smPlaying=false;
 
-function resetSimon(){
-  smSequence=[]; smUserSeq=[]; smLevel=1; smScore=0; smActive=false;
-  smLevelEl.textContent=smLevel; smScoreEl.textContent=smScore; smMsg.textContent='Appuie sur Démarrer pour jouer.';
-}
-qs('#sm-back').addEventListener('click',()=>show('screen-menu'));
+function resetSimon(){smMsg.textContent='Clique sur démarrer'; smSequence=[]; smUser=[]; smLevel=1; smLevelEl.textContent=smLevel; smPlaying=false;}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
-function playSimonSeq(){
-  smActive=false; smUserSeq=[];
-  let i=0;
-  const interval = setInterval(()=>{
-    if(i>=smSequence.length){clearInterval(interval); smActive=true; smMsg.textContent='À toi !'; return;}
-    const idx=smSequence[i]; const pad=pads[idx];
-    pad.classList.add('active'); simonSounds[idx].currentTime=0; simonSounds[idx].play();
-    setTimeout(()=>pad.classList.remove('active'),400);
-    i++;
-  },600);
+async function playSimonSequence(){
+  smPlaying=true; smMsg.textContent='Observe…';
+  for(const p of smSequence){
+    pads[p].classList.add('active'); simonSounds[p].currentTime=0; simonSounds[p].play();
+    await sleep(600); pads[p].classList.remove('active'); await sleep(200);
+  }
+  smMsg.textContent='À toi !';
+  smUser=[];
 }
 
-function addSimonStep(){
-  smSequence.push(Math.floor(Math.random()*4));
-  smLevelEl.textContent=smLevel;
-  playSimonSeq();
-}
+pads.forEach(pad=>{pad.addEventListener('click',()=>{ if(!smPlaying) return;
+  const idx=parseInt(pad.dataset.pad);
+  pad.classList.add('active'); simonSounds[idx].currentTime=0; simonSounds[idx].play();
+  setTimeout(()=>pad.classList.remove('active'),300);
+  smUser.push(idx);
+  const currIdx=smUser.length-1;
+  if(smUser[currIdx]!==smSequence[currIdx]){smMsg.textContent='Raté ❌'; smPlaying=false; setTimeout(resetSimon,1000); return;}
+  if(smUser.length===smSequence.length){smLevel++; smLevelEl.textContent=smLevel; smSequence.push(Math.floor(Math.random()*4)); setTimeout(playSimonSequence,700);}
+});});
 
-qs('#sm-start').addEventListener('click',()=>{smSequence=[]; smLevel=1; smScore=0; addSimonStep(); smScoreEl.textContent=smScore; smMsg.textContent='Observe !';});
-pads.forEach((pad,idx)=>{
-  pad.addEventListener('click',()=>{
-    if(!smActive) return;
-    smUserSeq.push(idx);
-    simonSounds[idx].currentTime=0; simonSounds[idx].play();
-    const currentStep = smUserSeq.length-1;
-    if(smUserSeq[currentStep]!==smSequence[currentStep]){
-      smMsg.textContent='Raté ❌'; smLevel=Math.max(1,smLevel-1); smScore=Math.max(0,smScore-5);
-      smLevelEl.textContent=smLevel; smScoreEl.textContent=smScore; smActive=false;
-      setTimeout(()=>addSimonStep(),800);
-      return;
-    }
-    if(smUserSeq.length===smSequence.length){
-      smMsg.textContent='Bien ! 🎉'; smLevel++; smScore+=10; smLevelEl.textContent=smLevel; smScoreEl.textContent=smScore;
-      smActive=false;
-      setTimeout(()=>addSimonStep(),800);
-    }
-  });
+qs('#sm-start').addEventListener('click',()=>{
+  if(smPlaying) return;
+  smSequence=[Math.floor(Math.random()*4)];
+  playSimonSequence();
 });
+qs('#sm-back').addEventListener('click',()=>{enterMenu();});
 </script>
 </body>
 </html>
