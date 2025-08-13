@@ -3,40 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jeux Kabir – Ultimate Pro</title>
+<title>Jeux Kabir Ultime – Bonneteau & Simon</title>
 <style>
 :root{
   --bg1:#0f0c29; --bg2:#302b63; --bg3:#24243e;
-  --card:#10131aee; --muted:#aab3c4; --primary:#7cf5ff; --accent:#8b5cf6; --danger:#ff6b6b; --success:#22c55e;
+  --card:#10131aee; --muted:#aab3c4; --primary:#7cf5ff; --accent:#8b5cf6; --success:#22c55e; --danger:#ff6b6b; --gold:#facc15;
+  --glass: rgba(255,255,255,0.08);
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:Inter,sans-serif;color:#eef3ff;background:linear-gradient(-45deg,var(--bg1),var(--bg2),var(--bg3));background-size:400% 400%;animation:bgMove 25s ease infinite;overflow-x:hidden;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:Inter,sans-serif;color:#eef3ff;background:linear-gradient(-45deg,var(--bg1),var(--bg2),var(--bg3));background-size:400% 400%;animation:bgMove 18s ease infinite;overflow-x:hidden;}
 @keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.container{max-width:1100px;margin:0 auto;padding:20px;}
-.card{background:var(--card);border-radius:22px;padding:20px;backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.4);}
-h1,h2{text-align:center;}
-.muted{color:var(--muted);text-align:center;}
+.container{max-width:1100px;margin:auto;padding:20px;}
+.brand{display:flex;align-items:center;gap:10px;opacity:.9}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--primary);box-shadow:0 0 12px var(--primary);}
+.card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:20px;backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(0,0,0,.35);}
+.section{margin-top:18px;}
+h1{font-size:clamp(26px,6vw,40px);text-align:center;margin-bottom:10px;}
+h2{font-size:clamp(20px,5vw,28px);text-align:center;margin-bottom:10px;}
+p,.muted{color:var(--muted);text-align:center;font-size:1rem;}
 .btn{appearance:none;border:none;padding:14px 18px;border-radius:14px;cursor:pointer;font-weight:700;font-size:16px;color:#0b0f17;background:linear-gradient(135deg,#e0fbff,var(--primary));box-shadow:0 10px 20px rgba(124,245,255,.25), inset 0 1px 0 #fff;transition:.2s transform,.3s box-shadow,.2s filter;user-select:none;width:100%;max-width:250px;margin:auto;display:block;}
 .btn:active{transform:translateY(1px);}
+.btn.ghost{background:transparent;color:#eef3ff;border:1px solid rgba(255,255,255,.15);}
+.btn.ok{background:linear-gradient(135deg,#c9ffd7,var(--success));box-shadow:0 10px 20px rgba(34,197,94,.25);}
 .grid{display:grid;gap:16px;}
-@media (min-width:860px){.grid.cols-2{grid-template-columns:1fr 1fr;}}
+@media(min-width:860px){.grid.cols-2{grid-template-columns:1fr 1fr;}}
 .screen{display:none;}
 .screen.active{display:block;}
 .inputRow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
 input[type="text"]{flex:1;min-width:140px;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:16px;outline:none;}
 input::placeholder{color:#97a3b7;}
 .notice{margin-top:10px;font-weight:600;text-align:center;}
-.cup-container{display:flex;justify-content:space-between;align-items:flex-end;gap:60px;margin-top:50px;perspective:900px;}
-.cupWrap{position:relative;width:90px;height:120px;cursor:pointer;transform-style:preserve-3d;transition:transform 0.6s ease;}
-.cup{width:100%;height:100%;background:linear-gradient(to top,#c69c6d,#e0c097);border-radius:0 0 20px 20px;display:flex;align-items:flex-end;justify-content:center;box-shadow:0 10px 20px rgba(0,0,0,.5);}
-.cupLabel{color:#fff;font-weight:700;font-size:22px;margin-bottom:12px;text-shadow:0 0 6px #fff;}
+.tag{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);font-size:12px;margin:2px;}
+.cup-container{display:flex;justify-content:center;align-items:flex-end;gap:40px;margin-top:40px;perspective:1000px;}
+.cupWrap{width:80px;height:120px;cursor:pointer;transform-style:preserve-3d;transition:transform 0.6s ease;}
+.cup{width:100%;height:100%;background:linear-gradient(to top,#c69c6d,#e0c097);border-radius:0 0 20px 20px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;}
+.cupLabel{font-weight:800;font-size:18px;color:#fff;}
 .padGrid{display:grid;grid-template-columns:repeat(2,150px);grid-template-rows:repeat(2,150px);gap:20px;justify-content:center;margin-top:20px;}
-.pad{border-radius:16px;cursor:pointer;box-shadow:0 5px 15px rgba(0,0,0,.4);transition:filter .2s,transform .2s;}
+.pad{border-radius:16px;cursor:pointer;box-shadow:0 5px 15px rgba(0,0,0,.3);}
 .pad.red{background:#ff4c4c;}
 .pad.green{background:#4cff4c;}
 .pad.blue{background:#4c4cff;}
 .pad.yellow{background:#ffff4c;}
-.pad.active{filter:brightness(1.8) drop-shadow(0 0 20px #fff);}
+.pad.active{filter:brightness(1.5);}
 .particle{position:fixed;pointer-events:none;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle,#fff,rgba(255,255,255,0));opacity:.2;animation:float 12s linear infinite;}
 @keyframes float{from{transform:translateY(110vh)}to{transform:translateY(-20vh)}}
 </style>
@@ -44,14 +52,16 @@ input::placeholder{color:#97a3b7;}
 <body>
 <div class="container">
 
+<div class="brand"><span class="dot"></span><strong>Jeux Kabir Ultime</strong><span class="tag">Bonneteau & Simon</span></div>
+
 <!-- INTRO -->
-<section id="screen-intro" class="screen active card">
+<section id="screen-intro" class="screen active card section">
 <h1>Bienvenue 👋</h1>
-<p class="muted">Réponds aux questions pour entrer :</p>
+<p class="muted">Réponds correctement pour accéder aux jeux.</p>
 <div class="section">
-<h2 id="questionLabel"></h2>
+<h2 id="questionLabel">Question 1/2</h2>
 <p id="questionText" class="notice"></p>
-<div class="inputRow">
+<div class="inputRow section">
 <input id="answerInput" type="text" placeholder="Ta réponse ici" autocomplete="off">
 <button id="answerBtn" class="btn">Valider</button>
 </div>
@@ -60,69 +70,71 @@ input::placeholder{color:#97a3b7;}
 </section>
 
 <!-- MENU -->
-<section id="screen-menu" class="screen card">
+<section id="screen-menu" class="screen card section">
 <h1>Menu principal</h1>
-<p class="muted">Choisis un mini‑jeu :</p>
-<div class="grid cols-2">
-<button class="btn" id="btn-bonneteau">🎩 Bonneteau</button>
-<button class="btn" id="btn-simon">🎨 Simon Game</button>
+<p class="muted">Choisis un mini‑jeu. Bonne chance !</p>
+<div class="menuCard grid cols-2">
+<button class="gameBtn" id="btn-bonneteau"><div class="gameIcon">🎩</div><div><div style="font-weight:800">Bonneteau</div><div class="muted" style="font-size:13px">Suis la bille</div></div></button>
+<button class="gameBtn" id="btn-simon"><div class="gameIcon">🎨</div><div><div style="font-weight:800">Simon Game</div><div class="muted" style="font-size:13px">Mémorise la séquence</div></div></button>
 </div>
+<div class="hud section"><span class="tag">Musique : <span id="musicState">off</span></span><button id="toggleMusic" class="btn ghost">Activer/Désactiver</button></div>
 </section>
 
 <!-- BONNETEAU -->
-<section id="screen-bonneteau" class="screen card">
+<section id="screen-bonneteau" class="screen card section">
 <h2>Bonneteau 🎩</h2>
 <div class="cup-container">
-  <div class="cupWrap" data-index="0"><div class="cup"><div class="cupLabel">●</div></div></div>
-  <div class="cupWrap" data-index="1"><div class="cup"><div class="cupLabel">●</div></div></div>
-  <div class="cupWrap" data-index="2"><div class="cup"><div class="cupLabel">●</div></div></div>
+<div class="cupWrap" data-index="0"><div class="cup"><div class="cupLabel">●</div></div></div>
+<div class="cupWrap" data-index="1"><div class="cup"><div class="cupLabel">●</div></div></div>
+<div class="cupWrap" data-index="2"><div class="cup"><div class="cupLabel">●</div></div></div>
 </div>
-<div style="margin-top:20px;text-align:center;">
-<button class="btn" id="bn-shuffle">Mélanger</button>
+<div class="hud section">
+<button class="btn ok" id="bn-shuffle">Mélanger</button>
+<span class="tag">Choisis un gobelet après le mélange</span>
+</div>
 <p id="bn-msg" class="notice"></p>
-</div>
+<button class="btn ghost" id="bn-back">Retour menu</button>
 </section>
 
 <!-- SIMON -->
-<section id="screen-simon" class="screen card">
+<section id="screen-simon" class="screen card section">
 <h2>Simon Game 🎨</h2>
 <div class="padGrid">
-  <div class="pad red" data-pad="0"></div>
-  <div class="pad green" data-pad="1"></div>
-  <div class="pad blue" data-pad="2"></div>
-  <div class="pad yellow" data-pad="3"></div>
+<div class="pad red" data-pad="0"></div>
+<div class="pad green" data-pad="1"></div>
+<div class="pad blue" data-pad="2"></div>
+<div class="pad yellow" data-pad="3"></div>
 </div>
-<div style="text-align:center;margin-top:20px;">
-<button class="btn" id="sm-start">Démarrer</button>
+<div class="hud section">
+<button class="btn ok" id="sm-start">Démarrer</button>
+<span class="tag">Répète la séquence</span>
 <p id="sm-msg" class="notice"></p>
+<button class="btn ghost" id="sm-back">Retour menu</button>
 </div>
 </section>
 
 </div>
 
 <!-- AUDIO -->
-<audio id="bgm" loop src="https://cdn.pixabay.com/download/audio/2022/10/20/audio_d6a1a0f8bd.mp3?filename=cyber-dream-ambient-124841.mp3"></audio>
-<audio id="billeSound" src="https://freesound.org/data/previews/335/335908_586551-lq.mp3"></audio>
+<audio id="bgm" loop preload="auto" src="https://cdn.pixabay.com/download/audio/2022/10/20/audio_d6a1a0f8bd.mp3?filename=cyber-dream-ambient-124841.mp3"></audio>
+<audio id="billeSound" src="https://freesound.org/data/previews/169/169162_2437358-lq.mp3"></audio>
 <audio id="redNote" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
 <audio id="greenNote" src="https://freesound.org/data/previews/256/256114_3263906-lq.mp3"></audio>
 <audio id="blueNote" src="https://freesound.org/data/previews/256/256115_3263906-lq.mp3"></audio>
 <audio id="yellowNote" src="https://freesound.org/data/previews/256/256116_3263906-lq.mp3"></audio>
 
 <script>
-// ==== PARTICULES ====
-for(let i=0;i<30;i++){
-  const p=document.createElement('div'); p.className='particle';
+// ===== Particules =====
+for(let i=0;i<25;i++){
+  const p=document.createElement('div');p.className='particle';
   p.style.left=Math.random()*100+'vw';
   p.style.animationDelay=(Math.random()*-12)+'s';
-  p.style.opacity=.1+Math.random()*.25;
+  p.style.opacity=.1+Math.random()*.2;
   document.body.appendChild(p);
 }
 
-// ==== QUESTIONS INTRO ====
-const questions=[
-  {text:"Qui est le meilleur ami de Kabir ?",answer:"jesus"},
-  {text:"Quelle est la première amoureuse de Kabir ?",answer:"francoise"}
-];
+// ===== Intro Quiz =====
+const questions=[{text:"Qui est le meilleur ami de Kabir ?",answer:"jesus"},{text:"Quelle est l'amoureuse de Kabir ?",answer:"francoise"}];
 let step=0;
 const qLabel=document.querySelector('#questionLabel');
 const qText=document.querySelector('#questionText');
@@ -130,11 +142,12 @@ const introMsg=document.querySelector('#introMsg');
 const answerInput=document.querySelector('#answerInput');
 const answerBtn=document.querySelector('#answerBtn');
 
-function setQuestion(){ 
-  qLabel.textContent=`Question ${step+1}/2`; 
-  qText.textContent=questions[step].text; 
+function setQuestion(){
+  qLabel.textContent=`Question ${step+1}/2`;
+  qText.textContent=questions[step].text;
   answerInput.value=''; introMsg.textContent=''; answerInput.focus();
 }
+
 function verifyCurrent(){
   const raw=(answerInput.value||'').trim().toLowerCase();
   if(raw===questions[step].answer){ step=2; enterMenu(); }
@@ -144,33 +157,44 @@ answerBtn.addEventListener('click',verifyCurrent);
 answerInput.addEventListener('keydown',e=>{if(e.key==='Enter') verifyCurrent();});
 setQuestion();
 
-function show(id){ document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active')); document.querySelector('#'+id).classList.add('active');}
-function enterMenu(){ show('screen-menu'); document.querySelector('#bgm').play();}
+// ===== Navigation =====
+function show(id){ document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function enterMenu(){ show('screen-menu'); document.getElementById('bgm').play(); }
 
-// ==== MENU ====
-document.querySelector('#btn-bonneteau').addEventListener('click',()=>{show('screen-bonneteau'); initBonneteau();});
-document.querySelector('#btn-simon').addEventListener('click',()=>{show('screen-simon'); initSimon();});
+// ===== Music Toggle =====
+const bgm=document.getElementById('bgm');
+const musicState=document.getElementById('musicState');
+const toggleMusic=document.getElementById('toggleMusic');
+toggleMusic.addEventListener('click',()=>{
+  if(bgm.paused){bgm.play(); musicState.textContent='on';}else{bgm.pause(); musicState.textContent='off';}
+});
 
-// ==== BONNETEAU ====
+// ===== MENU BUTTONS =====
+document.getElementById('btn-bonneteau').addEventListener('click',()=>{show('screen-bonneteau'); initBonneteau();});
+document.getElementById('btn-simon').addEventListener('click',()=>{show('screen-simon'); initSimon();});
+document.getElementById('bn-back').addEventListener('click',()=>show('screen-menu'));
+document.getElementById('sm-back').addEventListener('click',()=>show('screen-menu'));
+
+// ===== BONNETEAU =====
 let cupOrder=[0,1,2],ballIndex=0,shuffling=false;
 function initBonneteau(){
   const cups=document.querySelectorAll('.cupWrap');
-  // visible au départ
   cupOrder=[0,1,2];
   ballIndex=Math.floor(Math.random()*3);
   cups.forEach((c,i)=>c.querySelector('.cupLabel').style.visibility=(i===ballIndex?'visible':'hidden'));
-  document.querySelector('#bn-msg').textContent='Clique sur "Mélanger" pour commencer';
+  document.getElementById('bn-msg').textContent='Clique sur "Mélanger" pour commencer';
 }
 
-document.querySelector('#bn-shuffle').addEventListener('click',()=>{
-  if(shuffling) return; shuffling=true; const cups=document.querySelectorAll('.cupWrap'); document.querySelector('#bn-msg').textContent='Mélange en cours...';
-  // cache la balle
+document.getElementById('bn-shuffle').addEventListener('click',()=>{
+  if(shuffling) return; shuffling=true;
+  const cups=document.querySelectorAll('.cupWrap');
   cups.forEach(c=>c.querySelector('.cupLabel').style.visibility='hidden');
   let moves=0;
   const interval=setInterval(()=>{
-    const a=Math.floor(Math.random()*3),b=Math.floor(Math.random()*3); if(a!==b){[cupOrder[a],cupOrder[b]]=[cupOrder[b],cupOrder[a]];}
+    const a=Math.floor(Math.random()*3),b=Math.floor(Math.random()*3);
+    if(a!==b){[cupOrder[a],cupOrder[b]]=[cupOrder[b],cupOrder[a]];}
     cups.forEach((c,i)=>{c.style.transform=`rotateY(${360*moves}deg) translateX(${cupOrder[i]*0}px)`});
-    moves++; if(moves>20){clearInterval(interval); shuffling=false; document.querySelector('#bn-msg').textContent='Clique sur un gobelet pour deviner la balle'; addCupClicks(); }
+    moves++; if(moves>20){clearInterval(interval); shuffling=false; document.getElementById('bn-msg').textContent='Clique sur un gobelet pour deviner la balle'; addCupClicks(); }
   },150);
 });
 
@@ -178,49 +202,42 @@ function addCupClicks(){
   const cups=document.querySelectorAll('.cupWrap');
   cups.forEach(c=>c.addEventListener('click',cupClick));
 }
+
 function cupClick(e){
   const idx=parseInt(e.currentTarget.dataset.index);
-  if(idx===ballIndex){document.querySelector('#bn-msg').textContent='Bravo! 🎉';document.querySelector('#billeSound').play();}
-  else{document.querySelector('#bn-msg').textContent='Raté 😢 La balle était ici.';document.querySelectorAll('.cupWrap')[ballIndex].querySelector('.cupLabel').style.visibility='visible';}
-  document.querySelectorAll('.cupWrap').forEach(c=>c.removeEventListener('click',cupClick));
+  if(idx===ballIndex){document.getElementById('bn-msg').textContent='Bravo! 🎉';document.getElementById('billeSound').play();}
+  else{document.getElementById('bn-msg').textContent='Raté! 😢 La balle était ici.';document.getElementById('billeSound').play();}
+  const cups=document.querySelectorAll('.cupWrap');
+  cups.forEach(c=>c.removeEventListener('click',cupClick));
 }
 
-// ==== SIMON GAME ====
-let sequence=[],userSeq=[],level=0,canClick=false;
+// ===== SIMON GAME =====
 const pads=document.querySelectorAll('.pad');
-const sounds=['redNote','greenNote','blueNote','yellowNote'];
-function initSimon(){sequence=[];userSeq=[];level=0;canClick=false; document.querySelector('#sm-msg').textContent='Appuie sur Démarrer';}
-document.querySelector('#sm-start').addEventListener('click',nextSimonLevel);
+const padSounds=[document.getElementById('redNote'),document.getElementById('greenNote'),document.getElementById('blueNote'),document.getElementById('yellowNote')];
+let simonSeq=[],userSeq=[],level=0;
 
-pads.forEach(pad=>{
-  pad.addEventListener('click',()=>{
-    if(!canClick) return;
-    const idx=parseInt(pad.dataset.pad);
-    userSeq.push(idx); playPad(idx);
-    if(idx!==sequence[userSeq.length-1]){ document.querySelector('#sm-msg').textContent='Raté 😢'; canClick=false; return;}
-    if(userSeq.length===sequence.length){ canClick=false; setTimeout(nextSimonLevel,800);}
-  });
+function initSimon(){simonSeq=[];userSeq=[];level=0;document.getElementById('sm-msg').textContent='Clique "Démarrer" pour jouer';}
+document.getElementById('sm-start').addEventListener('click',()=>{level=1; nextSimonLevel();});
+
+pads.forEach((pad,i)=>{
+  pad.addEventListener('click',()=>{padSounds[i].currentTime=0;padSounds[i].play();userSeq.push(i);checkUserInput();pad.classList.add('active');setTimeout(()=>pad.classList.remove('active'),200);});
 });
 
 function nextSimonLevel(){
-  level++; document.querySelector('#sm-msg').textContent='Niveau '+level;
-  sequence.push(Math.floor(Math.random()*4));
-  userSeq=[]; playSequence();
+  userSeq=[];simonSeq.push(Math.floor(Math.random()*4));
+  playSequence(0);
 }
 
-function playSequence(){
-  canClick=false;
-  sequence.forEach((val,i)=>{
-    setTimeout(()=>{playPad(val);}, i*800);
-  });
-  setTimeout(()=>{canClick=true;}, sequence.length*800);
+function playSequence(idx){
+  if(idx>=simonSeq.length) return;
+  const i=simonSeq[idx];
+  pads[i].classList.add('active'); padSounds[i].currentTime=0; padSounds[i].play();
+  setTimeout(()=>{pads[i].classList.remove('active'); setTimeout(()=>playSequence(idx+1),300)},600);
 }
 
-function playPad(idx){
-  const pad=pads[idx];
-  pad.classList.add('active');
-  document.getElementById(sounds[idx]).currentTime=0; document.getElementById(sounds[idx]).play();
-  setTimeout(()=>pad.classList.remove('active'),400);
+function checkUserInput(){
+  for(let i=0;i<userSeq.length;i++){if(userSeq[i]!==simonSeq[i]){document.getElementById('sm-msg').textContent=`Raté au niveau ${level}`; return;}}
+  if(userSeq.length===simonSeq.length){document.getElementById('sm-msg').textContent=`Bravo niveau ${level}`;level++;setTimeout(nextSimonLevel,800);}
 }
 </script>
 </body>
