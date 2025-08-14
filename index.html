@@ -1,308 +1,328 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎮 Jeux Kabir — Bonneteau & Simon</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Rubik:wght@500;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0b0c1f;
-  --panel: #1a1b35;
-  --accent: #ff416c;
-  --accent-dark: #ff4b2b;
-  --text: #ffffff;
-  --muted: #aaaaaa;
-  --danger: #ff3b3b;
-  --padRed: #ff5b6b;
-  --padGreen: #5bff88;
-  --padBlue: #5bbfff;
-  --padYellow: #ffe55b;
-}
-
-* { box-sizing: border-box; margin:0; padding:0; }
-body { font-family:'Poppins',sans-serif; background:var(--bg); color:var(--text); display:flex; justify-content:center; padding:16px; }
-.app { max-width:960px; width:100%; text-align:center; }
-h2,h3 { font-family:'Rubik',sans-serif; }
-.screen { display:none; padding:16px; }
-.screen.active { display:block; }
-.btn {
-  display:inline-block; padding:12px 20px; margin:6px; border:none; border-radius:12px;
-  font-weight:600; background: linear-gradient(180deg,var(--accent),var(--accent-dark));
-  color:#fff; cursor:pointer; transition: all 0.2s ease;
-}
-.btn:hover { transform:scale(1.05); box-shadow:0 6px 20px rgba(0,0,0,0.6); }
-.btn.ghost { background:transparent; border:1px solid var(--muted); color:var(--muted); }
-input { width:100%; padding:10px; border-radius:8px; border:none; margin-top:8px; font-size:16px; }
-
-#bnStage { position:relative; height:220px; margin:20px auto; background:#222; border-radius:12px; }
-.cup {
-  position:absolute; bottom:20px; width:80px; height:80px; border-radius:50% 50% 0 0;
-  background:#555; cursor:pointer; transition:transform 0.3s, box-shadow 0.3s;
-}
-#ball { position:absolute; width:28px; height:28px; border-radius:50%; background:var(--danger);
-  bottom:140px; left:50%; transform:translateX(-50%); transition:left 0.5s, bottom 0.3s; }
-
-.pad { width:100px; height:100px; border-radius:16px; display:inline-block; margin:10px;
-  cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,0.5); transition:transform 0.2s, box-shadow 0.2s; }
-.pad.active { transform:scale(1.1); box-shadow:0 0 20px #fff; }
-.pad.red { background:var(--padRed); }
-.pad.green { background:var(--padGreen); }
-.pad.blue { background:var(--padBlue); }
-.pad.yellow { background:var(--padYellow); }
-
-#footer { margin-top:24px; font-size:14px; color:var(--muted); }
-
-/* Responsive */
-@media(max-width:600px){
-  .pad { width:70px; height:70px; margin:6px; }
-  #bnStage { height:180px; }
-  .cup { width:60px; height:60px; }
-  #ball { width:20px; height:20px; bottom:110px; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon Lane Runner Ultimate</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header, footer {
+      background: rgba(0,0,0,0.7);
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 0 10px #0ff;
+    }
+    header button {
+      background: #0ff;
+      border: none;
+      padding: 8px 15px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      box-shadow: 0 0 10px #0ff;
+      margin: 0 5px;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    canvas {
+      background: linear-gradient(180deg,#111,#000);
+      border: 2px solid #0ff;
+      box-shadow: 0 0 20px #0ff;
+    }
+    #hud {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 18px;
+    }
+    #menu {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      background: rgba(0,0,0,0.8);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #0ff;
+    }
+    #menu h1 {
+      margin-bottom: 20px;
+      font-size: 2em;
+      color: #0ff;
+    }
+    #menu button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background: #0ff;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0ff;
+    }
+  </style>
 </head>
 <body>
-<div class="app">
-<h2>🎮 Jeux Kabir — Bonneteau & Simon</h2>
-<button id="toggleAmb" class="btn ghost">🎵 Musique ON/OFF</button>
+  <header>
+    <button id="startBtn">▶ Jouer</button>
+    <button id="pauseBtn">⏸ Pause</button>
+  </header>
+  <main>
+    <canvas id="gameCanvas"></canvas>
+    <div id="hud"></div>
+    <div id="menu">
+      <h1>Neon Lane Runner</h1>
+      <button id="playBtn">Commencer</button>
+    </div>
+  </main>
+  <footer>by Kabir & Samuel Deporno</footer>
 
-<!-- Intro -->
-<div id="intro" class="screen active">
-  <h3>🔐 Accès sécurisé</h3>
-  <p id="qLabel">Question 1/2</p>
-  <p id="qText">Qui est le meilleur ami de Kabir ?</p>
-  <input id="qInput" placeholder="Ta réponse">
-  <button id="qBtn" class="btn">Valider</button>
-  <p id="qMsg"></p>
-</div>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth * 0.8;
+    canvas.height = window.innerHeight * 0.7;
 
-<!-- Menu -->
-<div id="menu" class="screen">
-  <h3>📋 Menu Principal</h3>
-  <button id="openBon" class="btn">🎩 Bonneteau</button>
-  <button id="openSim" class="btn">🎵 Simon</button>
-</div>
+    let gameRunning = false, paused = false;
+    let player, obstacles = [], coins = [], powerUps = [];
+    let score = 0, lives = 3, speed = 5, frame = 0, time = 0;
+    const laneCount = 3, laneWidth = canvas.width / laneCount;
 
-<!-- Bonneteau -->
-<div id="bon" class="screen">
-  <h3>🎩 Bonneteau — Niveau <span id="bnLevel">1</span></h3>
-  <div id="bnStage">
-    <div id="cup0" class="cup" style="left:40px"></div>
-    <div id="cup1" class="cup" style="left:160px"></div>
-    <div id="cup2" class="cup" style="left:280px"></div>
-    <div id="ball"></div>
-  </div>
-  <button id="mixBtn" class="btn">🔀 Mélanger</button>
-  <button id="resetBn" class="btn ghost">🔄 Réinitialiser</button>
-  <button id="backMenuBn" class="btn ghost">⬅ Retour</button>
-  <p id="bnMsg">Regarde la balle, puis clique sur Mélanger.</p>
-  <p>Score : <span id="bnScore">0</span></p>
-</div>
-
-<!-- Simon -->
-<div id="sim" class="screen">
-  <h3>🎵 Simon — Niveau <span id="smLevel">0</span></h3>
-  <div style="display:grid; grid-template-columns:1fr 1fr; grid-gap:10px; justify-items:center;">
-    <div class="pad red" data-idx="0"></div>
-    <div class="pad green" data-idx="1"></div>
-    <div class="pad blue" data-idx="2"></div>
-    <div class="pad yellow" data-idx="3"></div>
-  </div>
-  <button id="startSim" class="btn">▶ Démarrer</button>
-  <button id="resetSim" class="btn ghost">🔄 Réinitialiser</button>
-  <button id="backMenuSim" class="btn ghost">⬅ Retour</button>
-  <p>Score : <span id="smScore">0</span></p>
-  <p id="smMsg">Prêt</p>
-</div>
-
-<div id="footer">by Kabir & Samuel Deporno</div>
-</div>
-
-<script>
-// ================= Audio & musique =================
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-const audio = new AudioCtx();
-const master = audio.createGain(); master.gain.value=0.9; master.connect(audio.destination);
-const bgGain = audio.createGain(); bgGain.gain.value=0.06; bgGain.connect(master);
-function ensureAudio(){ if(audio.state==='suspended') audio.resume(); }
-function playNote(freq,dur=0.3,type='sine'){ const t=audio.currentTime;
-  const o=audio.createOscillator(); o.type=type; o.frequency.setValueAtTime(freq,t);
-  const g=audio.createGain(); g.gain.setValueAtTime(0.001,t);
-  g.gain.exponentialRampToValueAtTime(1,t+0.01);
-  g.gain.exponentialRampToValueAtTime(0.001,t+dur);
-  o.connect(g); g.connect(master); o.start(t); o.stop(t+dur+0.02);
-}
-function clickSound(){ const dur=0.04; const buffer=audio.createBuffer(1,audio.sampleRate*dur,audio.sampleRate);
-  const data=buffer.getChannelData(0); for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.exp(-i/(data.length*0.02));
-  const src=audio.createBufferSource(); src.buffer=buffer; const g=audio.createGain(); g.gain.value=0.12; src.connect(g); g.connect(master); src.start(); }
-
-let ambientOsc=null;
-function startAmbient(){ if(ambientOsc) return; 
-  const o1=audio.createOscillator(); o1.type='sine'; o1.frequency.value=110;
-  const g1=audio.createGain(); g1.gain.value=0.02; o1.connect(g1); g1.connect(bgGain);
-  const o2=audio.createOscillator(); o2.type='sine'; o2.frequency.value=220; const g2=audio.createGain(); g2.gain.value=0.01; o2.connect(g2); g2.connect(bgGain);
-  o1.start(); o2.start(); ambientOsc=[o1,o2];
-}
-function stopAmbient(){ if(!ambientOsc) return; ambientOsc.forEach(o=>o.stop()); ambientOsc=null; }
-
-document.getElementById('toggleAmb').addEventListener('click',()=>{
-  ensureAudio();
-  if(bgGain.gain.value>0.01){ bgGain.gain.value=0; stopAmbient(); }
-  else{ bgGain.gain.value=0.06; startAmbient(); }
-});
-document.addEventListener('pointerdown',()=>ensureAudio(),{once:true});
-
-// ================= Navigation =================
-const screens = { intro:document.getElementById('intro'), menu:document.getElementById('menu'),
-bon:document.getElementById('bon'), sim:document.getElementById('sim') };
-function show(id){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[id].classList.add('active'); }
-
-// ================= Questions =================
-const qA={text:"Qui est le meilleur ami de Kabir ?",answer:"jesus"};
-const qB={text:"Quelle est la première amoureuse de Kabir ?",answer:"francoise"};
-let qStep=0;
-const qLabel=document.getElementById('qLabel'), qText=document.getElementById('qText'),
-qInput=document.getElementById('qInput'), qBtn=document.getElementById('qBtn'), qMsg=document.getElementById('qMsg');
-
-function setQuestion(){ qLabel.textContent=`Question ${qStep+1}/2`; qText.textContent=qStep===0?qA.text:qB.text; qInput.value=''; qMsg.textContent=''; }
-qBtn.addEventListener('click',()=>{
-  const val=qInput.value.trim().toLowerCase();
-  if((qStep===0&&val===qA.answer)||(qStep===1&&val===qB.answer)){ show('menu'); return; }
-  if(qStep===0){ qStep=1; setQuestion(); } else { qMsg.textContent='❌ Mauvaise réponse'; }
-});
-setQuestion();
-
-// ================= Bonneteau =================
-const bnCups=[document.getElementById('cup0'),document.getElementById('cup1'),document.getElementById('cup2')];
-const bnBall=document.getElementById('ball');
-const bnMixBtn=document.getElementById('mixBtn'), bnReset=document.getElementById('resetBn'), bnBack=document.getElementById('backMenuBn');
-const bnScoreEl=document.getElementById('bnScore'), bnLevelEl=document.getElementById('bnLevel'), bnMsgEl=document.getElementById('bnMsg');
-
-let bnPos=0, bnScore=0, bnLevel=1, bnMixing=false;
-
-function placeBall(idx){
-    bnPos=idx;
-    const cup = bnCups[idx];
-    const rect = cup.offsetLeft;
-    const cupWidth = cup.offsetWidth;
-    const ballWidth = bnBall.offsetWidth;
-    bnBall.style.left = (rect + cupWidth/2 - ballWidth/2) + 'px';
-}
-
-function swapCups(a,b){
-    return new Promise(res=>{
-        const dx = bnCups[b].offsetLeft - bnCups[a].offsetLeft;
-        let progress=0;
-        function step(){
-            progress += 0.1;
-            bnCups[a].style.transform = `translateX(${dx*progress}px)`;
-            bnCups[b].style.transform = `translateX(${-dx*progress}px)`;
-            if(progress<1) requestAnimationFrame(step);
-            else{
-                [bnCups[a],bnCups[b]]=[bnCups[b],bnCups[a]];
-                bnCups[a].style.transform=''; bnCups[b].style.transform='';
-                res();
-            }
-        }
-        step();
-    });
-}
-
-async function mixBn(){
-    if(bnMixing) return;
-    bnMixing=true; bnMsgEl.textContent='🔀 Mélange en cours...'; bnBall.style.display='none';
-    let moves = bnLevel+2;
-    for(let i=0;i<moves;i++){
-        let a=Math.floor(Math.random()*3); let b;
-        do{ b=Math.floor(Math.random()*3); }while(b===a);
-        await swapCups(a,b);
-        if(bnPos===a) bnPos=b;
-        else if(bnPos===b) bnPos=a;
+    class Player {
+      constructor() {
+        this.lane = 1;
+        this.y = canvas.height - 80;
+        this.width = laneWidth * 0.6;
+        this.height = 40;
+        this.color = "cyan";
+      }
+      moveLeft() { if (this.lane > 0) this.lane--; }
+      moveRight() { if (this.lane < laneCount - 1) this.lane++; }
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = this.color;
+        ctx.fillRect(this.lane * laneWidth + laneWidth * 0.2, this.y, this.width, this.height);
+        ctx.shadowBlur = 0;
+      }
     }
-    bnBall.style.display='block';
-    placeBall(bnPos);
-    bnMsgEl.textContent='🎯 Devine la balle !';
-    bnMixing=false;
-}
 
-bnMixBtn.addEventListener('click',()=>{ clickSound(); mixBn(); });
-bnCups.forEach((cup,i)=>{
-    cup.addEventListener('click',()=>{
-        if(bnMixing) return;
-        if(i===bnPos){ bnScore++; bnLevel++; bnMsgEl.textContent='✅ Bien joué !'; playNote(440,0.2); }
-        else{ bnScore=0; bnLevel=1; bnMsgEl.textContent='❌ Perdu !'; playNote(220,0.3,'sawtooth'); }
-        bnScoreEl.textContent=bnScore; bnLevelEl.textContent=bnLevel;
-        placeBall(Math.floor(Math.random()*3));
-    });
-});
-bnReset.addEventListener('click',()=>{
-    bnScore=0; bnLevel=1; bnScoreEl.textContent=0; bnLevelEl.textContent=1;
-    bnMsgEl.textContent='Regarde la balle, puis clique sur Mélanger.';
-    placeBall(Math.floor(Math.random()*3));
-});
-bnBack.addEventListener('click',()=>show('menu'));
-document.getElementById('openBon').addEventListener('click',()=>show('bon'));
-placeBall(Math.floor(Math.random()*3));
+    class Obstacle {
+      constructor(lane) {
+        this.lane = lane;
+        this.y = -50;
+        this.width = laneWidth * 0.6;
+        this.height = 40;
+        this.color = "red";
+      }
+      update() { this.y += speed; }
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "red";
+        ctx.fillRect(this.lane * laneWidth + laneWidth * 0.2, this.y, this.width, this.height);
+        ctx.shadowBlur = 0;
+      }
+    }
 
-// ================= Simon =================
-const pads=[...document.querySelectorAll('.pad')];
-const startSim=document.getElementById('startSim'), resetSim=document.getElementById('resetSim'), backMenuSim=document.getElementById('backMenuSim');
-const smLevelEl=document.getElementById('smLevel'), smScoreEl=document.getElementById('smScore'), smMsg=document.getElementById('smMsg');
+    class Coin {
+      constructor(lane) {
+        this.lane = lane;
+        this.y = -30;
+        this.size = 20;
+        this.color = "gold";
+      }
+      update() { this.y += speed; }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.lane * laneWidth + laneWidth / 2, this.y, this.size / 2, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "gold";
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
 
-let simSeq=[], simUser=[], simLevel=0, simScore=0, simPlaying=false;
+    class PowerUp {
+      constructor(lane, type) {
+        this.lane = lane;
+        this.y = -30;
+        this.size = 25;
+        this.type = type;
+      }
+      update() { this.y += speed; }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.lane * laneWidth + laneWidth / 2, this.y, this.size / 2, 0, Math.PI * 2);
+        ctx.fillStyle = (this.type === "slow") ? "blue" : (this.type === "magnet" ? "purple" : "green");
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
 
-function flashPad(idx){
-    pads[idx].classList.add('active');
-    const freqs=[261,329,392,523];
-    playNote(freqs[idx],0.3,'sawtooth');
-    setTimeout(()=>pads[idx].classList.remove('active'),300);
-}
+    function init() {
+      player = new Player();
+      obstacles = [];
+      coins = [];
+      powerUps = [];
+      score = 0;
+      lives = 3;
+      speed = 5;
+      frame = 0;
+      time = 0;
+      gameRunning = true;
+      paused = false;
+      document.getElementById("menu").style.display = "none";
+      loop();
+    }
 
-function nextRound(){
-    simUser=[];
-    simLevel++;
-    smLevelEl.textContent=simLevel;
-    smMsg.textContent='👀 Regarde la séquence...';
-    simSeq.push(Math.floor(Math.random()*pads.length));
-    simPlaying=false;
-    startSim.style.display='none';
-    simSeq.forEach((v,i)=>setTimeout(()=>flashPad(v),i*600));
-    setTimeout(()=>{ smMsg.textContent='👉 À toi !'; simPlaying=true; }, simSeq.length*600+400);
-}
+    function loop() {
+      if (!gameRunning || paused) return;
+      frame++;
+      time = Math.floor(frame / 60);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBackground();
 
-pads.forEach((pad,i)=>{
-    pad.addEventListener('click',()=>{
-        if(!simPlaying) return;
-        flashPad(i);
-        simUser.push(i);
-        if(simUser[simUser.length-1]!==simSeq[simUser.length-1]){
-            smMsg.textContent='❌ Perdu !'; playNote(150,0.3,'sawtooth');
-            simSeq=[]; simUser=[]; simLevel=0; simScore=0; smScoreEl.textContent=0; smLevelEl.textContent=0;
-            simPlaying=false; startSim.style.display='inline-block';
-        } else if(simUser.length===simSeq.length){
-            simScore+=simLevel*10; smScoreEl.textContent=simScore; playNote(880,0.2);
-            simPlaying=false; setTimeout(nextRound,800);
+      if (frame % 60 === 0) {
+        if (Math.random() < 0.6) obstacles.push(new Obstacle(Math.floor(Math.random() * laneCount)));
+        if (Math.random() < 0.4) coins.push(new Coin(Math.floor(Math.random() * laneCount)));
+        if (Math.random() < 0.1) {
+          const types = ["slow", "magnet", "double"];
+          powerUps.push(new PowerUp(Math.floor(Math.random() * laneCount), types[Math.floor(Math.random() * types.length)]));
         }
+      }
+
+      player.draw();
+
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        obstacles[i].update();
+        obstacles[i].draw();
+        if (collides(player, obstacles[i])) {
+          lives--;
+          obstacles.splice(i, 1);
+          if (lives <= 0) endGame();
+        } else if (obstacles[i].y > canvas.height) obstacles.splice(i, 1);
+      }
+
+      for (let i = coins.length - 1; i >= 0; i--) {
+        coins[i].update();
+        coins[i].draw();
+        if (collides(player, coins[i])) {
+          score += 10;
+          coins.splice(i, 1);
+        } else if (coins[i].y > canvas.height) coins.splice(i, 1);
+      }
+
+      for (let i = powerUps.length - 1; i >= 0; i--) {
+        powerUps[i].update();
+        powerUps[i].draw();
+        if (collides(player, powerUps[i])) {
+          activatePowerUp(powerUps[i].type);
+          powerUps.splice(i, 1);
+        } else if (powerUps[i].y > canvas.height) powerUps.splice(i, 1);
+      }
+
+      // HUD
+      document.getElementById("hud").innerHTML = `Score: ${score}<br>Vies: ${lives}<br>Temps: ${time}s`;
+
+            // Difficulté progressive
+      if (score % 100 === 0 && score !== 0) {
+        speed = Math.min(10, speed + 0.5);
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function collides(a, b) {
+      return (
+        a.lane === b.lane &&
+        b.y + (b.height || b.size) > a.y &&
+        b.y < a.y + a.height
+      );
+    }
+
+    function activatePowerUp(type) {
+      if (type === "slow") {
+        speed = 2;
+        setTimeout(() => speed = 5, 3000);
+      } else if (type === "magnet") {
+        for (let i = coins.length - 1; i >= 0; i--) score += 10;
+        coins = [];
+      } else if (type === "double") {
+        let old = score;
+        setTimeout(() => score += old, 3000);
+      }
+    }
+
+    function endGame() {
+      gameRunning = false;
+      alert(`Game Over! Score: ${score}`);
+      document.getElementById("menu").style.display = "block";
+    }
+
+    // Contrôles clavier
+    document.addEventListener("keydown", (e) => {
+      if (!gameRunning) return;
+      if (e.key === "ArrowLeft") player.moveLeft();
+      if (e.key === "ArrowRight") player.moveRight();
+      if (e.key.toLowerCase() === "p") {
+        paused = !paused;
+        if (!paused) loop();
+      }
     });
-});
 
-startSim.addEventListener('click',()=>{
-    clickSound();
-    simSeq=[]; simUser=[]; simLevel=0; simScore=0;
-    smScoreEl.textContent=0; smLevelEl.textContent=0;
-    nextRound();
-});
+    // Contrôles tactiles
+    let touchStartX = 0;
+    document.addEventListener("touchstart", (e) => {
+      touchStartX = e.touches[0].clientX;
+    });
+    document.addEventListener("touchend", (e) => {
+      let dx = e.changedTouches[0].clientX - touchStartX;
+      if (dx > 50) player.moveRight();
+      else if (dx < -50) player.moveLeft();
+    });
 
-resetSim.addEventListener('click',()=>{
-    simSeq=[]; simUser=[]; simLevel=0; simScore=0;
-    smScoreEl.textContent=0; smLevelEl.textContent=0;
-    smMsg.textContent='Prêt';
-    startSim.style.display='inline-block';
-});
+    // Boutons
+    document.getElementById("startBtn").addEventListener("click", () => {
+      init();
+    });
+    document.getElementById("playBtn").addEventListener("click", () => {
+      init();
+    });
+    document.getElementById("pauseBtn").addEventListener("click", () => {
+      paused = !paused;
+      if (!paused) loop();
+    });
 
-backMenuSim.addEventListener('click',()=>show('menu'));
-document.getElementById('openSim').addEventListener('click',()=>show('sim'));
-</script>
+    // Responsive canvas
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth * 0.8;
+      canvas.height = window.innerHeight * 0.7;
+    });
+  </script>
 </body>
 </html>
